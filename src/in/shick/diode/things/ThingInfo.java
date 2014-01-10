@@ -31,6 +31,7 @@ import android.text.Html;
 import android.text.SpannableString;
 
 import in.shick.diode.markdown.MarkdownURL;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * Class representing a thread posting in reddit API.
@@ -455,7 +456,8 @@ public class ThingInfo implements Serializable, Parcelable {
 		this.thumbnail = thumbnail;
 	}
 
-	public void setThumbnailBitmap(Bitmap thumbnailBitmap) {
+  @JsonIgnore
+  public void setThumbnailBitmap(Bitmap thumbnailBitmap) {
 		this.mThumbnailBitmap = thumbnailBitmap;
 	}
 	
