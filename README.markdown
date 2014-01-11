@@ -13,6 +13,7 @@ Code](http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl=market%3A%2F%2Fd
 Contributors
 ------------
 
+* icantrap ( fixed samsung android.graphics.Bitmap jackson crash )
 * John459 ( saved comments )
 * shobhitg ( potpourri of features and fixes )
 * primehunter326 ( search! )
