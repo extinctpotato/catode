@@ -57,14 +57,14 @@ public class Markdown {
     
     static final RunAutomaton inlineLinkAutomaton = new RunAutomaton(new RegExp("(" + // Whole match = $1
             "\\[([^\\]]*)\\]" + // Link text = $2
-            "\\(" +
+            " ?\\(" +
             "([^\\)\\\\]|(\\\\.))+" +  // 3 cases: 1. simple URL. 2. escaped right-paren in URL. 3. escaped anything in URL. 
             "\\)" +
             ")", RegExp.NONE).toAutomaton());
     // Use inlineLinkAutomaton to check for whole match, then use inlineLink to capture groups
     static final Pattern inlineLink = Pattern.compile("(" + // Whole match = $1
             "\\[(.*?)\\]" + // Link text = $2
-            "\\(" +
+            " ?\\(" +
             "[ \\t]*" +
             "<?(.*?)>?" + // href = $3
             "[ \\t]*" +
