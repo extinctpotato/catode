@@ -21,6 +21,8 @@ package in.shick.diode.submit;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -161,6 +163,11 @@ public class SubmitLinkActivity extends TabActivity {
     	mSettings.saveRedditPreferences(this);
 		CookieSyncManager.getInstance().stopSync();
     }
+
+  private class SubmissionProperties {
+    private String title = "";
+    private String url = "";
+  }
     
 	/**
 	 * Enable the UI after user is logged in.
@@ -168,69 +175,51 @@ public class SubmitLinkActivity extends TabActivity {
 	private void start() {
 		// Intents can be external (browser share page) or from Reddit is fun.
         String intentAction = getIntent().getAction();
-        if (Intent.ACTION_SEND.equals(intentAction)) {
-        	// Share
-	        Bundle extras = getIntent().getExtras();
-	        if (extras != null) {
-                        // find the most likely submission URL since some
-                        // programs share more than the URL
-                        // the most likely is considered to be the longest
-                        // string token with a URI scheme of http or https
-                        StringBuilder titleBuilder = new StringBuilder();
-                        String rawText = extras.getString(Intent.EXTRA_TEXT);
-                        StringTokenizer extraTextTokenizer = new StringTokenizer(rawText);
-                        Uri bestUri = Uri.parse("");
-                        while(extraTextTokenizer.hasMoreTokens()) {
-                            Uri uri = Uri.parse(extraTextTokenizer.nextToken());
-                            if(!"http".equalsIgnoreCase(uri.getScheme()) &&
-                                    !"https".equalsIgnoreCase(uri.getScheme())) {
-                                titleBuilder.append(uri.toString()).append(' ');
-                                continue;
-                            }
-                            if(uri.toString().length() > bestUri.toString().length()) {
-                                bestUri = uri;
-                            }
-                        }
-                        String url = bestUri.toString();
-                        String title = titleBuilder.toString();
-	        	final EditText submitLinkUrl = (EditText) findViewById(R.id.submit_link_url);
-	        	final EditText submitLinkReddit = (EditText) findViewById(R.id.submit_link_reddit);
-			final EditText submitLinkTitle = (EditText) findViewById(R.id.submit_link_title);
-	        	final EditText submitTextReddit = (EditText) findViewById(R.id.submit_text_reddit);
-	        	submitLinkUrl.setText(url);
-	        	submitLinkReddit.setText("");
-        		submitTextReddit.setText("");
-                        submitLinkTitle.setText(title);
-        		mSubmitUrl = Constants.REDDIT_BASE_URL + "/submit";
-	        }
+    if (Intent.ACTION_SEND.equals(intentAction)) {
+      // Share
+      Bundle extras = getIntent().getExtras();
+      SubmissionProperties submissionProperties = new SubmissionProperties();
+
+      boolean ignored = defaultExtractProperties(extras, submissionProperties) ||
+        lastDitchExtractProperties(extras, submissionProperties);
+
+      final EditText submitLinkUrl = (EditText) findViewById(R.id.submit_link_url);
+      final EditText submitLinkReddit = (EditText) findViewById(R.id.submit_link_reddit);
+      final EditText submitLinkTitle = (EditText) findViewById(R.id.submit_link_title);
+      final EditText submitTextReddit = (EditText) findViewById(R.id.submit_text_reddit);
+      submitLinkUrl.setText(submissionProperties.url);
+      submitLinkReddit.setText("");
+      submitTextReddit.setText("");
+      submitLinkTitle.setText(submissionProperties.title);
+      mSubmitUrl = Constants.REDDIT_BASE_URL + "/submit";
+    } else {
+      String submitPath = null;
+      Uri data = getIntent().getData();
+      if (data != null && Util.isRedditUri(data))
+        submitPath = data.getPath();
+      if (submitPath == null)
+        submitPath = "/submit";
+
+      // the URL to do HTTP POST to
+      mSubmitUrl = Util.absolutePathToURL(submitPath);
+
+      // Put the subreddit in the text field
+      final EditText submitLinkReddit = (EditText) findViewById(R.id.submit_link_reddit);
+      final EditText submitTextReddit = (EditText) findViewById(R.id.submit_text_reddit);
+      Matcher m = SUBMIT_PATH_PATTERN.matcher(submitPath);
+      if (m.matches()) {
+        String subreddit = m.group(1);
+        if (StringUtils.isEmpty(subreddit)) {
+          submitLinkReddit.setText("");
+          submitTextReddit.setText("");
         } else {
-        	String submitPath = null;
-        	Uri data = getIntent().getData();
-        	if (data != null && Util.isRedditUri(data))
-        		submitPath = data.getPath();
-        	if (submitPath == null)
-    			submitPath = "/submit";
-        	
-        	// the URL to do HTTP POST to
-        	mSubmitUrl = Util.absolutePathToURL(submitPath);
-        	
-        	// Put the subreddit in the text field
-        	final EditText submitLinkReddit = (EditText) findViewById(R.id.submit_link_reddit);
-        	final EditText submitTextReddit = (EditText) findViewById(R.id.submit_text_reddit);
-        	Matcher m = SUBMIT_PATH_PATTERN.matcher(submitPath);
-        	if (m.matches()) {
-        		String subreddit = m.group(1);
-        		if (StringUtils.isEmpty(subreddit)) {
-            		submitLinkReddit.setText("");
-            		submitTextReddit.setText("");
-        		} else {
-		        	submitLinkReddit.setText(subreddit);
-		        	submitTextReddit.setText(subreddit);
-		    	}
-        	}
+          submitLinkReddit.setText(subreddit);
+          submitTextReddit.setText(subreddit);
         }
-        
-        final Button submitLinkButton = (Button) findViewById(R.id.submit_link_button);
+      }
+    }
+
+    final Button submitLinkButton = (Button) findViewById(R.id.submit_link_button);
         submitLinkButton.setOnClickListener(new OnClickListener() {
         	public void onClick(View v) {
         		if (validateLinkForm()) {
@@ -266,8 +255,65 @@ public class SubmitLinkActivity extends TabActivity {
         // Check the CAPTCHA
         new MyCaptchaCheckRequiredTask().execute();
 	}
-	
-	private void returnStatus(int status) {
+
+  private boolean defaultExtractProperties(Bundle extras, SubmissionProperties properties) {
+    if (null == extras) {
+      return false;
+    }
+
+    String url = extras.getString(Intent.EXTRA_TEXT);
+    String title = extras.getString(Intent.EXTRA_SUBJECT);
+
+    if ((null == url) || (null == title)) {
+      return false;
+    }
+
+    try {
+      new URL(url);
+    }
+    catch (MalformedURLException e) {
+      return false;
+    }
+
+    properties.url = url;
+    properties.title = title;
+
+    return true;
+  }
+
+  private boolean lastDitchExtractProperties(Bundle extras, SubmissionProperties properties) {
+    if (extras != null) {
+      // find the most likely submission URL since some
+      // programs share more than the URL
+      // the most likely is considered to be the longest
+      // string token with a URI scheme of http or https
+      StringBuilder titleBuilder = new StringBuilder();
+      String rawText = extras.getString(Intent.EXTRA_TEXT);
+      StringTokenizer extraTextTokenizer = new StringTokenizer(rawText);
+      Uri bestUri = Uri.parse("");
+      while (extraTextTokenizer.hasMoreTokens()) {
+        Uri uri = Uri.parse(extraTextTokenizer.nextToken());
+        if (!"http".equalsIgnoreCase(uri.getScheme()) &&
+          !"https".equalsIgnoreCase(uri.getScheme())) {
+          titleBuilder.append(uri.toString()).append(' ');
+          continue;
+        }
+        if (uri.toString().length() > bestUri.toString().length()) {
+          bestUri = uri;
+        }
+      }
+
+      properties = new SubmissionProperties();
+      properties.url = bestUri.toString();
+      properties.title = titleBuilder.toString();
+
+      return true;
+    }
+
+    return false;
+  }
+
+  private void returnStatus(int status) {
 		Intent i = new Intent();
 		setResult(status, i);
 		finish();
