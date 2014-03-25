@@ -1350,7 +1350,9 @@ public class CommentsListActivity extends ListActivity
             break;
     	case R.id.refresh_menu_id:
     		CacheInfo.invalidateCachedThread(getApplicationContext());
-    		getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+			DownloadCommentsTask downloadCommentsTask = getNewDownloadCommentsTask();
+			if(downloadCommentsTask.getStatus() != AsyncTask.Status.RUNNING)
+				downloadCommentsTask.execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
     		break;
     	case R.id.sort_by_menu_id:
     		showDialog(Constants.DIALOG_SORT_BY);
