@@ -482,8 +482,14 @@ public final class ThreadsListActivity extends ListActivity {
         String domain = item.getDomain();
         if (domain == null)
         	domain = "";
-        int domainLen = domain.length();
-        SpannableString domainSS = new SpannableString("("+item.getDomain()+")");
+        String flair = item.getLink_flair_text();
+        if(flair == null) {
+            flair = "";
+        } else {
+            flair = "[" + flair + "] ";
+        }
+        int domainLen = domain.length() + flair.length();
+        SpannableString domainSS = new SpannableString(flair+"("+item.getDomain()+")");
         domainSS.setSpan(new TextAppearanceSpan(activity,
         		Util.getTextAppearanceResource(settings.getTheme(), android.R.style.TextAppearance_Small)),
         		0, domainLen+2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
