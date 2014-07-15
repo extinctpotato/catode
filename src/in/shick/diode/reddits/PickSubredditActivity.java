@@ -480,6 +480,9 @@ public final class PickSubredditActivity extends ListActivity {
                 refresh = true;
                 new DownloadRedditsTask().execute();
                 break;
+            case R.id.random_subreddit:
+                returnSubreddit("random");
+                break;
 
             default:
                 throw new IllegalArgumentException("Unexpected action value "+item.getItemId());
