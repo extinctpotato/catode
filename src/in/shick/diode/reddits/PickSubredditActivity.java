@@ -100,6 +100,7 @@ public final class PickSubredditActivity extends ListActivity {
 
     public static final String[] DEFAULT_SUBREDDITS = {
         Constants.FRONTPAGE_STRING,
+        "all",
         "diode",
         "pics",
         "funny",
@@ -311,6 +312,10 @@ public final class PickSubredditActivity extends ListActivity {
                     SubredditInfo fp = new SubredditInfo();
                     fp.name = Constants.FRONTPAGE_STRING;
                     reddits.add(0, fp);
+                    // insert /r/all as well (this is a really gross way to do these. . .)
+                    fp = new SubredditInfo();
+                    fp.name = "all";
+                    reddits.add(1, fp);
                     CacheInfo.setCachedSubredditList(getApplicationContext(), reddits);
                     refresh = false;
                 } else {
