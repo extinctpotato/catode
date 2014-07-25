@@ -71,8 +71,10 @@ public class BrowserActivity extends Activity {
         resetUI();
 		WebSettings settings = webview.getSettings();
 		settings.setBuiltInZoomControls(true);
-		settings.setPluginsEnabled(true);
-		settings.setJavaScriptEnabled(true);
+        //browsersettings
+        settings.setUserAgentString(mSettings.getUseragent());
+	    //settings.setPluginsEnabled(mSettings.isLoadPlugins());
+		settings.setJavaScriptEnabled(mSettings.isLoadJavascript());
 		settings.setUseWideViewPort(true);
 		trySetDomStorageEnabled(settings);
 		trySetLoadWithOverviewMode(settings);
@@ -142,6 +144,11 @@ public class BrowserActivity extends Activity {
 				Log.e(TAG, "trySetDomStorageEnabled", ex);
 			}
 		}
+	}
+
+	private void trySetUserAgentEnabled(WebSettings settings) {
+		settings.setUserAgentString("Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile");
+
 	}
 	
 	private void trySetLoadWithOverviewMode(WebSettings settings) {
