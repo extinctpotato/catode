@@ -291,7 +291,16 @@ public class Constants {
     // Preference keys and values
     public static final String PREF_HOMEPAGE = "homepage";
     public static final String PREF_USE_EXTERNAL_BROWSER = "use_external_browser";
+
     public static final String PREF_CONFIRM_QUIT = "confirm_quit";
+
+    //browsersettings
+    public static final String BROWSER_UA_STRING = "Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile";
+    public static final String BROWSER_UA = "useragent";
+
+    public static final String PREF_LOAD_JS = "load_javascript";
+    public static final String PREF_LOAD_PLUGINS = "load_plugins";
+
     public static final String PREF_SAVE_HISTORY = "save_history";
     public static final String PREF_ALWAYS_SHOW_NEXT_PREVIOUS = "always_show_next_previous";
     public static final String PREF_COMMENTS_SORT_BY_URL = "sort_by_url";
