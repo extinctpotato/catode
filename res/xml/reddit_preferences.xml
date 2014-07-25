@@ -124,4 +124,19 @@
 			android:dependency="load_thumbnails" />
 	</PreferenceCategory>
 
+ <PreferenceCategory android:title="@string/pref_browser">
+
+    <EditTextPreference
+        android:key="useragent"
+        android:title="@string/pref_useragent"
+        android:inputType="text"
+        android:defaultValue="@string/pref_useragent_string"
+        android:singleLine="true" />
+    </PreferenceCategory>
+
+    <CheckBoxPreference
+        android:key="load_javascript"
+        android:defaultValue="true"
+        android:title="@string/pref_load_javascript" />
+
 </PreferenceScreen>
