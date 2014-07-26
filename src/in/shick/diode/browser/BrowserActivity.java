@@ -71,8 +71,10 @@ public class BrowserActivity extends Activity {
         resetUI();
 		WebSettings settings = webview.getSettings();
 		settings.setBuiltInZoomControls(true);
-		settings.setPluginsEnabled(true);
-		settings.setJavaScriptEnabled(true);
+		settings.setJavaScriptEnabled(mSettings.isLoadJavascript());
+        if (mSettings.isOverwriteUA())
+            settings.setUserAgentString(mSettings.getUseragent());
+
 		settings.setUseWideViewPort(true);
 		trySetDomStorageEnabled(settings);
 		trySetLoadWithOverviewMode(settings);

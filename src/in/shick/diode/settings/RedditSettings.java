@@ -53,33 +53,39 @@ public class RedditSettings {
 	private Cookie redditSessionCookie = null;
 	private String modhash = null;
 	private String homepage = Constants.FRONTPAGE_STRING;
+
 	private boolean useExternalBrowser = false;
 	private boolean showCommentGuideLines = true;
 	private boolean confirmQuitOrLogout = true;
 	private boolean saveHistory = true;
 	private boolean alwaysShowNextPrevious = true;
-	
+
+    private String useragent = Constants.BROWSER_UA_STRING;
+    private boolean loadJavascript = true;
+    private boolean loadPlugins = true;
+    private boolean overWriteUA = false;
+
 	private int threadDownloadLimit = Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT;
 	private String commentsSortByUrl = Constants.CommentsSort.SORT_BY_BEST_URL;
-	
+
     private boolean showNSFW = false;
-	
+
 	// --- Themes ---
 	private int theme = R.style.Reddit_Light_Medium;
 	private int rotation = -1;  // -1 means unspecified
 	private boolean loadThumbnails = true;
 	private boolean loadThumbnailsOnlyWifi = false;
-	
+
 	private String mailNotificationStyle = Constants.PREF_MAIL_NOTIFICATION_STYLE_DEFAULT;
 	private String mailNotificationService = Constants.PREF_MAIL_NOTIFICATION_SERVICE_OFF;
-	
+
 	private ArrayList<SubredditFilter> filters = new ArrayList<SubredditFilter>();
-	
-	
+
+
 	//
 	// --- Methods ---
 	//
-	
+
 	// --- Preferences ---
 	public static class Rotation {
 		/* From http://developer.android.com/reference/android/R.attr.html#screenOrientation
@@ -113,11 +119,11 @@ public class RedditSettings {
 			}
 		}
 	}
-	
+
     public void saveRedditPreferences(Context context) {
     	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor editor = settings.edit();
-    	
+
     	// Session
     	if (this.username != null)
     		editor.putString("username", this.username);
@@ -132,10 +138,16 @@ public class RedditSettings {
     	}
     	if (this.modhash != null)
     		editor.putString("modhash", this.modhash.toString());
-    	
+
     	// Default subreddit
     	editor.putString(Constants.PREF_HOMEPAGE, this.homepage.toString());
-    	
+
+    	// browsersettings
+        editor.putBoolean(Constants.PREF_OVERWRITE_UA, this.overWriteUA);
+        editor.putString(Constants.BROWSER_UA_STRING, this.useragent.toString());
+        editor.putBoolean(Constants.PREF_LOAD_JS, this.loadJavascript);
+        editor.putBoolean(Constants.PREF_LOAD_PLUGINS, this.loadPlugins);
+
     	// Use external browser instead of BrowserActivity
     	editor.putBoolean(Constants.PREF_USE_EXTERNAL_BROWSER, this.useExternalBrowser);
 
@@ -144,42 +156,42 @@ public class RedditSettings {
 
     	// Save reddit history to Browser history
     	editor.putBoolean(Constants.PREF_SAVE_HISTORY, this.saveHistory);
-    	
+
     	// Whether to always show the next/previous buttons, or only at bottom of list
     	editor.putBoolean(Constants.PREF_ALWAYS_SHOW_NEXT_PREVIOUS, this.alwaysShowNextPrevious);
-    	
+
     	// Comments sort order
     	editor.putString(Constants.PREF_COMMENTS_SORT_BY_URL, this.commentsSortByUrl);
-    	
+
     	// Theme and text size
     	String[] themeTextSize = Util.getPrefsFromThemeResource(this.theme);
     	editor.putString(Constants.PREF_THEME, themeTextSize[0]);
     	editor.putString(Constants.PREF_TEXT_SIZE, themeTextSize[1]);
-    	
+
     	// Comment guide lines
     	editor.putBoolean(Constants.PREF_SHOW_COMMENT_GUIDE_LINES, this.showCommentGuideLines);
-    	
-    	
+
+
     	// Rotation
     	editor.putString(Constants.PREF_ROTATION, RedditSettings.Rotation.toString(this.rotation));
-    	
+
     	// Thumbnails
     	editor.putBoolean(Constants.PREF_LOAD_THUMBNAILS, this.loadThumbnails);
     	editor.putBoolean(Constants.PREF_LOAD_THUMBNAILS_ONLY_WIFI, this.loadThumbnailsOnlyWifi);
-    	
+
     	// Notifications
     	editor.putString(Constants.PREF_MAIL_NOTIFICATION_STYLE, this.mailNotificationStyle);
     	editor.putString(Constants.PREF_MAIL_NOTIFICATION_SERVICE, this.mailNotificationService);
-    	
+
     	// Show NSFW
     	editor.putBoolean(Constants.PREF_SHOW_NSFW, this.showNSFW);
-    	
+
     	// Filters
     	editor.putString(Constants.PREF_REDDIT_FILTERS, getFilterString());
     	editor.commit();
     }
-    
-    
+
+
 	public void loadRedditPreferences(Context context, HttpClient client) {
         // Session
     	SharedPreferences sessionPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -205,14 +217,20 @@ public class RedditSettings {
     			if (Constants.LOGGING) Log.e(TAG, "CookieSyncManager.getInstance().sync()", ex);
     		}
         }
-        
+
         // Default subreddit
         String homepage = sessionPrefs.getString(Constants.PREF_HOMEPAGE, Constants.FRONTPAGE_STRING).trim();
         if (StringUtils.isEmpty(homepage))
         	this.setHomepage(Constants.FRONTPAGE_STRING);
         else
         	this.setHomepage(homepage);
-        
+
+        //Browser Settings
+        this.setOverwriteUA(sessionPrefs.getBoolean(Constants.PREF_OVERWRITE_UA, false));
+        this.setUseragent(sessionPrefs.getString(Constants.BROWSER_UA,Constants.BROWSER_UA_STRING));
+        this.setLoadJS(sessionPrefs.getBoolean(Constants.PREF_LOAD_JS, true));
+        this.setLoadPlugins(sessionPrefs.getBoolean(Constants.PREF_LOAD_PLUGINS, true));
+
     	// Use external browser instead of BrowserActivity
         this.setUseExternalBrowser(sessionPrefs.getBoolean(Constants.PREF_USE_EXTERNAL_BROWSER, false));
 
@@ -307,6 +325,7 @@ public class RedditSettings {
 		this.homepage = homepage;
 	}
 
+
 	public boolean isUseExternalBrowser() {
 		return useExternalBrowser;
 	}
@@ -370,6 +389,40 @@ public class RedditSettings {
 	public void setTheme(int theme) {
 		this.theme = theme;
 	}
+
+    //browsersettings
+    public void setUseragent(String ua) {
+           this.useragent = ua;
+       }
+
+    public String getUseragent() {
+        return useragent;
+    }
+
+    public void setOverwriteUA(boolean overwriteUA) {
+        this.overWriteUA = overwriteUA;
+    }
+
+    public void setLoadJS(boolean LoadJS) {
+        this.loadJavascript = LoadJS;
+    }
+
+    public void setLoadPlugins(boolean LoadPlugins) {
+        this.loadPlugins = LoadPlugins;
+    }
+
+    public boolean isOverwriteUA() {
+        return overWriteUA;
+    }
+
+    public boolean isLoadJavascript() {
+        return loadJavascript;
+    }
+
+    public boolean isLoadPlugins() {
+        return loadPlugins;
+    }
+
 
 	public int getRotation() {
 		return rotation;
