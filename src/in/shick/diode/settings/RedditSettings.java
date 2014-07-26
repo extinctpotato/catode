@@ -54,17 +54,17 @@ public class RedditSettings {
 	private String modhash = null;
 	private String homepage = Constants.FRONTPAGE_STRING;
 
-    // browsersettings
-    private String useragent = Constants.BROWSER_UA_STRING;
-    private boolean loadJavascript = true;
-    private boolean loadPlugins = true;
-
-
 	private boolean useExternalBrowser = false;
 	private boolean showCommentGuideLines = true;
 	private boolean confirmQuitOrLogout = true;
 	private boolean saveHistory = true;
 	private boolean alwaysShowNextPrevious = true;
+
+    //browsersettings
+    private String useragent = Constants.BROWSER_UA_STRING;
+    private boolean loadJavascript = true;
+    private boolean loadPlugins = true;
+    private boolean overWriteUA = false;
 
 	private int threadDownloadLimit = Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT;
 	private String commentsSortByUrl = Constants.CommentsSort.SORT_BY_BEST_URL;
@@ -144,6 +144,7 @@ public class RedditSettings {
     	editor.putString(Constants.PREF_HOMEPAGE, this.homepage.toString());
 
     	// browsersettings
+        editor.putBoolean(Constants.PREF_OVERWRITE_UA, this.overWriteUA);
         editor.putString(Constants.BROWSER_UA_STRING, this.useragent.toString());
         editor.putBoolean(Constants.PREF_LOAD_JS, this.loadJavascript);
         editor.putBoolean(Constants.PREF_LOAD_PLUGINS, this.loadPlugins);
@@ -226,6 +227,7 @@ public class RedditSettings {
         	this.setHomepage(homepage);
 
         //browsersettings
+        this.setOverwriteUA(sessionPrefs.getBoolean(Constants.PREF_OVERWRITE_UA, true));
         this.setUseragent(sessionPrefs.getString(Constants.BROWSER_UA,Constants.BROWSER_UA_STRING));
         this.setLoadJS(sessionPrefs.getBoolean(Constants.PREF_LOAD_JS, true));
         this.setLoadPlugins(sessionPrefs.getBoolean(Constants.PREF_LOAD_PLUGINS, true));
@@ -393,17 +395,25 @@ public class RedditSettings {
     public void setUseragent(String ua) {
            this.useragent = ua;
        }
+
     public String getUseragent() {
         return useragent;
+    }
+
+    public void setOverwriteUA(boolean overwriteUA) {
+        this.overWriteUA = overwriteUA;
     }
 
     public void setLoadJS(boolean LoadJS) {
         this.loadJavascript = LoadJS;
     }
 
-
     public void setLoadPlugins(boolean LoadPlugins) {
         this.loadPlugins = LoadPlugins;
+    }
+
+    public boolean isOverwriteUA() {
+        return overWriteUA;
     }
 
     public boolean isLoadJavascript() {
@@ -414,8 +424,6 @@ public class RedditSettings {
         return loadPlugins;
     }
 
-
-    //browsersettings
 
 	public int getRotation() {
 		return rotation;

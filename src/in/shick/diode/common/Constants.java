@@ -294,10 +294,9 @@ public class Constants {
 
     public static final String PREF_CONFIRM_QUIT = "confirm_quit";
 
-    //browsersettings
+    public static final String PREF_OVERWRITE_UA = "overwrite_useragent";
     public static final String BROWSER_UA_STRING = "Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile";
     public static final String BROWSER_UA = "useragent";
-
     public static final String PREF_LOAD_JS = "load_javascript";
     public static final String PREF_LOAD_PLUGINS = "load_plugins";
 
