@@ -180,15 +180,14 @@
 
     <!-- === Browser settings === -->
     <string name="pref_browser">Browser settings</string>
-    <string name="pref_useragent">User agent</string>
-
+    <string name="pref_useragent">User-Agent string</string>
     <string name="pref_useragent_string">Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile</string>
-
-    <string name="pref_load_javascript">Load javascript</string>
-    <string name="pref_load_plugins">Load plugins</string>
-    <!-- === Browser settings === -->
+    <string name="pref_overwrite_useragent">Overwrite User-Agent</string>
+    <string name="pref_load_javascript">Load Javascript</string>
+    <string name="pref_load_plugins">Load Plugins</string>
 
 	<string name="pref_homepage">Default starting reddit</string>
+
 	<string name="pref_homepage_hint">Leave blank to use default</string>
 	
 	<string name="pref_use_external_browser">Use external browser</string>

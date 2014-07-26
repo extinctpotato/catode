@@ -126,12 +126,18 @@
 
  <PreferenceCategory android:title="@string/pref_browser">
 
+     <CheckBoxPreference
+         android:key="overwrite_useragent"
+         android:defaultValue="false"
+         android:title="@string/pref_overwrite_useragent" />
+
     <EditTextPreference
         android:key="useragent"
         android:title="@string/pref_useragent"
         android:inputType="text"
         android:defaultValue="@string/pref_useragent_string"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:dependency="overwrite_useragent" />
     </PreferenceCategory>
 
     <CheckBoxPreference
