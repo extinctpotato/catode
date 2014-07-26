@@ -145,11 +145,6 @@ public class BrowserActivity extends Activity {
 			}
 		}
 	}
-
-	private void trySetUserAgentEnabled(WebSettings settings) {
-		settings.setUserAgentString("Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile");
-
-	}
 	
 	private void trySetLoadWithOverviewMode(WebSettings settings) {
 		if (mWebSettings_setLoadWithOverviewMode != null) {
