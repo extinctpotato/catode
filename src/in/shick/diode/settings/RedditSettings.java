@@ -60,7 +60,6 @@ public class RedditSettings {
 	private boolean saveHistory = true;
 	private boolean alwaysShowNextPrevious = true;
 
-    //browsersettings
     private String useragent = Constants.BROWSER_UA_STRING;
     private boolean loadJavascript = true;
     private boolean loadPlugins = true;
@@ -226,8 +225,8 @@ public class RedditSettings {
         else
         	this.setHomepage(homepage);
 
-        //browsersettings
-        this.setOverwriteUA(sessionPrefs.getBoolean(Constants.PREF_OVERWRITE_UA, true));
+        //Browser Settings
+        this.setOverwriteUA(sessionPrefs.getBoolean(Constants.PREF_OVERWRITE_UA, false));
         this.setUseragent(sessionPrefs.getString(Constants.BROWSER_UA,Constants.BROWSER_UA_STRING));
         this.setLoadJS(sessionPrefs.getBoolean(Constants.PREF_LOAD_JS, true));
         this.setLoadPlugins(sessionPrefs.getBoolean(Constants.PREF_LOAD_PLUGINS, true));
