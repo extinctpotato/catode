@@ -142,15 +142,29 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     		if (mSubreddit != null) {
     			sb.append("/r/").append(mSubreddit.trim());
     		}
-    		sb.append("/comments/")
-        		.append(mThreadId)
-        		.append("/z/").append(mMoreChildrenId).append("/.json?")
-        		.append(mSettings.getCommentsSortByUrl()).append("&");
-        	if (mJumpToCommentContext != 0)
-        		sb.append("context=").append(mJumpToCommentContext).append("&");
+			if (mMoreChildrenId != null && mMoreChildrenId.length() > 0) {
+				sb.append("/comments/")
+						.append(mThreadId)
+						.append("/z/").append(mMoreChildrenId).append("/.json?")
+						.append(mSettings.getCommentsSortByUrl()).append("&");
+				if (mJumpToCommentContext != 0) {
+					sb.append("context=").append(mJumpToCommentContext).append("&");
+				}
+			} else {
+				sb.append("/comments/")
+						.append(mThreadId)
+						.append("/.json?")
+						.append(mSettings.getCommentsSortByUrl());
+				if (mJumpToCommentId != null && mJumpToCommentId.length() > 0 && mJumpToCommentContext != 0) {
+					sb.append("&comment=")
+						.append(mJumpToCommentId)
+						.append("&context=")
+						.append(mJumpToCommentContext);
+				}
+			}
         	
         	String url = sb.toString();
-        	
+			if (Constants.LOGGING) Log.d(TAG, "Loading comments from URL: " + url);
         	InputStream in = null;
     		boolean currentlyUsingCache = false;
     		
