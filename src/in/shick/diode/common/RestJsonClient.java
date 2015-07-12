@@ -21,7 +21,7 @@ public class RestJsonClient {
         HttpClient httpclient = RedditIsFunHttpClientFactory.getGzipHttpClient();
 
         // Prepare a request object
-        HttpGet httpget = new HttpGet(url); 
+        HttpGet httpget = new HttpGet(url);
 
         // Execute the request
         HttpResponse response;
@@ -39,7 +39,7 @@ public class RestJsonClient {
                 InputStream instream = entity.getContent();
 
                 data = json.readValue(instream, JsonNode.class);
-                
+
                 instream.close();
             }
 

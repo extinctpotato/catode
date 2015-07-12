@@ -6,186 +6,186 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class UserInfo implements Serializable, Parcelable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private Boolean has_mail;
-	private String name;
-	private boolean is_friend;
-	private long created;
-	private String modhash;
-	private long created_utc;
-	private int link_karma;
-	private int comment_karma;
-	private boolean is_gold;
-	private boolean is_mod;
-	private String id;
-	private Boolean has_mod_mail;
-        private boolean over_18;
-	
-	public UserInfo() {
-		super();
-	}
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Use dest.writeValue for fields that may be null
-	 */
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeValue(has_mail);
-		dest.writeString(name);
-		dest.writeLong(created);
-		dest.writeValue(modhash);
-		dest.writeLong(created_utc);
-		dest.writeInt(link_karma);
-		dest.writeInt(comment_karma);
-		dest.writeString(id);
-		dest.writeValue(has_mod_mail);
-		
-		boolean booleans[] = new boolean[4];
-		booleans[0] = is_gold;
-		booleans[1] = is_mod;
-		booleans[2] = is_friend;
-		booleans[3] = over_18;
-		dest.writeBooleanArray(booleans);
-	}
-	
-	public static final Parcelable.Creator<UserInfo> CREATOR = new Parcelable.Creator<UserInfo>() {
-		public UserInfo createFromParcel(Parcel in) {
-		    return new UserInfo(in);
-		}
-		
-		public UserInfo[] newArray(int size) {
-		    return new UserInfo[size];
-		}
-	};
-		
-	private UserInfo(Parcel in) {
-		has_mail      = (Boolean) in.readValue(null);
-		name          = in.readString();
-		created       = in.readLong();
-		modhash       = (String) in.readValue(null);
-		created_utc   = in.readLong();
-		link_karma    = in.readInt();
-		comment_karma = in.readInt();
-		id            = in.readString();
-		has_mod_mail  = (Boolean) in.readValue(null);
-		
-		boolean booleans[] = new boolean[2];
-		in.readBooleanArray(booleans);
-		is_gold   = booleans[0];
-		is_mod    = booleans[1];
-		is_friend = booleans[2];
-		over_18 = booleans[3];
-	}
+    private Boolean has_mail;
+    private String name;
+    private boolean is_friend;
+    private long created;
+    private String modhash;
+    private long created_utc;
+    private int link_karma;
+    private int comment_karma;
+    private boolean is_gold;
+    private boolean is_mod;
+    private String id;
+    private Boolean has_mod_mail;
+    private boolean over_18;
 
-	public boolean isHas_mail() {
-		return has_mail;
-	}
+    public UserInfo() {
+        super();
+    }
 
-	public void setHas_mail(boolean has_mail) {
-		this.has_mail = has_mail;
-	}
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * Use dest.writeValue for fields that may be null
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(has_mail);
+        dest.writeString(name);
+        dest.writeLong(created);
+        dest.writeValue(modhash);
+        dest.writeLong(created_utc);
+        dest.writeInt(link_karma);
+        dest.writeInt(comment_karma);
+        dest.writeString(id);
+        dest.writeValue(has_mod_mail);
 
-	public void setName(String name) {
-		this.name = name;
-	}
+        boolean booleans[] = new boolean[4];
+        booleans[0] = is_gold;
+        booleans[1] = is_mod;
+        booleans[2] = is_friend;
+        booleans[3] = over_18;
+        dest.writeBooleanArray(booleans);
+    }
 
-	public long getCreated() {
-		return created;
-	}
+    public static final Parcelable.Creator<UserInfo> CREATOR = new Parcelable.Creator<UserInfo>() {
+        public UserInfo createFromParcel(Parcel in) {
+            return new UserInfo(in);
+        }
 
-	public void setCreated(long created) {
-		this.created = created;
-	}
+        public UserInfo[] newArray(int size) {
+            return new UserInfo[size];
+        }
+    };
 
-	public String getModhash() {
-		return modhash;
-	}
+    private UserInfo(Parcel in) {
+        has_mail      = (Boolean) in.readValue(null);
+        name          = in.readString();
+        created       = in.readLong();
+        modhash       = (String) in.readValue(null);
+        created_utc   = in.readLong();
+        link_karma    = in.readInt();
+        comment_karma = in.readInt();
+        id            = in.readString();
+        has_mod_mail  = (Boolean) in.readValue(null);
 
-	public void setModhash(String modhash) {
-		this.modhash = modhash;
-	}
+        boolean booleans[] = new boolean[2];
+        in.readBooleanArray(booleans);
+        is_gold   = booleans[0];
+        is_mod    = booleans[1];
+        is_friend = booleans[2];
+        over_18 = booleans[3];
+    }
 
-	public long getCreated_utc() {
-		return created_utc;
-	}
+    public boolean isHas_mail() {
+        return has_mail;
+    }
 
-	public void setCreated_utc(long created_utc) {
-		this.created_utc = created_utc;
-	}
+    public void setHas_mail(boolean has_mail) {
+        this.has_mail = has_mail;
+    }
 
-	public int getLink_karma() {
-		return link_karma;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setLink_karma(int link_karma) {
-		this.link_karma = link_karma;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public int getComment_karma() {
-		return comment_karma;
-	}
+    public long getCreated() {
+        return created;
+    }
 
-	public void setComment_karma(int comment_karma) {
-		this.comment_karma = comment_karma;
-	}
+    public void setCreated(long created) {
+        this.created = created;
+    }
 
-	public boolean isIs_gold() {
-		return is_gold;
-	}
+    public String getModhash() {
+        return modhash;
+    }
 
-	public void setIs_gold(boolean is_gold) {
-		this.is_gold = is_gold;
-	}
+    public void setModhash(String modhash) {
+        this.modhash = modhash;
+    }
 
-	public boolean isIs_mod() {
-		return is_mod;
-	}
+    public long getCreated_utc() {
+        return created_utc;
+    }
 
-	public void setIs_mod(boolean is_mod) {
-		this.is_mod = is_mod;
-	}
+    public void setCreated_utc(long created_utc) {
+        this.created_utc = created_utc;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public int getLink_karma() {
+        return link_karma;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setLink_karma(int link_karma) {
+        this.link_karma = link_karma;
+    }
 
-	public boolean isHas_mod_mail() {
-		return has_mod_mail;
-	}
+    public int getComment_karma() {
+        return comment_karma;
+    }
 
-	public void setHas_mod_mail(boolean has_mod_mail) {
-		this.has_mod_mail = has_mod_mail;
-	}
+    public void setComment_karma(int comment_karma) {
+        this.comment_karma = comment_karma;
+    }
 
-	public void setIs_friend(boolean input) {
-		this.is_friend = input;
-	}
+    public boolean isIs_gold() {
+        return is_gold;
+    }
 
-	public boolean isIs_friend() {
-		return is_friend;
-	}
+    public void setIs_gold(boolean is_gold) {
+        this.is_gold = is_gold;
+    }
 
-	public void setOver_18(boolean input) {
-		this.over_18 = input;
-	}
+    public boolean isIs_mod() {
+        return is_mod;
+    }
 
-	public boolean isOver_18() {
-		return over_18;
-	}
-	
+    public void setIs_mod(boolean is_mod) {
+        this.is_mod = is_mod;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isHas_mod_mail() {
+        return has_mod_mail;
+    }
+
+    public void setHas_mod_mail(boolean has_mod_mail) {
+        this.has_mod_mail = has_mod_mail;
+    }
+
+    public void setIs_friend(boolean input) {
+        this.is_friend = input;
+    }
+
+    public boolean isIs_friend() {
+        return is_friend;
+    }
+
+    public void setOver_18(boolean input) {
+        this.over_18 = input;
+    }
+
+    public boolean isOver_18() {
+        return over_18;
+    }
+
 }

@@ -10,15 +10,15 @@ import android.preference.PreferenceManager;
 
 public class BootAlarmSetter extends BroadcastReceiver {
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		SharedPreferences sessionPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String mailNotificationPref = sessionPrefs.getString(Constants.PREF_MAIL_NOTIFICATION_SERVICE, Constants.PREF_MAIL_NOTIFICATION_SERVICE_OFF);
-		
-		if (!Constants.PREF_MAIL_NOTIFICATION_SERVICE_OFF.equals(mailNotificationPref)) {
-			Intent envelopeIntent = new Intent(context, EnvelopeService.class);
-			context.startService(envelopeIntent);
-		}
-	}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        SharedPreferences sessionPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String mailNotificationPref = sessionPrefs.getString(Constants.PREF_MAIL_NOTIFICATION_SERVICE, Constants.PREF_MAIL_NOTIFICATION_SERVICE_OFF);
+
+        if (!Constants.PREF_MAIL_NOTIFICATION_SERVICE_OFF.equals(mailNotificationPref)) {
+            Intent envelopeIntent = new Intent(context, EnvelopeService.class);
+            context.startService(envelopeIntent);
+        }
+    }
 
 }

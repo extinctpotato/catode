@@ -40,7 +40,7 @@ import android.os.SystemClock;
  * This is an example of implementing an application service that will run in
  * response to an alarm, allowing us to move long duration work out of an
  * intent receiver.
- * 
+ *
  * @see AlarmService
  * @see AlarmService_Alarm
  */
@@ -55,16 +55,16 @@ public class EnvelopeService extends Service {
         mSettings.loadRedditPreferences(this, mClient);
         new PeekEnvelopeServiceTask(this, mClient, mSettings.getMailNotificationStyle()).execute();
     }
-    
+
     private class PeekEnvelopeServiceTask extends PeekEnvelopeTask {
-    	public PeekEnvelopeServiceTask(Context context, HttpClient client, String mailNotificationStyle) {
-    		super(context, client, mailNotificationStyle);
-    	}
-    	@Override
-    	public void onPostExecute(Object count) {
-    		super.onPostExecute(count);
-    		EnvelopeService.this.stopSelf();
-    	}
+        public PeekEnvelopeServiceTask(Context context, HttpClient client, String mailNotificationStyle) {
+            super(context, client, mailNotificationStyle);
+        }
+        @Override
+        public void onPostExecute(Object count) {
+            super.onPostExecute(count);
+            EnvelopeService.this.stopSelf();
+        }
     }
 
     @Override
@@ -78,12 +78,12 @@ public class EnvelopeService extends Service {
      */
     private final IBinder mBinder = new Binder() {
         @Override
-		protected boolean onTransact(int code, Parcel data, Parcel reply,
-		        int flags) throws RemoteException {
+        protected boolean onTransact(int code, Parcel data, Parcel reply,
+                                     int flags) throws RemoteException {
             return super.onTransact(code, data, reply, flags);
         }
     };
-    
+
     public static void resetAlarm(Context context, long interval) {
         // Create an IntentSender that will launch our service, to be scheduled
         // with the alarm manager.
@@ -91,7 +91,7 @@ public class EnvelopeService extends Service {
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         am.cancel(alarmSender);
         if (interval != 0)
-        	am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, alarmSender);
+            am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, alarmSender);
     }
 }
 

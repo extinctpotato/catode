@@ -30,8 +30,8 @@ import in.shick.diode.R;
 public class SubredditInfo implements Serializable, Comparable<SubredditInfo>
 {
     public static final long SEC_PER_MIN = 60L, SEC_PER_HOUR = SEC_PER_MIN * 60L,
-           SEC_PER_DAY = SEC_PER_HOUR * 24L, SEC_PER_MON = SEC_PER_DAY * 30L,
-           SEC_PER_YR = SEC_PER_DAY * 365L;
+                             SEC_PER_DAY = SEC_PER_HOUR * 24L, SEC_PER_MON = SEC_PER_DAY * 30L,
+                             SEC_PER_YR = SEC_PER_DAY * 365L;
     public String name;
     public String description;
     public boolean nsfw;

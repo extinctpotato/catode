@@ -429,7 +429,7 @@ public final class PickSubredditActivity extends ListActivity {
             if(subject.subscribers > 0)
             {
                 text.setText(String.format(getString(R.string.subscriber_count_format),
-                            mSubscriberFormat.format(subject.subscribers)));
+                                           mSubscriberFormat.format(subject.subscribers)));
             }
             else
             {
@@ -456,16 +456,16 @@ public final class PickSubredditActivity extends ListActivity {
         ProgressDialog pdialog;
 
         switch (id) {
-            // "Please wait"
-            case Constants.DIALOG_LOADING_REDDITS_LIST:
-                pdialog = new ProgressDialog(new ContextThemeWrapper(this, mSettings.getDialogTheme()));
-                pdialog.setMessage("Loading your reddits...");
-                pdialog.setIndeterminate(true);
-                pdialog.setCancelable(true);
-                dialog = pdialog;
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected dialog id "+id);
+        // "Please wait"
+        case Constants.DIALOG_LOADING_REDDITS_LIST:
+            pdialog = new ProgressDialog(new ContextThemeWrapper(this, mSettings.getDialogTheme()));
+            pdialog.setMessage("Loading your reddits...");
+            pdialog.setIndeterminate(true);
+            pdialog.setCancelable(true);
+            dialog = pdialog;
+            break;
+        default:
+            throw new IllegalArgumentException("Unexpected dialog id "+id);
         }
         return dialog;
     }
@@ -473,19 +473,19 @@ public final class PickSubredditActivity extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                Common.goHome(this);
-                break;
-            case R.id.refresh_subreddit_list:
-                refresh = true;
-                new DownloadRedditsTask().execute();
-                break;
-            case R.id.random_subreddit:
-                returnSubreddit("random");
-                break;
+        case android.R.id.home:
+            Common.goHome(this);
+            break;
+        case R.id.refresh_subreddit_list:
+            refresh = true;
+            new DownloadRedditsTask().execute();
+            break;
+        case R.id.random_subreddit:
+            returnSubreddit("random");
+            break;
 
-            default:
-                throw new IllegalArgumentException("Unexpected action value "+item.getItemId());
+        default:
+            throw new IllegalArgumentException("Unexpected action value "+item.getItemId());
         }
         return true;
     }
@@ -517,7 +517,7 @@ public final class PickSubredditActivity extends ListActivity {
         return true;
     }
 
-    protected ArrayList<SubredditInfo> getCachedSubredditsList(){
+    protected ArrayList<SubredditInfo> getCachedSubredditsList() {
         ArrayList<SubredditInfo> reddits = null;
         if (Constants.USE_SUBREDDITS_CACHE) {
             if (CacheInfo.checkFreshSubredditListCache(getApplicationContext())) {

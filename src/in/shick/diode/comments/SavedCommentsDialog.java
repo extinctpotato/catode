@@ -21,19 +21,19 @@ import android.widget.Button;
 
 public class SavedCommentsDialog extends Dialog
 {
-    
+
     public SavedCommentsDialog(Context context, RedditSettings settings)
     {
         super(context, settings.getDialogNoTitleTheme());
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.saved_comment_click_dialog);
-        
+
         Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
         LayoutParams params = getWindow().getAttributes();
@@ -41,8 +41,8 @@ public class SavedCommentsDialog extends Dialog
         if (display.getOrientation() == Configuration.ORIENTATION_LANDSCAPE)
             params.height = LayoutParams.FILL_PARENT;
         getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
-        
+
         setCanceledOnTouchOutside(true);
     }
-    
+
 }
