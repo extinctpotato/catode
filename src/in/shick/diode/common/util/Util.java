@@ -448,7 +448,7 @@ public class Util {
         return createSubredditUri(thingInfo.getSubreddit());
     }
 
-    static Uri createThreadUri(String subreddit, String threadId) {
+    public static Uri createThreadUri(String subreddit, String threadId) {
         return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
                          .append(subreddit)
                          .append("/comments/")

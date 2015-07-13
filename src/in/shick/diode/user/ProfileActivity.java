@@ -380,11 +380,14 @@ public final class ProfileActivity extends ListActivity
         mVoteTargetThingInfo = item;
         mVoteTargetView = v;
 
-        if (item.getName().startsWith(Constants.THREAD_KIND)) {
+        if (item.isThreadKind()) {
             menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, "Go to thread");
         } else {
-            // TODO: include the context!
             menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, "Go to comment");
+            if (mVoteTargetThingInfo.getLink_id() != null) {
+                // Don't add the thread link if the link_id is null for some reason.
+                menu.add(1, Constants.DIALOG_THREAD_CLICK, Menu.NONE, "Go to thread");
+            }
         }
     }
 
@@ -395,7 +398,7 @@ public final class ProfileActivity extends ListActivity
         switch (item.getItemId()) {
         case Constants.DIALOG_COMMENT_CLICK:
             i = new Intent(getApplicationContext(), CommentsListActivity.class);
-            i.setData(Util.createCommentUri(mVoteTargetThingInfo, 0));
+            i.setData(Util.createCommentUri(mVoteTargetThingInfo, 3));
             i.putExtra(Constants.EXTRA_SUBREDDIT, mVoteTargetThingInfo.getSubreddit());
             i.putExtra(Constants.EXTRA_TITLE, mVoteTargetThingInfo.getTitle());
             startActivity(i);
@@ -404,10 +407,16 @@ public final class ProfileActivity extends ListActivity
             // Launch an Intent for CommentsListActivity
             CacheInfo.invalidateCachedThread(getApplicationContext());
             i = new Intent(getApplicationContext(), CommentsListActivity.class);
-            i.setData(Util.createThreadUri(mVoteTargetThingInfo));
             i.putExtra(Constants.EXTRA_SUBREDDIT, mVoteTargetThingInfo.getSubreddit());
             i.putExtra(Constants.EXTRA_TITLE, mVoteTargetThingInfo.getTitle());
-            i.putExtra(Constants.EXTRA_NUM_COMMENTS, Integer.valueOf(mVoteTargetThingInfo.getNum_comments()));
+            // Thread things are handled differently than comment things.
+            if (mVoteTargetThingInfo.isThreadKind()) {
+                i.setData(Util.createThreadUri(mVoteTargetThingInfo));
+                i.putExtra(Constants.EXTRA_NUM_COMMENTS, Integer.valueOf(mVoteTargetThingInfo.getNum_comments()));
+            } else {
+                // Should only get to this point if the Thing is a Comment, and link_id is valid.
+                i.setData(Util.createThreadUri(mVoteTargetThingInfo.getSubreddit(), Util.nameToId(mVoteTargetThingInfo.getLink_id())));
+            }
             startActivity(i);
             return true;
         default:

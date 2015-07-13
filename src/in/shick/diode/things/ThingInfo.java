@@ -22,6 +22,7 @@ package in.shick.diode.things;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import in.shick.diode.common.Constants;
 import org.codehaus.jackson.annotate.JsonAnySetter;
 
 import android.graphics.Bitmap;
@@ -488,6 +489,14 @@ public class ThingInfo implements Serializable, Parcelable {
 
     public void setWas_comment(boolean was_comment) {
         this.was_comment = was_comment;
+    }
+
+    public final boolean isCommentKind() {
+        return (this.name != null && this.name.startsWith(Constants.COMMENT_KIND));
+    }
+
+    public final boolean isThreadKind() {
+        return (this.name != null && this.name.startsWith(Constants.THREAD_KIND));
     }
 
     //Parcelable interface
