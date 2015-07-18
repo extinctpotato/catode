@@ -375,8 +375,7 @@ public final class InboxListActivity extends ListActivity
         mReplyTargetName = item.getName();
 
         if (item.isWas_comment()) {
-            // TODO: include the context!
-            menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, "Go to comment");
+            menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, R.string.view_context);
         } else {
             menu.add(0, Constants.DIALOG_MESSAGE_CLICK, Menu.NONE, "Reply");
         }

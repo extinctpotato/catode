@@ -379,13 +379,14 @@ public class CommentsListActivity extends ListActivity
         public static final int COMMENT_ITEM_VIEW_TYPE = 1;
         public static final int MORE_ITEM_VIEW_TYPE = 2;
         public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 3;
+        public static final int VIEWING_SINGLE_VIEW_TYPE = 4;
         // The number of view types
-        public static final int VIEW_TYPE_COUNT = 4;
+        public static final int VIEW_TYPE_COUNT = 5;
 
         public boolean mIsLoading = true;
 
         private LayoutInflater mInflater;
-        private int mFrequentSeparatorPos = ListView.INVALID_POSITION;
+        private final int mFrequentSeparatorPos = ListView.INVALID_POSITION;
 
         public CommentsListAdapter(Context context, List<ThingInfo> objects) {
             super(context, 0, objects);
@@ -394,20 +395,24 @@ public class CommentsListActivity extends ListActivity
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0)
+            if (position == 0) {
                 return OP_ITEM_VIEW_TYPE;
+            }
             if (position == mFrequentSeparatorPos) {
                 // We don't want the separator view to be recycled.
                 return IGNORE_ITEM_VIEW_TYPE;
             }
 
             ThingInfo item = getItem(position);
-            if (item.isHiddenCommentDescendant())
+            if (item.isHiddenCommentDescendant()) {
                 return IGNORE_ITEM_VIEW_TYPE;
-            if (item.isHiddenCommentHead())
+            } else if (item.isHiddenCommentHead()) {
                 return HIDDEN_ITEM_HEAD_VIEW_TYPE;
-            if (item.isLoadMoreCommentsPlaceholder())
+            } else if (item.isLoadMoreCommentsPlaceholder()) {
                 return MORE_ITEM_VIEW_TYPE;
+            } else if (item.isContext()) {
+                return VIEWING_SINGLE_VIEW_TYPE;
+            }
 
             return COMMENT_ITEM_VIEW_TYPE;
         }
@@ -436,7 +441,6 @@ public class CommentsListActivity extends ListActivity
                     if (view == null) {
                         view = mInflater.inflate(R.layout.threads_list_item, null);
                     }
-
                     ThreadsListActivity.fillThreadsListItemView(
                         position, view, item, CommentsListActivity.this, mClient, mSettings, mThumbnailOnClickListenerFactory
                     );
@@ -500,6 +504,10 @@ public class CommentsListActivity extends ListActivity
 
                     setCommentIndent(view, item.getIndent(), mSettings);
 
+                } else if (item.isContext()) {
+                    if (view == null) {
+                        view = mInflater.inflate(R.layout.viewing_single_comment_list_item, null);
+                    }
                 } else {  // Regular comment
                     // Here view may be passed in for re-use, or we make a new one.
                     if (view == null) {
@@ -588,19 +596,23 @@ public class CommentsListActivity extends ListActivity
             showComment(position);
             return;
         }
-
         // Mark the OP post/regular comment as selected
-        mVoteTargetThing = item;
-        mReplyTargetName = mVoteTargetThing.getName();
+        if (!item.isContext()) {
+            mVoteTargetThing = item;
+            mReplyTargetName = mVoteTargetThing.getName();
+        }
 
         if (isLoadMoreCommentsPosition(position)) {
             // Use this constructor to tell it to load more comments inline
             getNewDownloadCommentsTask().prepareLoadMoreComments(item.getId(), position, item.getIndent())
             .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
         } else {
-            if (!"[deleted]".equals(item.getAuthor()))
-            {
-                showDialog(Constants.DIALOG_COMMENT_CLICK);
+            if (item.isContext()) {
+                getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+            } else {
+                if (!"[deleted]".equals(item.getAuthor())) {
+                    showDialog(Constants.DIALOG_COMMENT_CLICK);
+                }
             }
         }
     }
@@ -1431,19 +1443,28 @@ public class CommentsListActivity extends ListActivity
                      String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
 
         } else if (isLoadMoreCommentsPosition(rowId)) {
-            menu.add(0, Constants.DIALOG_GOTO_PARENT, Menu.NONE, "Go to parent");
+            menu.add(0, Constants.DIALOG_FOCUS_PARENT, Menu.NONE, R.string.focus_parent_comment);
         } else if (isHiddenCommentHeadPosition(rowId)) {
-            menu.add(0, Constants.DIALOG_SHOW_COMMENT, Menu.NONE, "Show comment");
-            menu.add(0, Constants.DIALOG_GOTO_PARENT, Menu.NONE, "Go to parent");
+            menu.add(0, Constants.DIALOG_SHOW_COMMENT, Menu.NONE, R.string.show_comment);
+            menu.add(0, Constants.DIALOG_FOCUS_PARENT, Menu.NONE, R.string.focus_parent_comment);
+        } else if (item.isContext()) {
+            // If the top-level context item has a parent comment, then there's more context to be viewed.
+            if (item.getParent_id() != null && item.isParentAComment()) {
+                menu.add(0, Constants.DIALOG_FULL_CONTEXT, Menu.NONE, R.string.view_full_context);
+            }
+            menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
         } else {
             if (mSettings.getUsername() != null && mSettings.getUsername().equalsIgnoreCase(item.getAuthor())) {
                 menu.add(0, Constants.DIALOG_EDIT, Menu.NONE, "Edit");
                 menu.add(0, Constants.DIALOG_DELETE, Menu.NONE, "Delete");
             }
-            menu.add(0, Constants.DIALOG_HIDE_COMMENT, Menu.NONE, "Hide comment");
+            menu.add(0, Constants.DIALOG_HIDE_COMMENT, Menu.NONE, R.string.hide_comment);
 //    		if (mSettings.isLoggedIn())
 //    			menu.add(0, Constants.DIALOG_REPORT, Menu.NONE, "Report comment");
-            menu.add(0, Constants.DIALOG_GOTO_PARENT, Menu.NONE, "Go to parent");
+            menu.add(0, Constants.DIALOG_FOCUS_PARENT, Menu.NONE, R.string.focus_parent_comment);
+            if (item.isParentAComment()) {
+                menu.add(0, Constants.DIALOG_VIEW_CONTEXT, Menu.NONE, R.string.view_context);
+            }
             if (mSettings.isLoggedIn())
             {
                 saveCommentThing = item;
@@ -1528,13 +1549,18 @@ public class CommentsListActivity extends ListActivity
             Toast.makeText(CommentsListActivity.this, "Comment unsaved", Toast.LENGTH_LONG).show();
             return true;
 
-        case Constants.DIALOG_GOTO_PARENT:
-            int myIndent = mCommentsAdapter.getItem(rowId).getIndent();
-            int parentRowId;
-            for (parentRowId = rowId - 1; parentRowId >= 0; parentRowId--)
-                if (mCommentsAdapter.getItem(parentRowId).getIndent() < myIndent)
-                    break;
-            getListView().setSelection(parentRowId);
+        case Constants.DIALOG_FOCUS_PARENT:
+            if (mCommentsAdapter.getItem(rowId).isParentAComment()) {
+                int myIndent = mCommentsAdapter.getItem(rowId).getIndent();
+                int parentRowId;
+                for (parentRowId = rowId - 1; parentRowId >= 0; parentRowId--)
+                    if (mCommentsAdapter.getItem(parentRowId).getIndent() < myIndent)
+                        break;
+                getListView().setSelection(parentRowId);
+            } else {
+                // Focus the OP
+                getListView().setSelection(0);
+            }
             return true;
 
         case Constants.DIALOG_VIEW_PROFILE:
@@ -1571,6 +1597,19 @@ public class CommentsListActivity extends ListActivity
                 android.content.ClipData clip = android.content.ClipData.newPlainText(url,url);
                 clipboard.setPrimaryClip(clip);
             }
+            return true;
+        case Constants.DIALOG_FULL_CONTEXT:
+            DownloadCommentsTask dct = getNewDownloadCommentsTask();
+            dct.prepareLoadAndJumpToComment( mCommentsAdapter.getItem(rowId).getId(), 10000);
+            dct.execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+            return true;
+        case Constants.DIALOG_VIEW_CONTEXT:
+            getNewDownloadCommentsTask()
+            .prepareLoadAndJumpToComment(mCommentsAdapter.getItem(rowId).getId(), 3)
+            .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+            return true;
+        case Constants.DIALOG_THREAD_CLICK:
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
 
         default:

@@ -99,6 +99,8 @@
 	
 	<string name="comment_hidden">[+]</string>
 	<string name="more_comments">load more comments</string>
+	<string name="context_warning">You are viewing a single comment\'s thread.</string>
+	<string name="click_to_view_all">Click here to view the rest of the comments.</string>
 	<string name="next_threads">next</string>
 	<string name="previous_threads">prev</string>
 	
@@ -171,7 +173,13 @@
 	<string name="save_comment">save</string>
 	<string name="unsave_comment">unsave</string>
 	<string name="view_saved_comment">view</string>
-	
+	<string name="focus_parent_comment">Focus parent</string>
+	<string name="show_comment">Show comment</string>
+	<string name="hide_comment">Hide comment</string>
+	<string name="view_full_context">View the full context</string>
+	<string name="view_context">View context</string>
+	<string name="goto_thread">Go to thread</string>
+
 	
 	<!-- === Preferences === -->
 	<string name="pref_general_category">General settings</string>

@@ -53,7 +53,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     implements PropertyChangeListener {
 
 
-    private static final String TAG = "CommentsListActivity.DownloadCommentsTask";
+    private static final String TAG = "DownloadCommentsTask";
     private final ObjectMapper mObjectMapper = Common.getObjectMapper();
     private final Markdown markdown = new Markdown();
 
@@ -294,12 +294,12 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
                 mSettings.setModhash(threadListingData.getModhash());
 
             if (Constants.LOGGING) Log.d(TAG, "Successfully got OP listing[0]: modhash "+mSettings.getModhash());
-
             ThingListing threadThingListing = threadListingData.getChildren()[0];
             Assert.assertEquals(Constants.THREAD_KIND, threadThingListing.getKind(), genericListingError);
-
+            // listings[1] is a comment Listing for the comments
+            ListingData commentListingData = listings[1].getData();
             if (isInsertingEntireThread()) {
-                parseOP(threadThingListing.getData());
+                parseOP(threadThingListing.getData(), commentListingData.getChildren().length == 0 ? null : commentListingData.getChildren()[0].getData());
                 insertedCommentIndex = 0;  // we just inserted the OP into position 0
 
                 // at this point we've started displaying comments, so disable the loading screen
@@ -309,9 +309,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
                 insertedCommentIndex = mPositionOffset - 1;  // -1 because we +1 for the first comment
             }
 
-            // listings[1] is a comment Listing for the comments
             // Go through the children and get the ThingInfos
-            ListingData commentListingData = listings[1].getData();
             for (ThingListing commentThingListing : commentListingData.getChildren()) {
                 // insert the comment and its replies, prefix traversal order
                 insertedCommentIndex = insertNestedComment(commentThingListing, 0, insertedCommentIndex + 1);
@@ -324,7 +322,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         }
     }
 
-    private void parseOP(final ThingInfo data) {
+    private void parseOP(final ThingInfo data, final ThingInfo contextOP) {
         data.setIndent(0);
         data.setClicked(Common.isClicked(mActivity, data.getUrl()));
 
@@ -332,6 +330,16 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
             @Override
             public void run() {
                 mActivity.mObjectStates.mCommentsList.add(0, data);
+                if (mJumpToCommentContext > 0) {
+                    // Need to add a fake comment to get it to draw in the comments list properly, without
+                    // 'hacking' the adapter to work properly.
+                    ThingInfo tempInfo = new ThingInfo();
+                    tempInfo.setIsContext(true);
+                    // Set the parent ID to allow the user to view the parent thread.
+                    tempInfo.setParent_id(contextOP.getParent_id());
+                    tempInfo.setId(mJumpToCommentId);
+                    mActivity.mObjectStates.mCommentsList.add(1, tempInfo);
+                }
             }
         });
 

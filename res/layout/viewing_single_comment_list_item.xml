@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright 2010 Andrew Shu
+ *
+ * This file is part of "diode".
+ *
+ * "diode" is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * "diode" is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with "diode".  If not, see <http://www.gnu.org/licenses/>.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+			  android:background="#93944c24" android:paddingTop="5dp" android:paddingBottom="5dp"
+			  android:paddingLeft="5dp" android:paddingRight="5dp" android:clickable="false"
+			  android:hapticFeedbackEnabled="false"
+			  android:focusableInTouchMode="false" android:focusable="false" android:baselineAligned="false">
+	<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:text="@string/context_warning"
+			android:id="@+id/context_warning_text" android:clickable="false"/>
+	<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:text="@string/click_to_view_all"
+			android:id="@+id/click_to_view_all" android:clickable="false"/>
+</LinearLayout>

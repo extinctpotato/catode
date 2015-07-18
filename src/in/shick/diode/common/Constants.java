@@ -105,7 +105,7 @@ public class Constants {
     public static final int DIALOG_SORT_BY_TOP = 23;
     public static final int DIALOG_COMMENT_CLICK = 24;
     public static final int DIALOG_MESSAGE_CLICK = 25;
-    public static final int DIALOG_GOTO_PARENT = 28;
+    public static final int DIALOG_FOCUS_PARENT = 28;
     public static final int DIALOG_EDIT = 29;
     public static final int DIALOG_DELETE = 30;
     public static final int DIALOG_COMPOSE = 31;
@@ -116,6 +116,8 @@ public class Constants {
     public static final int DIALOG_SAVED_COMMENTS = 36;
     public static final int DIALOG_SAVE_COMMENT = 37;
     public static final int DIALOG_UNSAVE_COMMENT = 38;
+    public static final int DIALOG_FULL_CONTEXT = 40;
+    public static final int DIALOG_VIEW_CONTEXT = 41;
 
     // progress dialogs
     public static final int DIALOG_LOGGING_IN = 1000;

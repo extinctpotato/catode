@@ -381,12 +381,12 @@ public final class ProfileActivity extends ListActivity
         mVoteTargetView = v;
 
         if (item.isThreadKind()) {
-            menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, "Go to thread");
+            menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
         } else {
-            menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, "Go to comment");
+            menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, R.string.view_context);
             if (mVoteTargetThingInfo.getLink_id() != null) {
                 // Don't add the thread link if the link_id is null for some reason.
-                menu.add(1, Constants.DIALOG_THREAD_CLICK, Menu.NONE, "Go to thread");
+                menu.add(1, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
             }
         }
     }

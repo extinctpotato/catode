@@ -47,13 +47,14 @@ public class ThingInfo implements Serializable, Parcelable {
     // comment: c
     // message: m
 
-    private String author;					// t c m
+    private String author = "";					// t c m
     private String author_flair_text;		//   c
     private String link_flair_text;		//   t
     private String body;					//   c m
     private String body_html;				//   c m
     private boolean clicked;				// t
     private String context;					//     m
+    private boolean isContext = false;
     private double created;					// t c m
     private double created_utc;				// t c m
     private String dest;					//     m
@@ -330,6 +331,14 @@ public class ThingInfo implements Serializable, Parcelable {
         this.context = context;
     }
 
+    public void setIsContext(boolean isContext) {
+        this.isContext = isContext;
+    }
+
+    public boolean isContext() {
+        return this.isContext;
+    }
+
     public void setCreated(double created) {
         this.created = created;
     }
@@ -493,6 +502,10 @@ public class ThingInfo implements Serializable, Parcelable {
 
     public final boolean isCommentKind() {
         return (this.name != null && this.name.startsWith(Constants.COMMENT_KIND));
+    }
+
+    public final boolean isParentAComment() {
+        return this.parent_id != null && this.parent_id.startsWith(Constants.COMMENT_KIND);
     }
 
     public final boolean isThreadKind() {
