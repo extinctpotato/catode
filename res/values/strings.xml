@@ -178,7 +178,7 @@
 	<string name="hide_comment">Hide comment</string>
 	<string name="view_full_context">View the full context</string>
 	<string name="view_context">View context</string>
-	<string name="goto_thread">Go to thread</string>
+	<string name="goto_thread">Go to full comments</string>
 
 	
 	<!-- === Preferences === -->
