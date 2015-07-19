@@ -142,6 +142,8 @@ public class CommentsListActivity extends ListActivity
 
     // UI State
     private ThingInfo mVoteTargetThing = null;
+    private String mContextOPID = null;
+    private int mContextCount = 0;
     private String mReportTargetName = null;
     private String mReplyTargetName = null;
     private String mEditTargetBody = null;
@@ -212,6 +214,7 @@ public class CommentsListActivity extends ListActivity
         registerForContextMenu(getListView());
 
         if (savedInstanceState != null) {
+            Log.d(TAG, "Loading saved instance state");
             mReplyTargetName = savedInstanceState.getString(Constants.REPLY_TARGET_NAME_KEY);
             mReportTargetName = savedInstanceState.getString(Constants.REPORT_TARGET_NAME_KEY);
             mEditTargetBody = savedInstanceState.getString(Constants.EDIT_TARGET_BODY_KEY);
@@ -220,6 +223,8 @@ public class CommentsListActivity extends ListActivity
             mSubreddit = savedInstanceState.getString(Constants.SUBREDDIT_KEY);
             mThreadId = savedInstanceState.getString(Constants.THREAD_ID_KEY);
             mVoteTargetThing = savedInstanceState.getParcelable(Constants.VOTE_TARGET_THING_INFO_KEY);
+            mContextOPID = savedInstanceState.getString(Constants.CONTEXT_OP_ID_KEY);
+            mContextCount = savedInstanceState.getInt(Constants.CONTEXT_COUNT_KEY);
 
             if (mThreadTitle != null) {
                 setTitle(mThreadTitle + " : " + mSubreddit);
@@ -296,13 +301,9 @@ public class CommentsListActivity extends ListActivity
                 // TODO: use extras.getInt(Constants.EXTRA_NUM_COMMENTS) somehow
             }
 
-            if (!StringUtils.isEmpty(jumpToCommentId)) {
-                getNewDownloadCommentsTask().prepareLoadAndJumpToComment(jumpToCommentId, jumpToCommentContext)
-                .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
-            }
-            else {
-                getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
-            }
+            setContextOPID(jumpToCommentId);
+            setContextCount(jumpToCommentContext);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
         }
     }
 
@@ -351,15 +352,61 @@ public class CommentsListActivity extends ListActivity
     }
 
     private DownloadCommentsTask getNewDownloadCommentsTask() {
-        if(mObjectStates.mDownloadCommentsTask == null || mObjectStates.mDownloadCommentsTask.getStatus() == Status.FINISHED)
+        if(mObjectStates.mDownloadCommentsTask == null || mObjectStates.mDownloadCommentsTask.getStatus() == Status.FINISHED) {
             mObjectStates.mDownloadCommentsTask = new DownloadCommentsTask(
-                this,
-                mSubreddit,
-                mThreadId,
-                mSettings,
-                mClient
+                    this,
+                    mSubreddit,
+                    mThreadId,
+                    mSettings,
+                    mClient,
+                    mContextOPID,
+                    mContextCount
             );
+        } else if (mObjectStates.mDownloadCommentsTask.getStatus() == Status.RUNNING) {
+            // Found that if you can click real quickly on the 'Load more comments' button, you can crash the channel.
+            // This makes it so that any currently running download task will be allowed to finish before starting
+            // another.
+            // It would have to be decided if you want to cancel the previous running one and start a new task.
+            Toast.makeText(CommentsListActivity.this, R.string.load_in_progress_toast, Toast.LENGTH_SHORT).show();
+            return new DoNothingDownloadTask(this,
+                    mSubreddit,
+                    mThreadId,
+                    mSettings,
+                    mClient,
+                    mContextOPID,
+                    mContextCount);
+        }
         return mObjectStates.mDownloadCommentsTask;
+    }
+
+    public class DoNothingDownloadTask extends DownloadCommentsTask {
+
+        /**
+         * Default constructor to do nothing.
+         */
+        public DoNothingDownloadTask(CommentsListActivity activity, String subreddit, String threadId, RedditSettings settings, HttpClient client, String contextOP, int contextAmount) {
+            // Really - do nothing
+        }
+
+        @Override
+        public void onPreExecute() {
+            // Do nothing
+        }
+
+        @Override
+        public void onPostExecute(Boolean success) {
+            // Do nothing
+        }
+
+        @Override
+        public void onProgressUpdate(Long... progress) {
+            // Do nothing
+        }
+
+        @Override
+        public Boolean doInBackground(Integer... maxComments) {
+            return false;
+        }
     }
 
     private boolean isHiddenCommentHeadPosition(int position) {
@@ -508,6 +555,7 @@ public class CommentsListActivity extends ListActivity
                     if (view == null) {
                         view = mInflater.inflate(R.layout.viewing_single_comment_list_item, null);
                     }
+                    setContextOPID(item.getId());
                 } else {  // Regular comment
                     // Here view may be passed in for re-use, or we make a new one.
                     if (view == null) {
@@ -608,6 +656,7 @@ public class CommentsListActivity extends ListActivity
             .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
         } else {
             if (item.isContext()) {
+                resetContextInfo();
                 getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             } else {
                 if (!"[deleted]".equals(item.getAuthor())) {
@@ -683,7 +732,18 @@ public class CommentsListActivity extends ListActivity
         getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_START);
     }
 
+    private void resetContextInfo() {
+        mContextOPID = null;
+        mContextCount = 0;
+    }
 
+    private void setContextOPID(String contextOPID) {
+        mContextOPID = contextOPID;
+    }
+
+    private void setContextCount(int contextCount) {
+        mContextCount = contextCount;
+    }
 
     private class MyLoginTask extends LoginTask {
         public MyLoginTask(String username, String password) {
@@ -1439,8 +1499,11 @@ public class CommentsListActivity extends ListActivity
                 menu.add(0, Constants.HIDE_CONTEXT_ITEM, Menu.NONE, "Hide");
             }
 
-            menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                     String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+            // Make sure the user isn't '[deleted]'
+            if (!item.isDeletedUser()) {
+                menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
+                        String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+            }
 
         } else if (isLoadMoreCommentsPosition(rowId)) {
             menu.add(0, Constants.DIALOG_FOCUS_PARENT, Menu.NONE, R.string.focus_parent_comment);
@@ -1477,8 +1540,12 @@ public class CommentsListActivity extends ListActivity
                     menu.add(0, Constants.DIALOG_SAVE_COMMENT, Menu.NONE, "Save");
                 }
             }
-            menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                     String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+
+            // Make sure the user isn't '[deleted]'
+            if (!item.isDeletedUser()) {
+                menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
+                        String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+            }
         }
     }
 
@@ -1599,16 +1666,19 @@ public class CommentsListActivity extends ListActivity
             }
             return true;
         case Constants.DIALOG_FULL_CONTEXT:
-            DownloadCommentsTask dct = getNewDownloadCommentsTask();
-            dct.prepareLoadAndJumpToComment( mCommentsAdapter.getItem(rowId).getId(), 10000);
-            dct.execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+            setContextOPID(mCommentsAdapter.getItem(rowId).getId());
+            // 10k denotes 'full context'
+            setContextCount(10000);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
         case Constants.DIALOG_VIEW_CONTEXT:
-            getNewDownloadCommentsTask()
-            .prepareLoadAndJumpToComment(mCommentsAdapter.getItem(rowId).getId(), 3)
-            .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+            setContextOPID(mCommentsAdapter.getItem(rowId).getId());
+            setContextCount(3);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
         case Constants.DIALOG_THREAD_CLICK:
+            // Reset context information so whole thread is shown.
+            resetContextInfo();
             getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
 
@@ -2249,11 +2319,9 @@ public class CommentsListActivity extends ListActivity
         mCommentsAdapter.notifyDataSetChanged();
     }
 
-
-
     @Override
     protected void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
+        Log.d(TAG, "onSaveInstanceState called");
         state.putString(Constants.REPLY_TARGET_NAME_KEY, mReplyTargetName);
         state.putString(Constants.REPORT_TARGET_NAME_KEY, mReportTargetName);
         state.putString(Constants.EDIT_TARGET_BODY_KEY, mEditTargetBody);
@@ -2262,6 +2330,9 @@ public class CommentsListActivity extends ListActivity
         state.putString(Constants.THREAD_ID_KEY, mThreadId);
         state.putString(Constants.THREAD_TITLE_KEY, mThreadTitle);
         state.putParcelable(Constants.VOTE_TARGET_THING_INFO_KEY, mVoteTargetThing);
+        state.putString(Constants.CONTEXT_OP_ID_KEY, mContextOPID);
+        state.putInt(Constants.CONTEXT_COUNT_KEY, mContextCount);
+        super.onSaveInstanceState(state);
     }
 
     /**

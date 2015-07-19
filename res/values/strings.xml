@@ -103,7 +103,8 @@
 	<string name="click_to_view_all">Click here to view the rest of the comments.</string>
 	<string name="next_threads">next</string>
 	<string name="previous_threads">prev</string>
-	
+
+	<string name="load_in_progress_toast">Please wait, still loading.</string>
 	<string name="error_voting_toast">Error voting. Please try again.</string>
 	<string name="mail_notification_unscheduled">Reddit mail notification service disabled.</string>
 	<string name="mail_notification_scheduled_5min">Reddit mail set to check every 5 minutes.</string>

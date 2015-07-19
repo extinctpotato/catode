@@ -1069,8 +1069,11 @@ public final class ThreadsListActivity extends ListActivity {
             menu.add(0, Constants.HIDE_CONTEXT_ITEM, 0, "Hide");
         }
 
-        menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                 String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
+        // Make sure the user isn't '[deleted]'
+        if (!_item.isDeletedUser()) {
+            menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
+                    String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
+        }
     }
 
     @Override
@@ -1119,6 +1122,7 @@ public final class ThreadsListActivity extends ListActivity {
             new MyHideTask(false, _item, mSettings, getApplicationContext()).execute();
 
         case Constants.DIALOG_VIEW_PROFILE:
+            assert(!_item.isDeletedUser());
             Intent i = new Intent(this, ProfileActivity.class);
             i.setData(Util.createProfileUri(_item.getAuthor()));
             startActivity(i);

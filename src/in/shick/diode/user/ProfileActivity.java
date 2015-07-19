@@ -211,7 +211,7 @@ public final class ProfileActivity extends ListActivity
             } else {
                 // Orientation change. Use prior instance.
                 resetUI(new ThingsListAdapter(this, mThingsList));
-                setTitle(mUsername + "'s profile");
+                setTitle(String.format(getResources().getString(R.string.user_profile), mUsername));
             }
             return;
         }

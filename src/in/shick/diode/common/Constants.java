@@ -183,6 +183,8 @@ public class Constants {
     public static final String VOTE_TARGET_THING_INFO_KEY = "vote_target_thing_info";
     public static final String WHICH_INBOX_KEY = "which_inbox";
     public static final String QUERY_KEY = "search_query";
+    public static final String CONTEXT_OP_ID_KEY = "context_op";
+    public static final String CONTEXT_COUNT_KEY = "context_count";
 
     public static final String SUBMIT_KIND_LINK = "link";
     public static final String SUBMIT_KIND_SELF = "self";
@@ -268,7 +270,7 @@ public class Constants {
         };
     }
 
-
+    public static final String DELETED_USER = "[deleted]";
     // JSON values
     public static final String JSON_AFTER = "after";
     public static final String JSON_AUTHOR = "author";

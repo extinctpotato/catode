@@ -54,7 +54,7 @@ public class ThingInfo implements Serializable, Parcelable {
     private String body_html;				//   c m
     private boolean clicked;				// t
     private String context;					//     m
-    private boolean isContext = false;
+    private boolean misContext = false;
     private double created;					// t c m
     private double created_utc;				// t c m
     private String dest;					//     m
@@ -332,11 +332,15 @@ public class ThingInfo implements Serializable, Parcelable {
     }
 
     public void setIsContext(boolean isContext) {
-        this.isContext = isContext;
+        this.misContext = isContext;
     }
 
     public boolean isContext() {
-        return this.isContext;
+        return this.misContext;
+    }
+
+    public boolean isDeletedUser() {
+        return Constants.DELETED_USER.equalsIgnoreCase(this.author);
     }
 
     public void setCreated(double created) {
@@ -550,7 +554,7 @@ public class ThingInfo implements Serializable, Parcelable {
         out.writeValue(url);
         out.writeValue(likes);
 
-        boolean booleans[] = new boolean[10];
+        boolean booleans[] = new boolean[11];
         booleans[0] = clicked;
         booleans[1] = hidden;
         booleans[2] = is_self;
@@ -561,6 +565,7 @@ public class ThingInfo implements Serializable, Parcelable {
         booleans[7] = mIsLoadMoreCommentsPlaceholder;
         booleans[8] = mIsHiddenCommentHead;
         booleans[9] = mIsHiddenCommentDescendant;
+        booleans[10] = misContext;
         out.writeBooleanArray(booleans);
     }
 
@@ -595,7 +600,7 @@ public class ThingInfo implements Serializable, Parcelable {
         url           = (String) in.readValue(null);
         likes         = (Boolean) in.readValue(null);
 
-        boolean booleans[] = new boolean[10];
+        boolean booleans[] = new boolean[11];
         in.readBooleanArray(booleans);
         clicked                        = booleans[0];
         hidden                         = booleans[1];
@@ -607,6 +612,7 @@ public class ThingInfo implements Serializable, Parcelable {
         mIsLoadMoreCommentsPlaceholder = booleans[7];
         mIsHiddenCommentHead           = booleans[8];
         mIsHiddenCommentDescendant     = booleans[9];
+        misContext                     = booleans[10];
     }
 
     public static final Parcelable.Creator<ThingInfo> CREATOR

@@ -98,6 +98,12 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     private final LinkedList<ThingInfo> mDeferredReplacementList = new LinkedList<ThingInfo>();
 
     /**
+     * Protected default constructor for subclasses, don't allow it to be called normally.
+     */
+    protected DownloadCommentsTask() {
+        // Do nothing
+    }
+    /**
      * Default constructor to do normal comments page
      */
     public DownloadCommentsTask(
@@ -105,7 +111,9 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         String subreddit,
         String threadId,
         RedditSettings settings,
-        HttpClient client
+        HttpClient client,
+        String contextOP,
+        int contextAmount
     ) {
         attach(activity);
         this.mSubreddit = subreddit;
@@ -113,6 +121,8 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         this.mSettings = settings;
         this.mClient = client;
         this.mProcessCommentsTask = new ProcessCommentsTask(mActivity);
+        this.mJumpToCommentId = contextOP;
+        this.mJumpToCommentContext = contextAmount;
     }
 
     /**
@@ -128,12 +138,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         return this;
     }
 
-    public DownloadCommentsTask prepareLoadAndJumpToComment(String commentId, int context) {
-        mJumpToCommentId = commentId;
-        mJumpToCommentContext = context;
-        return this;
-    }
-
     // XXX: maxComments is unused for now
     public Boolean doInBackground(Integer... maxComments) {
         HttpEntity entity = null;
@@ -146,16 +150,14 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
                 sb.append("/comments/")
                 .append(mThreadId)
                 .append("/z/").append(mMoreChildrenId).append("/.json?")
-                .append(mSettings.getCommentsSortByUrl()).append("&");
-                if (mJumpToCommentContext != 0) {
-                    sb.append("context=").append(mJumpToCommentContext).append("&");
-                }
+                .append(mSettings.getCommentsSortByUrl());
+                // Loading more with context makes no sense
             } else {
                 sb.append("/comments/")
                 .append(mThreadId)
                 .append("/.json?")
                 .append(mSettings.getCommentsSortByUrl());
-                if (mJumpToCommentId != null && mJumpToCommentId.length() > 0 && mJumpToCommentContext != 0) {
+                if (!StringUtils.isEmpty(mJumpToCommentId) && mJumpToCommentContext > 0) {
                     sb.append("&comment=")
                     .append(mJumpToCommentId)
                     .append("&context=")
