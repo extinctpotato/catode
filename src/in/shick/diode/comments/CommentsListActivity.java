@@ -2233,7 +2233,7 @@ public class CommentsListActivity extends ListActivity
         textFlairView.setText(item.getAuthor_flair_text());
 
         if (voteUpView != null && voteDownView != null) {
-            if (item.getLikes() == null || "[deleted]".equals(item.getAuthor())) {
+            if (item.getLikes() == null || item.isDeletedUser()) {
                 voteUpView.setVisibility(View.GONE);
                 voteDownView.setVisibility(View.GONE);
             }

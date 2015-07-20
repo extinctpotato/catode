@@ -303,6 +303,10 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
             if (isInsertingEntireThread()) {
                 parseOP(threadThingListing.getData(), commentListingData.getChildren().length == 0 ? null : commentListingData.getChildren()[0].getData());
                 insertedCommentIndex = 0;  // we just inserted the OP into position 0
+                if (!StringUtils.isEmpty(mJumpToCommentId) && mJumpToCommentContext > 0) {
+                    // If viewing context, then the 'first' item will be the context-viewing warning.
+                    insertedCommentIndex++;
+                }
 
                 // at this point we've started displaying comments, so disable the loading screen
                 disableLoadingScreenKeepProgress();
