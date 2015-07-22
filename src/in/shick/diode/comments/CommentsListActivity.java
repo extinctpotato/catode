@@ -214,7 +214,7 @@ public class CommentsListActivity extends ListActivity
         registerForContextMenu(getListView());
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "Loading saved instance state");
+            if (Constants.LOGGING) Log.d(TAG, "Loading saved instance state");
             mReplyTargetName = savedInstanceState.getString(Constants.REPLY_TARGET_NAME_KEY);
             mReportTargetName = savedInstanceState.getString(Constants.REPORT_TARGET_NAME_KEY);
             mEditTargetBody = savedInstanceState.getString(Constants.EDIT_TARGET_BODY_KEY);
@@ -2321,7 +2321,7 @@ public class CommentsListActivity extends ListActivity
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
-        Log.d(TAG, "onSaveInstanceState called");
+        if (Constants.LOGGING) Log.d(TAG, "onSaveInstanceState called");
         state.putString(Constants.REPLY_TARGET_NAME_KEY, mReplyTargetName);
         state.putString(Constants.REPORT_TARGET_NAME_KEY, mReportTargetName);
         state.putString(Constants.EDIT_TARGET_BODY_KEY, mEditTargetBody);
