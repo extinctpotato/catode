@@ -293,7 +293,9 @@ public class SavedCommentsActivity extends Activity
             unsaveComment.setEnabled(true);
 
             ThingInfo ti = new ThingInfo();
-            Markdown.getURLs(currentSavedContent.getBody(), ti.getUrls());
+            if (ti.getUrls() != null && ti.getUrls().isEmpty()) {
+                Markdown.getURLs(currentSavedContent.getBody(), ti.getUrls());
+            }
             linkToEmbeddedURLs(linkButton, ti.getUrls());
 
             unsaveComment.setOnClickListener(new OnClickListener()
