@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import in.shick.diode.R;
 import in.shick.diode.common.Constants;
 import in.shick.diode.common.util.Util;
-import in.shick.diode.markdown.Markdown;
 import in.shick.diode.things.ThingInfo;
 
 public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
@@ -20,7 +19,6 @@ public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
     private static final String TAG = "ProcessCommentsSubTask";
 
     private final CommentsListActivity mActivity;
-    private final Markdown markdown = new Markdown();
 
     /**
      * List holding the deferred processing list starting from the first object to handle
@@ -109,7 +107,6 @@ public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
             CharSequence spanned = createSpanned(comment.getBody_html());
             comment.setSpannedBody(spanned);
         }
-        markdown.getURLs(comment.getBody(), comment.getUrls());
     }
 
     /**

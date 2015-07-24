@@ -34,7 +34,7 @@ import in.shick.diode.login.LoginDialog;
 import in.shick.diode.login.LoginTask;
 import in.shick.diode.mail.InboxActivity;
 import in.shick.diode.mail.PeekEnvelopeTask;
-import in.shick.diode.markdown.MarkdownURL;
+import in.shick.diode.markdown.Markdown;
 import in.shick.diode.saved.SavedContent;
 import in.shick.diode.saved.SavedDBHandler;
 import in.shick.diode.settings.RedditPreferencesPage;
@@ -69,15 +69,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
-import android.telephony.PhoneNumberUtils;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -354,13 +350,13 @@ public class CommentsListActivity extends ListActivity
     private DownloadCommentsTask getNewDownloadCommentsTask() {
         if(mObjectStates.mDownloadCommentsTask == null || mObjectStates.mDownloadCommentsTask.getStatus() == Status.FINISHED) {
             mObjectStates.mDownloadCommentsTask = new DownloadCommentsTask(
-                    this,
-                    mSubreddit,
-                    mThreadId,
-                    mSettings,
-                    mClient,
-                    mContextOPID,
-                    mContextCount
+                this,
+                mSubreddit,
+                mThreadId,
+                mSettings,
+                mClient,
+                mContextOPID,
+                mContextCount
             );
         } else if (mObjectStates.mDownloadCommentsTask.getStatus() == Status.RUNNING) {
             // Found that if you can click real quickly on the 'Load more comments' button, you can crash the channel.
@@ -369,12 +365,12 @@ public class CommentsListActivity extends ListActivity
             // It would have to be decided if you want to cancel the previous running one and start a new task.
             Toast.makeText(CommentsListActivity.this, R.string.load_in_progress_toast, Toast.LENGTH_SHORT).show();
             return new DoNothingDownloadTask(this,
-                    mSubreddit,
-                    mThreadId,
-                    mSettings,
-                    mClient,
-                    mContextOPID,
-                    mContextCount);
+                                             mSubreddit,
+                                             mThreadId,
+                                             mSettings,
+                                             mClient,
+                                             mContextOPID,
+                                             mContextCount);
         }
         return mObjectStates.mDownloadCommentsTask;
     }
@@ -655,10 +651,15 @@ public class CommentsListActivity extends ListActivity
             getNewDownloadCommentsTask().prepareLoadMoreComments(item.getId(), position, item.getIndent())
             .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
         } else {
+            // Clicking the comment-context warning takes you to the whole comments thread.
             if (item.isContext()) {
                 resetContextInfo();
                 getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             } else {
+                // Lazy-load the URL list to make the list-loading more 'snappy'.
+                if (mVoteTargetThing.getUrls() != null && mVoteTargetThing.getUrls().isEmpty()) {
+                    Markdown.getURLs(mVoteTargetThing.getBody(), mVoteTargetThing.getUrls());
+                }
                 if (!"[deleted]".equals(item.getAuthor())) {
                     showDialog(Constants.DIALOG_COMMENT_CLICK);
                 }
@@ -1502,7 +1503,7 @@ public class CommentsListActivity extends ListActivity
             // Make sure the user isn't '[deleted]'
             if (!item.isDeletedUser()) {
                 menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                        String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+                         String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
             }
 
         } else if (isLoadMoreCommentsPosition(rowId)) {
@@ -1544,7 +1545,7 @@ public class CommentsListActivity extends ListActivity
             // Make sure the user isn't '[deleted]'
             if (!item.isDeletedUser()) {
                 menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                        String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
+                         String.format(getResources().getString(R.string.user_profile), item.getAuthor()));
             }
         }
     }
@@ -1997,6 +1998,7 @@ public class CommentsListActivity extends ListActivity
             final TextView urlView = (TextView) dialog.findViewById(R.id.url);
             final TextView submissionStuffView = (TextView) dialog.findViewById(R.id.submissionTime_submitter_subreddit);
             final Button linkButton = (Button) dialog.findViewById(R.id.thread_link_button);
+            linkButton.setEnabled(false);
 
             if (mVoteTargetThing == getOpThingInfo()) {
                 likes = mVoteTargetThing.getLikes();
@@ -2011,7 +2013,20 @@ public class CommentsListActivity extends ListActivity
                 // For self posts, you're already there!
                 if (getOpThingInfo().getDomain().toLowerCase().startsWith("self.")) {
                     linkButton.setText(R.string.comment_links_button);
-                    linkToEmbeddedURLs(linkButton);
+                    // Lazy-load the URL list to make the list-loading more 'snappy'.
+                    if (mVoteTargetThing.getUrls() != null && mVoteTargetThing.getUrls().isEmpty()) {
+                        Markdown.getURLs(mVoteTargetThing.getSelftext(), mVoteTargetThing.getUrls());
+                    }
+                    if (mVoteTargetThing.getUrls() != null && !mVoteTargetThing.getUrls().isEmpty()) {
+                        linkButton.setEnabled(true);
+                        linkButton.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                removeDialog(Constants.DIALOG_COMMENT_CLICK);
+                                Common.showLinksDialog(CommentsListActivity.this, mSettings, mVoteTargetThing);
+                            }
+                        });
+                    }
                 } else {
                     final String url = getOpThingInfo().getUrl();
                     linkButton.setText(R.string.thread_link_button);
@@ -2035,7 +2050,16 @@ public class CommentsListActivity extends ListActivity
 
                 // Get embedded URLs
                 linkButton.setText(R.string.comment_links_button);
-                linkToEmbeddedURLs(linkButton);
+                if (mVoteTargetThing.getUrls() != null && !mVoteTargetThing.getUrls().isEmpty()) {
+                    linkButton.setEnabled(true);
+                    linkButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            removeDialog(Constants.DIALOG_COMMENT_CLICK);
+                            Common.showLinksDialog(CommentsListActivity.this, mSettings, mVoteTargetThing);
+                        }
+                    });
+                }
             }
             final CheckBox voteUpButton = (CheckBox) dialog.findViewById(R.id.vote_up_button);
             final CheckBox voteDownButton = (CheckBox) dialog.findViewById(R.id.vote_down_button);
@@ -2105,94 +2129,6 @@ public class CommentsListActivity extends ListActivity
         default:
             // No preparation based on app state is required.
             break;
-        }
-    }
-
-    /**
-     * Helper function to add links from mVoteTargetThing to the button
-     * @param linkButton Button that should open list of links
-     */
-    private void linkToEmbeddedURLs(Button linkButton) {
-        final ArrayList<String> urls = new ArrayList<String>();
-        final ArrayList<MarkdownURL> vtUrls = mVoteTargetThing.getUrls();
-        int urlsCount = vtUrls.size();
-        for (int i = 0; i < urlsCount; i++) {
-            urls.add(vtUrls.get(i).url);
-        }
-        if (urlsCount == 0) {
-            linkButton.setEnabled(false);
-        } else {
-            linkButton.setEnabled(true);
-            linkButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    removeDialog(Constants.DIALOG_COMMENT_CLICK);
-
-                    ArrayAdapter<MarkdownURL> adapter =
-                    new ArrayAdapter<MarkdownURL>(CommentsListActivity.this, android.R.layout.select_dialog_item, vtUrls) {
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            TextView tv;
-                            if (convertView == null) {
-                                tv = (TextView) ((LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                                     .inflate(android.R.layout.select_dialog_item, null);
-                            } else {
-                                tv = (TextView) convertView;
-                            }
-
-                            String url = getItem(position).url;
-                            String anchorText = getItem(position).anchorText;
-                            if (Constants.LOGGING) Log.d(TAG, "links url="+url + " anchorText="+anchorText);
-
-                            Drawable d = null;
-                            try {
-                                d = getPackageManager().getActivityIcon(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                            } catch (NameNotFoundException ignore) {
-                            }
-                            if (d != null) {
-                                d.setBounds(0, 0, d.getIntrinsicHeight(), d.getIntrinsicHeight());
-                                tv.setCompoundDrawablePadding(10);
-                                tv.setCompoundDrawables(d, null, null, null);
-                            }
-
-                            final String telPrefix = "tel:";
-                            if (url.startsWith(telPrefix)) {
-                                url = PhoneNumberUtils.formatNumber(url.substring(telPrefix.length()));
-                            }
-
-                            if (anchorText != null)
-                                tv.setText(Html.fromHtml("<span>" + anchorText + "</span><br /><small>" + url + "</small>"));
-                            else
-                                tv.setText(Html.fromHtml(url));
-
-                            return tv;
-                        }
-                    };
-
-                    AlertDialog.Builder b = new AlertDialog.Builder(new ContextThemeWrapper(CommentsListActivity.this, mSettings.getDialogTheme()));
-
-                    DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
-                        public final void onClick(DialogInterface dialog, int which) {
-                            if (which >= 0) {
-                                Common.launchBrowser(CommentsListActivity.this, urls.get(which),
-                                                     Util.createThreadUri(getOpThingInfo()).toString(),
-                                                     false, false, mSettings.isUseExternalBrowser(),
-                                                     mSettings.isSaveHistory());
-                            }
-                        }
-                    };
-
-                    b.setTitle(R.string.select_link_title);
-                    b.setCancelable(true);
-                    b.setAdapter(adapter, click);
-
-                    b.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        public final void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    b.show();
-                }
-            });
         }
     }
 

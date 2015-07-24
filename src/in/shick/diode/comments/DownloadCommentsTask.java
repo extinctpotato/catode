@@ -30,7 +30,6 @@ import in.shick.diode.common.ProgressInputStream;
 import in.shick.diode.common.util.Assert;
 import in.shick.diode.common.util.StringUtils;
 import in.shick.diode.common.util.Util;
-import in.shick.diode.markdown.Markdown;
 import in.shick.diode.settings.RedditSettings;
 import in.shick.diode.things.Listing;
 import in.shick.diode.things.ListingData;
@@ -55,7 +54,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
 
     private static final String TAG = "DownloadCommentsTask";
     private final ObjectMapper mObjectMapper = Common.getObjectMapper();
-    private final Markdown markdown = new Markdown();
 
     private static AsyncTask<?, ?, ?> mCurrentDownloadCommentsTask = null;
     private static final Object mCurrentDownloadCommentsTaskLock = new Object();
@@ -359,9 +357,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
                 data.setSpannedSelftext(selftext.subSequence(0, selftext.length()-2));
             else
                 data.setSpannedSelftext("");
-
-            // Get URLs from markdown
-            markdown.getURLs(data.getSelftext(), data.getUrls());
         }
 
         // We might not have a title if we've intercepted a plain link to a thread.

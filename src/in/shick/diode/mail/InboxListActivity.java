@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.shick.diode.markdown.Markdown;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -43,7 +44,6 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -58,7 +58,6 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -123,10 +122,8 @@ public final class InboxListActivity extends ListActivity
     private final RedditSettings mSettings = new RedditSettings();
 
     // UI State
-    private View mVoteTargetView = null;
     private ThingInfo mVoteTargetThingInfo = null;
     private String mReplyTargetName = null;
-    private URLSpan[] mVoteTargetSpans = null;
     // TODO: String mVoteTargetId so when you rotate, you can find the TargetThingInfo again
     private DownloadMessagesTask mCurrentDownloadMessagesTask = null;
     private final Object mCurrentDownloadMessagesTaskLock = new Object();
@@ -144,8 +141,6 @@ public final class InboxListActivity extends ListActivity
     // ProgressDialogs with percentage bars
 //    private AutoResetProgressDialog mLoadingCommentsProgress;
 //    private int mNumVisibleMessages;
-
-    private boolean mCanChord = false;
 
     /**
      * Called when the activity starts up. Do activity initialization
@@ -256,22 +251,6 @@ public final class InboxListActivity extends ListActivity
     }
 
 
-    /**
-     * Return the ThingInfo based on linear search over the names
-     */
-    private ThingInfo findThingInfoByName(String name) {
-        if (name == null)
-            return null;
-        synchronized(MESSAGE_ADAPTER_LOCK) {
-            for (int i = 0; i < mMessagesAdapter.getCount(); i++) {
-                if (mMessagesAdapter.getItem(i).getName().equals(name))
-                    return mMessagesAdapter.getItem(i);
-            }
-        }
-        return null;
-    }
-
-
     private final class MessagesListAdapter extends ArrayAdapter<ThingInfo> {
         public boolean mIsLoading = true;
 
@@ -330,7 +309,7 @@ public final class InboxListActivity extends ListActivity
             builder.append(authorSS);
             // When it was sent
             builder.append(" sent ");
-            builder.append(Util.getTimeAgo(Double.valueOf(item.getCreated_utc())));
+            builder.append(Util.getTimeAgo(item.getCreated_utc()));
             fromInfoView.setText(builder);
 
             subjectView.setText(item.getSubject());
@@ -351,7 +330,6 @@ public final class InboxListActivity extends ListActivity
 
         // Mark the message/comment as selected
         mVoteTargetThingInfo = item;
-        mVoteTargetView = v;
         mReplyTargetName = item.getName();
 
         // If new, mark the message read. Otherwise handle it.
@@ -371,13 +349,19 @@ public final class InboxListActivity extends ListActivity
 
         // Mark the message/comment as selected
         mVoteTargetThingInfo = item;
-        mVoteTargetView = v;
         mReplyTargetName = item.getName();
 
         if (item.isWas_comment()) {
             menu.add(0, Constants.DIALOG_COMMENT_CLICK, Menu.NONE, R.string.view_context);
         } else {
             menu.add(0, Constants.DIALOG_MESSAGE_CLICK, Menu.NONE, "Reply");
+        }
+        // Lazy-load the URL list to make the list-loading more 'snappy'.
+        if (mVoteTargetThingInfo.getUrls() != null && mVoteTargetThingInfo.getUrls().isEmpty()) {
+            Markdown.getURLs(mVoteTargetThingInfo.getBody(), mVoteTargetThingInfo.getUrls());
+        }
+        if (mVoteTargetThingInfo.getUrls() != null && !mVoteTargetThingInfo.getUrls().isEmpty()) {
+            menu.add(0, Constants.DIALOG_LINKS, Menu.NONE, R.string.links_menu_item);
         }
     }
 
@@ -393,6 +377,9 @@ public final class InboxListActivity extends ListActivity
             return true;
         case Constants.DIALOG_MESSAGE_CLICK:
             showDialog(Constants.DIALOG_REPLY);
+            return true;
+        case Constants.DIALOG_LINKS:
+            Common.showLinksDialog(InboxListActivity.this, mSettings, mVoteTargetThingInfo);
             return true;
         default:
             return super.onContextItemSelected(item);
@@ -746,7 +733,7 @@ public final class InboxListActivity extends ListActivity
                 // Construct data
                 List<NameValuePair> nvps = new ArrayList<NameValuePair>();
                 nvps.add(new BasicNameValuePair("id", _mTargetThingInfo.getName()));
-                nvps.add(new BasicNameValuePair("uh", mSettings.getModhash().toString()));
+                nvps.add(new BasicNameValuePair("uh", mSettings.getModhash()));
                 // Votehash is currently unused by reddit
 //    				nvps.add(new BasicNameValuePair("vh", "0d4ab0ffd56ad0f66841c15609e9a45aeec6b015"));
 
@@ -912,10 +899,6 @@ public final class InboxListActivity extends ListActivity
     protected Dialog onCreateDialog(int id) {
         Dialog dialog;
         ProgressDialog pdialog;
-        AlertDialog.Builder builder;
-        LayoutInflater inflater;
-        View layout; // used for inflated views for AlertDialog.Builder.setView()
-
         switch (id) {
         case Constants.DIALOG_LOGIN:
             dialog = new LoginDialog(this, mSettings, true) {

@@ -85,7 +85,7 @@ public class Markdown {
      * @param txt input
      * @param urls out URLs
      */
-    public void getURLs(String txt, ArrayList<MarkdownURL> urls) {
+    static public void getURLs(String txt, ArrayList<MarkdownURL> urls) {
         if (txt == null) {
             txt = "";
         }
@@ -154,7 +154,7 @@ public class Markdown {
         return ssb;
     }
 
-    private boolean isOverlapping(int start, int end, TreeMap<Integer, Integer> startToEndOffsetMap) {
+    static private boolean isOverlapping(int start, int end, TreeMap<Integer, Integer> startToEndOffsetMap) {
         for (Map.Entry<Integer, Integer> startEnd : startToEndOffsetMap.entrySet()) {
             int entryStart = startEnd.getKey();
             int entryEnd = startEnd.getValue();
@@ -168,7 +168,7 @@ public class Markdown {
         return false;
     }
 
-    private void saveStartAndEnd(int start, int end, TreeMap<Integer, Integer> startToEndOffsetMap) {
+    static private void saveStartAndEnd(int start, int end, TreeMap<Integer, Integer> startToEndOffsetMap) {
         startToEndOffsetMap.put(start, end);
     }
 
@@ -177,7 +177,7 @@ public class Markdown {
      * @param urls Out URLs from anchors
      * @return updated text with anchors replaced
      */
-    private String doAnchorURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
+    static private String doAnchorURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
         // Inline-style links: [link text](url "optional title")
         AutomatonMatcher am = inlineLinkAutomaton.newMatcher(txt);
         // The offset into the entire original string
@@ -233,7 +233,7 @@ public class Markdown {
      * @param urls Out URLs from autolinks
      * @return txt, unchanged
      */
-    private String doAutoLinkURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
+    static private String doAutoLinkURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
         // Colorize URLs
         AutomatonMatcher am = autoLinkUrlAutomaton.newMatcher(txt);
         while (am.find()) {
@@ -271,7 +271,7 @@ public class Markdown {
      * @param urls Out URLs from subreddit references
      * @return txt, unchanged
      */
-    private String doAutoLinkSubredditURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
+    static private String doAutoLinkSubredditURLs(String txt, ArrayList<MarkdownURL> urls, TreeMap<Integer, Integer> startToEndOffsetMap) {
         AutomatonMatcher am = subredditAutomaton.newMatcher(txt);
         while (am.find()) {
             String subreddit = am.group();

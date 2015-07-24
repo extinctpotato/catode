@@ -31,7 +31,6 @@ import in.shick.diode.common.tasks.SaveTask;
 import in.shick.diode.common.tasks.VoteTask;
 import in.shick.diode.common.util.StringUtils;
 import in.shick.diode.common.util.Util;
-import in.shick.diode.filters.FilterListActivity;
 import in.shick.diode.login.LoginDialog;
 import in.shick.diode.login.LoginTask;
 import in.shick.diode.mail.InboxActivity;
@@ -65,7 +64,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -131,7 +129,6 @@ public final class ThreadsListActivity extends ListActivity {
 
     // UI State
     private ThingInfo mVoteTargetThing = null;
-    private final Object mCurrentDownloadThreadsTaskLock = new Object();
     private View mNextPreviousView = null;
 
     private ShowThumbnailsTask mCurrentShowThumbnailsTask = null;
@@ -230,7 +227,6 @@ public final class ThreadsListActivity extends ListActivity {
                         setTitle("/r/" + mSubreddit.trim());
                     }
                 }
-                return;
             }
         }
         // Handle subreddit Uri passed via Intent
@@ -531,7 +527,7 @@ public final class ThreadsListActivity extends ListActivity {
                 voteUpView.setImageResource(R.drawable.vote_up_gray);
                 voteDownView.setImageResource(R.drawable.vote_down_gray);
                 votesView.setTextColor(res.getColor(R.color.gray_75));
-            } else if (item.getLikes() == true) {
+            } else if (item.getLikes()) {
                 voteUpView.setImageResource(R.drawable.vote_up_red);
                 voteDownView.setImageResource(R.drawable.vote_down_gray);
                 votesView.setTextColor(res.getColor(R.color.arrow_red));
@@ -624,7 +620,7 @@ public final class ThreadsListActivity extends ListActivity {
                 // User is currently neutral
                 voteUpButton.setChecked(false);
                 voteDownButton.setChecked(false);
-            } else if (thingInfo.getLikes() == true) {
+            } else if (thingInfo.getLikes()) {
                 // User currenty likes it
                 voteUpButton.setChecked(true);
                 voteDownButton.setChecked(false);
@@ -757,15 +753,15 @@ public final class ThreadsListActivity extends ListActivity {
     }
 
 
-    /**
-     * Given a subreddit name string, starts the threadlist-download-thread going.
-     *
-     * @param subreddit The name of a subreddit ("android", "gaming", etc.)
-     *        If the number of elements in subreddit is >= 2, treat 2nd element as "after"
-     */
     private class MyDownloadThreadsTask extends DownloadThreadsTask {
         ThreadsListActivity threadListActivity=null;
 
+        /**
+         * Given a subreddit name string, starts the threadlist-download-thread going.
+         *
+         * @param subreddit The name of a subreddit ("android", "gaming", etc.)
+         *        If the number of elements in subreddit is >= 2, treat 2nd element as "after"
+         */
         public MyDownloadThreadsTask(String subreddit) {
             super(getApplicationContext(),
                   ThreadsListActivity.this.mClient,
@@ -953,7 +949,7 @@ public final class ThreadsListActivity extends ListActivity {
             }
             int newScore;
             Boolean newLikes;
-            _mPreviousScore = Integer.valueOf(_mTargetThingInfo.getScore());
+            _mPreviousScore = _mTargetThingInfo.getScore();
             _mPreviousLikes = _mTargetThingInfo.getLikes();
             if (_mPreviousLikes == null) {
                 if (_mDirection == 1) {
@@ -966,7 +962,7 @@ public final class ThreadsListActivity extends ListActivity {
                     cancel(true);
                     return;
                 }
-            } else if (_mPreviousLikes == true) {
+            } else if (_mPreviousLikes) {
                 if (_mDirection == 0) {
                     newScore = _mPreviousScore - 1;
                     newLikes = null;
@@ -1072,7 +1068,7 @@ public final class ThreadsListActivity extends ListActivity {
         // Make sure the user isn't '[deleted]'
         if (!_item.isDeletedUser()) {
             menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                    String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
+                     String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
         }
     }
 
@@ -1263,7 +1259,7 @@ public final class ThreadsListActivity extends ListActivity {
             if (mSubreddit.equals(Constants.FRONTPAGE_STRING))
                 url = Constants.REDDIT_BASE_URL;
             else
-                url = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/").append(mSubreddit).toString();
+                url = Constants.REDDIT_BASE_URL + "/r/" + mSubreddit;
             Common.launchBrowser(this, url, null, false, true, true, false);
             break;
         case R.id.light_dark_menu_id:

@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import in.shick.diode.markdown.Markdown;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import android.app.Activity;
@@ -48,7 +48,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -130,9 +129,7 @@ public final class ProfileActivity extends ListActivity
     private final RedditSettings mSettings = new RedditSettings();
 
     // UI State
-    private View mVoteTargetView = null;
     private ThingInfo mVoteTargetThingInfo = null;
-    private URLSpan[] mVoteTargetSpans = null;
     // TODO: String mVoteTargetId so when you rotate, you can find the TargetThingInfo again
     private DownloadProfileTask mCurrentDownloadThingsTask = null;
     private final Object mCurrentDownloadThingsTaskLock = new Object();
@@ -158,8 +155,6 @@ public final class ProfileActivity extends ListActivity
     // ProgressDialogs with percentage bars
 //    private AutoResetProgressDialog mLoadingCommentsProgress;
 //    private int mNumVisibleMessages;
-
-    private boolean mCanChord = false;
 
     /**
      * Called when the activity starts up. Do activity initialization
@@ -360,7 +355,6 @@ public final class ProfileActivity extends ListActivity
 
         // Mark the message/comment as selected
         mVoteTargetThingInfo = item;
-        mVoteTargetView = v;
 
         if (item.getName().startsWith(Constants.THREAD_KIND)) {
             showDialog(Constants.DIALOG_THREAD_CLICK);
@@ -378,7 +372,6 @@ public final class ProfileActivity extends ListActivity
 
         // Mark the message/comment as selected
         mVoteTargetThingInfo = item;
-        mVoteTargetView = v;
 
         if (item.isThreadKind()) {
             menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
@@ -387,6 +380,13 @@ public final class ProfileActivity extends ListActivity
             if (mVoteTargetThingInfo.getLink_id() != null) {
                 // Don't add the thread link if the link_id is null for some reason.
                 menu.add(1, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
+            }
+            // Lazy-load the URL list to make the list-loading more 'snappy'.
+            if (mVoteTargetThingInfo.getUrls() != null && mVoteTargetThingInfo.getUrls().isEmpty()) {
+                Markdown.getURLs(mVoteTargetThingInfo.getBody(), mVoteTargetThingInfo.getUrls());
+            }
+            if (mVoteTargetThingInfo.getUrls() != null && !mVoteTargetThingInfo.getUrls().isEmpty()) {
+                menu.add(0, Constants.DIALOG_LINKS, Menu.NONE, R.string.links_menu_item);
             }
         }
     }
@@ -418,6 +418,9 @@ public final class ProfileActivity extends ListActivity
                 i.setData(Util.createThreadUri(mVoteTargetThingInfo.getSubreddit(), Util.nameToId(mVoteTargetThingInfo.getLink_id())));
             }
             startActivity(i);
+            return true;
+        case Constants.DIALOG_LINKS:
+            Common.showLinksDialog(ProfileActivity.this, mSettings, mVoteTargetThingInfo);
             return true;
         default:
             return super.onContextItemSelected(item);
@@ -690,19 +693,25 @@ public final class ProfileActivity extends ListActivity
                     return new int[] { userInfo.getLink_karma(), userInfo.getComment_karma() };
 
             } finally {
-                try {
-                    in.close();
-                } catch (Exception ignore) {}
-                try {
-                    entity.consumeContent();
-                } catch (Exception ignore) {}
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (Exception ignore) {
+                    }
+                }
+                if (entity != null) {
+                    try {
+                        entity.consumeContent();
+                    } catch (Exception ignore) {
+                    }
+                }
             }
 
             return null;
         }
 
         private void parseThingsJSON(InputStream in) throws IOException,
-            JsonParseException, IllegalStateException {
+            IllegalStateException {
 
             String genericListingError = "Not a user page listing";
             try {
@@ -874,7 +883,7 @@ public final class ProfileActivity extends ListActivity
             }
             int newScore;
             Boolean newLikes;
-            _mPreviousScore = Integer.valueOf(_mTargetThingInfo.getScore());
+            _mPreviousScore = _mTargetThingInfo.getScore();
             _mPreviousLikes = _mTargetThingInfo.getLikes();
             if (_mPreviousLikes == null) {
                 if (_mDirection == 1) {
@@ -887,7 +896,7 @@ public final class ProfileActivity extends ListActivity
                     cancel(true);
                     return;
                 }
-            } else if (_mPreviousLikes == true) {
+            } else if (_mPreviousLikes) {
                 if (_mDirection == 0) {
                     newScore = _mPreviousScore - 1;
                     newLikes = null;

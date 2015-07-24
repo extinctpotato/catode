@@ -107,8 +107,6 @@ public class SavedCommentsActivity extends Activity
 
     private SavedContent currentSavedContent;
 
-    private ListView listview;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -128,7 +126,7 @@ public class SavedCommentsActivity extends Activity
 
         Adapter lAdapter = new Adapter(this, R.layout.saved_comments_item, savedContent);
 
-        listview = (ListView) findViewById(R.id.savedcommentslv);
+        ListView listview = (ListView) findViewById(R.id.savedcommentslv);
 
         listview.setAdapter(lAdapter);
 
@@ -136,8 +134,7 @@ public class SavedCommentsActivity extends Activity
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id)
-            {
+                                    long id) {
                 currentSavedContent = savedContent.get(position);
                 showDialog(Constants.DIALOG_SAVED_COMMENTS);
             }
@@ -296,7 +293,7 @@ public class SavedCommentsActivity extends Activity
             unsaveComment.setEnabled(true);
 
             ThingInfo ti = new ThingInfo();
-            new Markdown().getURLs(currentSavedContent.getBody(), ti.getUrls());
+            Markdown.getURLs(currentSavedContent.getBody(), ti.getUrls());
             linkToEmbeddedURLs(linkButton, ti.getUrls());
 
             unsaveComment.setOnClickListener(new OnClickListener()

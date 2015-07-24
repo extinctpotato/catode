@@ -180,6 +180,7 @@
 	<string name="view_full_context">View the full context</string>
 	<string name="view_context">View context</string>
 	<string name="goto_thread">Go to full comments</string>
+	<string name="links_menu_item">Links</string>
 
 	
 	<!-- === Preferences === -->

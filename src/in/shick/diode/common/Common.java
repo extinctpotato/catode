@@ -22,9 +22,21 @@ package in.shick.diode.common;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.app.*;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.telephony.PhoneNumberUtils;
+import android.text.Html;
+import android.view.ContextThemeWrapper;
+import android.view.ViewGroup;
+import android.widget.*;
+import in.shick.diode.markdown.MarkdownURL;
+import in.shick.diode.things.ThingInfo;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -35,11 +47,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.node.ArrayNode;
 
-import android.app.Activity;
-import android.app.ListActivity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -55,11 +62,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.CookieSyncManager;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.RemoteViews;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import in.shick.diode.R;
 import in.shick.diode.browser.BrowserActivity;
@@ -132,12 +134,13 @@ public class Common {
         // If alwaysShowNextPrevious, use the navbar
         if (settings.isAlwaysShowNextPrevious()) {
             nextPreviousView = act.findViewById(R.id.next_previous_layout);
-            if (nextPreviousView == null)
+            if (nextPreviousView == null) {
                 return;
+            }
             View nextPreviousBorder = act.findViewById(R.id.next_previous_border_top);
 
             if (shouldShow) {
-                if (nextPreviousView != null && nextPreviousBorder != null) {
+                if (nextPreviousBorder != null) {
                     if (Util.isLightTheme(settings.getTheme())) {
                         nextPreviousView.setBackgroundResource(android.R.color.background_light);
                         nextPreviousBorder.setBackgroundResource(R.color.black);
@@ -155,8 +158,9 @@ public class Common {
         }
         // Otherwise we are using the ListView footer
         else {
-            if (nextPreviousView == null)
+            if (nextPreviousView == null) {
                 return;
+            }
             if (shouldShow && nextPreviousView.getVisibility() != View.VISIBLE) {
                 nextPreviousView.setVisibility(View.VISIBLE);
             } else if (!shouldShow && nextPreviousView.getVisibility() == View.VISIBLE) {
@@ -216,6 +220,87 @@ public class Common {
         clearCookies(settings, client, context);
         CacheInfo.invalidateAllCaches(context);
         settings.setUsername(null);
+    }
+
+    /**
+     * Helper function to display a list of URLs.
+     * @param theContext The current application context.
+     * @param settings The settings to use regarding the browser component.
+     * @param theItem The ThingInfo item to get URLs from.
+     */
+    public static void showLinksDialog(final Context theContext, final RedditSettings settings, final ThingInfo theItem) {
+        assert(theContext != null);
+        assert(theItem != null);
+        assert(settings != null);
+        final ArrayList<String> urls = new ArrayList<String>();
+        final ArrayList<MarkdownURL> vtUrls = theItem.getUrls();
+        for (MarkdownURL vtUrl : vtUrls) {
+            urls.add(vtUrl.url);
+        }
+        ArrayAdapter<MarkdownURL> adapter =
+        new ArrayAdapter<MarkdownURL>(theContext, android.R.layout.select_dialog_item, vtUrls) {
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView tv;
+                if (convertView == null) {
+                    tv = (TextView) ((LayoutInflater)theContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                         .inflate(android.R.layout.select_dialog_item, null);
+                } else {
+                    tv = (TextView) convertView;
+                }
+
+                String url = getItem(position).url;
+                String anchorText = getItem(position).anchorText;
+//                        if (Constants.LOGGING) Log.d(TAG, "links url="+url + " anchorText="+anchorText);
+
+                Drawable d = null;
+                try {
+                    d = theContext.getPackageManager().getActivityIcon(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (PackageManager.NameNotFoundException ignore) {
+                }
+                if (d != null) {
+                    d.setBounds(0, 0, d.getIntrinsicHeight(), d.getIntrinsicHeight());
+                    tv.setCompoundDrawablePadding(10);
+                    tv.setCompoundDrawables(d, null, null, null);
+                }
+
+                final String telPrefix = "tel:";
+                if (url.startsWith(telPrefix)) {
+                    url = PhoneNumberUtils.formatNumber(url.substring(telPrefix.length()));
+                }
+
+                if (anchorText != null)
+                    tv.setText(Html.fromHtml("<span>" + anchorText + "</span><br /><small>" + url + "</small>"));
+                else
+                    tv.setText(Html.fromHtml(url));
+
+                return tv;
+            }
+        };
+
+        AlertDialog.Builder b = new AlertDialog.Builder(new ContextThemeWrapper(theContext, settings.getDialogTheme()));
+
+        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
+            public final void onClick(DialogInterface dialog, int which) {
+                if (which >= 0) {
+                    Common.launchBrowser(theContext, urls.get(which),
+                                         Util.createThreadUri(theItem).toString(),
+                                         false, false, settings.isUseExternalBrowser(),
+                                         settings.isSaveHistory());
+                }
+            }
+        };
+
+        b.setTitle(R.string.select_link_title);
+        b.setCancelable(true);
+        b.setAdapter(adapter, click);
+
+        b.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public final void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        b.show();
     }
 
 
