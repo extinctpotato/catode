@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.text.SpannableString;
 import in.shick.diode.markdown.Markdown;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -743,6 +744,21 @@ public final class ProfileActivity extends ListActivity
                             ti.setSpannedBody(body.subSequence(0, body.length()-2));
                         else
                             ti.setSpannedBody("");
+
+                        // First test for moderator distinguished
+                        if (Constants.DISTINGUISHED_MODERATOR.equalsIgnoreCase(ti.getDistinguished())) {
+                            SpannableString distSS = new SpannableString(ti.getAuthor() + " [M]");
+                            distSS.setSpan(Util.getModeratorSpan(getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            ti.setSSAuthor(distSS);
+                        } else if (Constants.DISTINGUISHED_ADMIN.equalsIgnoreCase(ti.getDistinguished())) {
+                            SpannableString distSS = new SpannableString(ti.getAuthor() + " [A]");
+                            distSS.setSpan(Util.getAdminSpan(getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            ti.setSSAuthor(distSS);
+                        } else if (ti.getLinkAuthor().equalsIgnoreCase(ti.getAuthor())) {
+                            SpannableString opSpan = new SpannableString(ti.getLinkAuthor() + " [S]");
+                            opSpan.setSpan(Util.getOPSpan(getApplicationContext(), mSettings.getTheme()), 0, opSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            ti.setSSAuthor(opSpan);
+                        }
                         _mThingInfos.add(ti);
                     } else if (Constants.THREAD_KIND.equals(tiContainer.getKind())) {
                         ThingInfo ti = tiContainer.getData();

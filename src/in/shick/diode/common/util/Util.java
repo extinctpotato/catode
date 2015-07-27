@@ -20,14 +20,15 @@
 package in.shick.diode.common.util;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.text.style.ForegroundColorSpan;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.text.style.URLSpan;
 import android.util.Log;
 
 import in.shick.diode.R;
@@ -39,14 +40,44 @@ public class Util {
 
     private static final String TAG = "Util";
 
-    public static ArrayList<String> extractUris(URLSpan[] spans) {
-        int size = spans.length;
-        ArrayList<String> accumulator = new ArrayList<String>();
+    // Spans for marking an author as the OP (submitter)
+    private static ForegroundColorSpan LIGHT_OP_FGCS = null;
+    private static ForegroundColorSpan DARK_OP_FGCS = null;
 
-        for (int i = 0; i < size; i++) {
-            accumulator.add(spans[i].getURL());
+    // Spans for marking an author as a moderator
+    // Determined that dark_green looks fine in both light and dark themes.
+    private static ForegroundColorSpan MODERATOR_FGCS = null;
+
+    // Spans for marking an author as an admin
+    // Determined that red looks fine in both light and dark themes.
+    private static ForegroundColorSpan ADMIN_FGCS = null;
+
+    public static ForegroundColorSpan getAdminSpan(Context context) {
+        if (ADMIN_FGCS == null) {
+            ADMIN_FGCS = new ForegroundColorSpan(context.getResources().getColor(R.color.red));
         }
-        return accumulator;
+        return ADMIN_FGCS;
+    }
+
+    public static ForegroundColorSpan getModeratorSpan(Context context) {
+        if (MODERATOR_FGCS == null) {
+            MODERATOR_FGCS = new ForegroundColorSpan(context.getResources().getColor(R.color.dark_green));
+        }
+        return MODERATOR_FGCS;
+    }
+
+    public static ForegroundColorSpan getOPSpan(Context context, int theme) {
+        if (Util.isLightTheme(theme)) {
+            if (LIGHT_OP_FGCS == null) {
+                LIGHT_OP_FGCS = new ForegroundColorSpan(context.getResources().getColor(R.color.blue));
+            }
+            return LIGHT_OP_FGCS;
+        } else {
+            if (DARK_OP_FGCS == null) {
+                DARK_OP_FGCS = new ForegroundColorSpan(context.getResources().getColor(R.color.pale_blue));
+            }
+            return DARK_OP_FGCS;
+        }
     }
 
     /**
@@ -92,57 +123,57 @@ public class Util {
      * @param timeSeconds
      * @return
      */
-    public static String getTimeAgo(long utcTimeSeconds) {
+    public static String getTimeAgo(long utcTimeSeconds, Resources resources) {
         long systime = System.currentTimeMillis() / 1000;
         long diff = systime - utcTimeSeconds;
         if (diff <= 0)
-            return "very recently";
+            return resources.getString(R.string.just_now);
         else if (diff < 60) {
             if (diff == 1)
-                return "1 second ago";
+                return resources.getString(R.string.one_second_ago);
             else
-                return diff + " seconds ago";
+                return String.format(resources.getString(R.string.n_seconds_ago), diff);
         }
         else if (diff < 3600) {
             if ((diff / 60) == 1)
-                return "1 minute ago";
+                return resources.getString(R.string.one_minute_ago);
             else
-                return (diff / 60) + " minutes ago";
+                return String.format(resources.getString(R.string.n_minutes_ago), (diff / 60));
         }
         else if (diff < 86400) { // 86400 seconds in a day
             if ((diff / 3600) == 1)
-                return "1 hour ago";
+                return resources.getString(R.string.one_hour_ago);
             else
-                return (diff / 3600) + " hours ago";
+                return String.format(resources.getString(R.string.n_hours_ago), (diff / 3600));
         }
         else if (diff < 604800) { // 86400 * 7
             if ((diff / 86400) == 1)
-                return "1 day ago";
+                return resources.getString(R.string.one_day_ago);
             else
-                return (diff / 86400) + " days ago";
+                return String.format(resources.getString(R.string.n_days_ago), (diff / 86400));
         }
         else if (diff < 2592000) { // 86400 * 30
             if ((diff / 604800) == 1)
-                return "1 week ago";
+                return resources.getString(R.string.one_week_ago);
             else
-                return (diff / 604800) + " weeks ago";
+                return String.format(resources.getString(R.string.n_weeks_ago), (diff / 604800));
         }
         else if (diff < 31536000) { // 86400 * 365
             if ((diff / 2592000) == 1)
-                return "1 month ago";
+                return resources.getString(R.string.one_month_ago);
             else
-                return (diff / 2592000) + " months ago";
+                return String.format(resources.getString(R.string.n_months_ago), (diff / 2592000));
         }
         else {
             if ((diff / 31536000) == 1)
-                return "1 year ago";
+                return resources.getString(R.string.one_year_ago);
             else
-                return (diff / 31536000) + " years ago";
+                return String.format(resources.getString(R.string.n_years_ago), (diff / 31536000));
         }
     }
 
-    public static String getTimeAgo(double utcTimeSeconds) {
-        return getTimeAgo((long)utcTimeSeconds);
+    public static String getTimeAgo(double utcTimeSeconds, Resources resources) {
+        return getTimeAgo((long)utcTimeSeconds, resources);
     }
 
     public static String showNumComments(int comments) {

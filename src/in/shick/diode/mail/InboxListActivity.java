@@ -309,7 +309,7 @@ public final class InboxListActivity extends ListActivity
             builder.append(authorSS);
             // When it was sent
             builder.append(" sent ");
-            builder.append(Util.getTimeAgo(item.getCreated_utc()));
+            builder.append(Util.getTimeAgo(item.getCreated_utc(), getResources()));
             fromInfoView.setText(builder);
 
             subjectView.setText(item.getSubject());

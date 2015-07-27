@@ -33,6 +33,7 @@ import android.text.SpannableString;
 
 import in.shick.diode.markdown.MarkdownURL;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * Class representing a thread posting in reddit API.
@@ -66,6 +67,10 @@ public class ThingInfo implements Serializable, Parcelable {
     private boolean is_self;				// t
     private Boolean likes;					// t c
     private String link_id;					//   c
+    @JsonProperty("link_author")
+    private String link_author = "";        //   c
+    @JsonProperty("distinguished")
+    private String distinguished = "";      // t c m
 //	private MediaInfo media;				// t		// TODO
 //	private MediaEmbedInfo media_embed;		// t		// TODO
     private String name;					// t c m
@@ -109,6 +114,13 @@ public class ThingInfo implements Serializable, Parcelable {
     public String getAuthor() {
         return author;
     }
+
+    /**
+     * On comment Things only.
+     * Returns the link_author, which is only returned for comments outside its thread.
+     * @return the link author.
+     */
+    public final String getLinkAuthor() { return link_author; }
 
     public String getAuthor_flair_text() {
         return author_flair_text;
@@ -165,6 +177,8 @@ public class ThingInfo implements Serializable, Parcelable {
     public Boolean getLikes() {
         return likes;
     }
+
+    public final String getDistinguished() { return distinguished; }
 
     public String getLink_id() {
         return link_id;
@@ -553,6 +567,8 @@ public class ThingInfo implements Serializable, Parcelable {
         out.writeInt(ups);
         out.writeValue(url);
         out.writeValue(likes);
+        out.writeValue(link_author);
+        out.writeValue(distinguished);
 
         boolean booleans[] = new boolean[11];
         booleans[0] = clicked;
@@ -599,6 +615,8 @@ public class ThingInfo implements Serializable, Parcelable {
         ups           = in.readInt();
         url           = (String) in.readValue(null);
         likes         = (Boolean) in.readValue(null);
+        link_author   = (String) in.readValue(null);
+        distinguished = (String) in.readValue(null);
 
         boolean booleans[] = new boolean[11];
         in.readBooleanArray(booleans);

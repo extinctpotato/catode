@@ -60,6 +60,11 @@ public class Constants {
     public static final String SUBREDDIT_KIND = "t5";
     public static final String MORE_KIND = "more";
 
+    public static final String DISTINGUISHED_MODERATOR = "moderator";
+    public static final String DISTINGUISHED_ADMIN = "admin";
+    // TODO: Not sure exactly how to handle the "special" case.
+    public static final String DISTINGUISHED_SPECIAL = "special";
+
     public static final int DEFAULT_THREAD_DOWNLOAD_LIMIT = 25;
     public static final int DEFAULT_COMMENT_DOWNLOAD_LIMIT = 200;
     public static final long DEFAULT_FRESH_DURATION = 1800000;  // 30 minutes
@@ -353,6 +358,7 @@ public class Constants {
 
     // A short HTML file returned by reddit, so we can get the modhash
     public static final String MODHASH_URL = REDDIT_BASE_URL + "/r";
+    public static final String NSFW_STRING = "nsfw";
 
 
 }

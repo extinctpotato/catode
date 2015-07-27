@@ -125,19 +125,29 @@
 			    />
 	        </LinearLayout>
 		
-			<!-- A bottommost row used for OP posts in commentslist -->		
-		
-			<TextView android:id="@+id/submissionTime_submitter"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-			    android:layout_marginRight="4dip"
-			    android:text="very recently"
-		        android:visibility="gone"
-		        
-		        android:singleLine="true"
-		        android:ellipsize="marquee"
-		        android:textAppearance="?android:attr/textAppearanceSmall"
-		    />
+			<!-- A bottommost row used for OP posts in commentslist -->
+
+			<LinearLayout
+					android:orientation="horizontal"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent">
+				<TextView android:id="@+id/submissionTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                          android:text="@string/just_now"
+                    android:visibility="gone"
+
+                    android:singleLine="false"
+                    android:ellipsize="marquee"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+						  android:layout_marginRight="2dip"/>
+				<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:id="@+id/submitterName" android:singleLine="false" android:layout_marginRight="4dip"
+                        android:visibility="gone"/>
+			</LinearLayout>
 		</LinearLayout>
 		
 		<LinearLayout android:id="@+id/thumbnail_view"

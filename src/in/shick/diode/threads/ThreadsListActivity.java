@@ -598,7 +598,7 @@ public final class ThreadsListActivity extends ListActivity {
 
         titleView.setText(thingInfo.getTitle());
         urlView.setText(thingInfo.getUrl());
-        StringBuilder sb = new StringBuilder(Util.getTimeAgo(thingInfo.getCreated_utc()))
+        StringBuilder sb = new StringBuilder(Util.getTimeAgo(thingInfo.getCreated_utc(), dialog.getContext().getResources()))
         .append(" by ").append(thingInfo.getAuthor())
         .append(" to ").append(thingInfo.getSubreddit());
         submissionStuffView.setText(sb);

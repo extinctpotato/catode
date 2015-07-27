@@ -2,6 +2,7 @@ package in.shick.diode.comments;
 
 import android.os.AsyncTask;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.Window;
@@ -83,6 +84,9 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     private int mJumpToCommentFoundIndex = -1;
 
     private int mJumpToCommentContext = 0;
+
+    // Lazily-created if the author has a comment in the thread.
+    private SpannableString m_OPSpan = null;
 
     /**
      * List holding the comments to be appended at the end.
@@ -374,7 +378,22 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
      */
     int insertNestedComment(ThingListing commentThingListing, int indentLevel, int insertedCommentIndex) {
         ThingInfo ci = commentThingListing.getData();
-
+        // First test for moderator distinguished
+        if (Constants.DISTINGUISHED_MODERATOR.equalsIgnoreCase(ci.getDistinguished())) {
+            SpannableString distSS = new SpannableString(ci.getAuthor() + " [M]");
+            distSS.setSpan(Util.getModeratorSpan(mActivity.getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            ci.setSSAuthor(distSS);
+        } else if (Constants.DISTINGUISHED_ADMIN.equalsIgnoreCase(ci.getDistinguished())) {
+            SpannableString distSS = new SpannableString(ci.getAuthor() + " [A]");
+            distSS.setSpan(Util.getAdminSpan(mActivity.getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            ci.setSSAuthor(distSS);
+        } else if (mOpThingInfo != null && mOpThingInfo.getAuthor().equalsIgnoreCase(ci.getAuthor())) {
+            if (m_OPSpan == null) {
+                m_OPSpan = new SpannableString(mOpThingInfo.getAuthor() + " [S]");
+                m_OPSpan.setSpan(Util.getOPSpan(mActivity.getApplicationContext(), mSettings.getTheme()), 0, m_OPSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            ci.setSSAuthor(m_OPSpan);
+        }
         // Add comment to deferred append/replace list
         if (isInsertingEntireThread())
             deferCommentAppend(ci);
@@ -538,9 +557,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
 
         if (Common.shouldLoadThumbnails(mActivity, mSettings))
             showOPThumbnail();
-
-        // label the OP's comments with [S]
-        mActivity.markSubmitterComments();
 
         if (mContentLength == -1)
             mActivity.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);

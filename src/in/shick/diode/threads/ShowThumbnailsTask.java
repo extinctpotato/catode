@@ -7,6 +7,7 @@ import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
+import in.shick.diode.common.Constants;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -93,7 +94,7 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
     }
 
     private Bitmap readBitmapFromNetwork( String url ) {
-        if (url == null)
+        if (url == null || Constants.NSFW_STRING.equalsIgnoreCase(url))
             return null;
 
         InputStream is = null;
@@ -110,7 +111,7 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
         } catch (MalformedURLException e) {
             Log.e(TAG, "Bad ad URL", e);
         } catch (IOException e) {
-            Log.e(TAG, "Could not get remote ad image", e);
+            Log.e(TAG, "Could not get remote ad image: " + url, e);
         } finally {
             try {
                 if( is != null )

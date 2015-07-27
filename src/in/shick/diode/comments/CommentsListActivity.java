@@ -20,6 +20,7 @@
 package in.shick.diode.comments;
 
 
+import android.content.res.Resources;
 import in.shick.diode.R;
 import in.shick.diode.common.CacheInfo;
 import in.shick.diode.common.Common;
@@ -496,13 +497,29 @@ public class CommentsListActivity extends ListActivity
                     // In addition to stuff from ThreadsListActivity,
                     // we want to show selftext in CommentsListActivity.
 
-                    TextView submissionStuffView = (TextView) view.findViewById(R.id.submissionTime_submitter);
+                    TextView submissionStuffView = (TextView) view.findViewById(R.id.submissionTime);
+                    TextView submitterView = (TextView) view.findViewById(R.id.submitterName);
                     TextView selftextView = (TextView) view.findViewById(R.id.selftext);
+
+                    submitterView.setVisibility(View.VISIBLE);
+                    SpannableString distSS = null;
+                    if (Constants.DISTINGUISHED_MODERATOR.equalsIgnoreCase(item.getDistinguished())) {
+                        distSS = new SpannableString(item.getAuthor() + " [M]");
+                        distSS.setSpan(Util.getModeratorSpan(getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    } else if (Constants.DISTINGUISHED_ADMIN.equalsIgnoreCase(item.getDistinguished())) {
+                        distSS = new SpannableString(item.getAuthor() + " [A]");
+                        distSS.setSpan(Util.getAdminSpan(getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }
+                    if (distSS != null) {
+                        submitterView.setText(distSS);
+                    } else {
+                        submitterView.setText(item.getAuthor());
+                    }
 
                     submissionStuffView.setVisibility(View.VISIBLE);
                     submissionStuffView.setText(
                         String.format(getResources().getString(R.string.thread_time_submitter),
-                                      Util.getTimeAgo(item.getCreated_utc()), item.getAuthor()));
+                                      Util.getTimeAgo(item.getCreated_utc(), getResources())));
 
                     if (!StringUtils.isEmpty(item.getSpannedSelftext())) {
                         selftextView.setVisibility(View.VISIBLE);
@@ -535,7 +552,7 @@ public class CommentsListActivity extends ListActivity
                         submitterView.setText(item.getAuthor() + " [S]");
                     else
                         submitterView.setText(item.getAuthor());
-                    submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc()));
+                    submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), getResources()));
 
                     setCommentIndent(view, item.getIndent(), mSettings);
 
@@ -695,29 +712,6 @@ public class CommentsListActivity extends ListActivity
         mCommentsAdapter.notifyDataSetChanged();  // Just in case
         getListView().setDivider(null);
         Common.updateListDrawables(this, mSettings.getTheme());
-    }
-
-    /**
-     * Mark the OP submitter comments
-     */
-    void markSubmitterComments() {
-        if (getOpThingInfo() == null || mCommentsAdapter == null)
-            return;
-
-        SpannableString authorSS = new SpannableString(getOpThingInfo().getAuthor() + " [S]");
-        ForegroundColorSpan fcs;
-        if (Util.isLightTheme(mSettings.getTheme()))
-            fcs = new ForegroundColorSpan(getResources().getColor(R.color.blue));
-        else
-            fcs = new ForegroundColorSpan(getResources().getColor(R.color.pale_blue));
-        authorSS.setSpan(fcs, 0, authorSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        for (int i = 0; i < mCommentsAdapter.getCount(); i++) {
-            ThingInfo ci = mCommentsAdapter.getItem(i);
-            // if it's the OP, mark his name
-            if (getOpThingInfo().getAuthor().equalsIgnoreCase(ci.getAuthor()))
-                ci.setSSAuthor(authorSS);
-        }
     }
 
     void enableLoadingScreen() {
@@ -2007,7 +2001,7 @@ public class CommentsListActivity extends ListActivity
                 urlView.setVisibility(View.VISIBLE);
                 urlView.setText(getOpThingInfo().getUrl());
                 submissionStuffView.setVisibility(View.VISIBLE);
-                sb = new StringBuilder(Util.getTimeAgo(getOpThingInfo().getCreated_utc()))
+                sb = new StringBuilder(Util.getTimeAgo(getOpThingInfo().getCreated_utc(), getResources()))
                 .append(" by ").append(getOpThingInfo().getAuthor());
                 submissionStuffView.setText(sb);
                 // For self posts, you're already there!
@@ -2155,7 +2149,7 @@ public class CommentsListActivity extends ListActivity
             submitterView.setText(item.getSSAuthor());
         else
             submitterView.setText(item.getAuthor());
-        submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc()));
+        submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), view.getContext().getResources()));
 
         if (item.getSpannedBody() != null)
             bodyView.setText(item.getSpannedBody());
