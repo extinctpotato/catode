@@ -21,6 +21,7 @@ package in.shick.diode.comments;
 
 
 import android.content.res.Resources;
+import android.text.SpannableStringBuilder;
 import in.shick.diode.R;
 import in.shick.diode.common.CacheInfo;
 import in.shick.diode.common.Common;
@@ -497,11 +498,9 @@ public class CommentsListActivity extends ListActivity
                     // In addition to stuff from ThreadsListActivity,
                     // we want to show selftext in CommentsListActivity.
 
-                    TextView submissionStuffView = (TextView) view.findViewById(R.id.submissionTime);
-                    TextView submitterView = (TextView) view.findViewById(R.id.submitterName);
+                    TextView submissionStuffView = (TextView) view.findViewById(R.id.submissionTime_submitter);
                     TextView selftextView = (TextView) view.findViewById(R.id.selftext);
 
-                    submitterView.setVisibility(View.VISIBLE);
                     SpannableString distSS = null;
                     if (Constants.DISTINGUISHED_MODERATOR.equalsIgnoreCase(item.getDistinguished())) {
                         distSS = new SpannableString(item.getAuthor() + " [M]");
@@ -509,17 +508,14 @@ public class CommentsListActivity extends ListActivity
                     } else if (Constants.DISTINGUISHED_ADMIN.equalsIgnoreCase(item.getDistinguished())) {
                         distSS = new SpannableString(item.getAuthor() + " [A]");
                         distSS.setSpan(Util.getAdminSpan(getApplicationContext()), 0, distSS.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
-                    if (distSS != null) {
-                        submitterView.setText(distSS);
                     } else {
-                        submitterView.setText(item.getAuthor());
+                        distSS = new SpannableString(item.getAuthor());
                     }
-
+                    SpannableStringBuilder ssb = new SpannableStringBuilder(String.format(getResources().getString(R.string.thread_time_submitter),
+                            Util.getTimeAgo(item.getCreated_utc(), getResources())));
+                    ssb.append(" ").append(distSS);
                     submissionStuffView.setVisibility(View.VISIBLE);
-                    submissionStuffView.setText(
-                        String.format(getResources().getString(R.string.thread_time_submitter),
-                                      Util.getTimeAgo(item.getCreated_utc(), getResources())));
+                    submissionStuffView.setText(ssb);
 
                     if (!StringUtils.isEmpty(item.getSpannedSelftext())) {
                         selftextView.setVisibility(View.VISIBLE);
