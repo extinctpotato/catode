@@ -196,6 +196,8 @@ public class Constants {
     public static final String SUBMIT_KIND_SELF = "self";
     public static final String SUBMIT_KIND_POLL = "poll";
 
+    public static final String DEFAULT_STRING   = "default";
+
     // Sorting things
     public static final class ThreadsSort {
         public static final String SORT_BY_KEY = "threads_sort_by";

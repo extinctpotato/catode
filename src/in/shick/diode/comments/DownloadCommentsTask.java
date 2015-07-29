@@ -504,11 +504,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         }
     }
 
-    void cleanupDeferred() {
-        mDeferredAppendList.clear();
-        mDeferredReplacementList.clear();
-    }
-
     @Override
     public void onPreExecute() {
         if (mThreadId == null) {

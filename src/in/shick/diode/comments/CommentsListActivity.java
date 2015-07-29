@@ -20,7 +20,6 @@
 package in.shick.diode.comments;
 
 
-import android.content.res.Resources;
 import android.text.SpannableStringBuilder;
 import in.shick.diode.R;
 import in.shick.diode.common.CacheInfo;
@@ -161,7 +160,7 @@ public class CommentsListActivity extends ListActivity
 
     static {
         initCompatibility();
-    };
+    }
 
     private static void initCompatibility() {
         try {
@@ -430,7 +429,7 @@ public class CommentsListActivity extends ListActivity
 
         public boolean mIsLoading = true;
 
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
         private final int mFrequentSeparatorPos = ListView.INVALID_POSITION;
 
         public CommentsListAdapter(Context context, List<ThingInfo> objects) {
@@ -528,27 +527,28 @@ public class CommentsListActivity extends ListActivity
                     if (view == null) {
                         // Doesn't matter which view we inflate since it's gonna be invisible
                         view = mInflater.inflate(R.layout.zero_size_layout, null);
+                        loadAndStoreViewHolder(view);
                     }
                 } else if (isHiddenCommentHeadPosition(position)) {
                     if (view == null) {
                         view = mInflater.inflate(R.layout.comments_list_item_hidden, null);
+                        loadAndStoreViewHolder(view);
                     }
-                    TextView votesView = (TextView) view.findViewById(R.id.votes);
-                    TextView submitterView = (TextView) view.findViewById(R.id.submitter);
-                    TextView submissionTimeView = (TextView) view.findViewById(R.id.submissionTime);
+                    ViewHolder vh = (ViewHolder)view.getTag();
 
                     try {
-                        votesView.setText(Util.showNumPoints(item.getUps() - item.getDowns()));
+                        vh.votesView.setText(Util.showNumPoints(item.getUps() - item.getDowns()));
                     } catch (NumberFormatException e) {
                         // This happens because "ups" comes after the potentially long "replies" object,
                         // so the ListView might try to display the View before "ups" in JSON has been parsed.
                         if (Constants.LOGGING) Log.e(TAG, "getView, hidden comment heads", e);
                     }
-                    if (getOpThingInfo() != null && item.getAuthor().equalsIgnoreCase(getOpThingInfo().getAuthor()))
-                        submitterView.setText(item.getAuthor() + " [S]");
-                    else
-                        submitterView.setText(item.getAuthor());
-                    submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), getResources()));
+                    if (getOpThingInfo() != null && item.getAuthor().equalsIgnoreCase(getOpThingInfo().getAuthor())) {
+                        vh.submitterView.setText(item.getAuthor() + " [S]");
+                    } else {
+                        vh.submitterView.setText(item.getAuthor());
+                    }
+                    vh.submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), getResources()));
 
                     setCommentIndent(view, item.getIndent(), mSettings);
 
@@ -556,6 +556,7 @@ public class CommentsListActivity extends ListActivity
                     // "load more comments"
                     if (view == null) {
                         view = mInflater.inflate(R.layout.more_comments_view, null);
+                        loadAndStoreViewHolder(view);
                     }
 
                     setCommentIndent(view, item.getIndent(), mSettings);
@@ -563,12 +564,14 @@ public class CommentsListActivity extends ListActivity
                 } else if (item.isContext()) {
                     if (view == null) {
                         view = mInflater.inflate(R.layout.viewing_single_comment_list_item, null);
+                        loadAndStoreViewHolder(view);
                     }
                     setContextOPID(item.getId());
                 } else {  // Regular comment
                     // Here view may be passed in for re-use, or we make a new one.
                     if (view == null) {
                         view = mInflater.inflate(R.layout.comments_list_item, null);
+                        loadAndStoreViewHolder(view);
                     } else {
                         view = convertView;
                     }
@@ -598,7 +601,7 @@ public class CommentsListActivity extends ListActivity
         }
     } // End of CommentsListAdapter
 
-    public ThingInfo getOpThingInfo() {
+    private ThingInfo getOpThingInfo() {
         if (!CollectionUtils.isEmpty(mObjectStates.mCommentsList))
             return mObjectStates.mCommentsList.get(0);
         return null;
@@ -612,17 +615,8 @@ public class CommentsListActivity extends ListActivity
         this.mShouldClearReply = shouldClearReply;
     }
 
-    public static void setCommentIndent(View commentListItemView, int indentLevel, RedditSettings settings) {
-        View[] indentViews = new View[] {
-            commentListItemView.findViewById(R.id.left_indent1),
-            commentListItemView.findViewById(R.id.left_indent2),
-            commentListItemView.findViewById(R.id.left_indent3),
-            commentListItemView.findViewById(R.id.left_indent4),
-            commentListItemView.findViewById(R.id.left_indent5),
-            commentListItemView.findViewById(R.id.left_indent6),
-            commentListItemView.findViewById(R.id.left_indent7),
-            commentListItemView.findViewById(R.id.left_indent8)
-        };
+    private static void setCommentIndent(View commentListItemView, int indentLevel, RedditSettings settings) {
+        View[] indentViews = ((ViewHolder)commentListItemView.getTag()).indentViews;
         for (int i = 0; i < indentLevel && i < indentViews.length; i++) {
             if (settings.isShowCommentGuideLines()) {
                 indentViews[i].setVisibility(View.VISIBLE);
@@ -765,7 +759,7 @@ public class CommentsListActivity extends ListActivity
 
 
     private class CommentReplyTask extends AsyncTask<String, Void, String> {
-        private String _mParentThingId;
+        private final String _mParentThingId;
         String _mUserError = "Error submitting reply. Please try again.";
 
         CommentReplyTask(String parentThingId) {
@@ -853,7 +847,7 @@ public class CommentsListActivity extends ListActivity
     }
 
     private class EditTask extends AsyncTask<String, Void, String> {
-        private String _mThingId;
+        private final String _mThingId;
         String _mUserError = "Error submitting edit. Please try again.";
 
         EditTask(String thingId) {
@@ -938,7 +932,7 @@ public class CommentsListActivity extends ListActivity
 
     private class DeleteTask extends AsyncTask<String, Void, Boolean> {
         private String _mUserError = "Error deleting. Please try again.";
-        private String _mKind;
+        private final String _mKind;
 
         public DeleteTask(String kind) {
             _mKind = kind;
@@ -1037,10 +1031,10 @@ public class CommentsListActivity extends ListActivity
 
         private static final String TAG = "VoteWorker";
 
-        private String _mThingFullname;
-        private int _mDirection;
+        private final String _mThingFullname;
+        private final int _mDirection;
         private String _mUserError = "Error voting.";
-        private ThingInfo _mTargetThingInfo;
+        private final ThingInfo _mTargetThingInfo;
 
         // Save the previous arrow and score in case we need to revert
         private int _mPreviousUps, _mPreviousDowns;
@@ -1199,7 +1193,7 @@ public class CommentsListActivity extends ListActivity
         private static final String TAG = "ReportTask";
 
         private String _mUserError = "Error reporting.";
-        private String _mFullId;
+        private final String _mFullId;
 
         ReportTask(String fullname) {
             this._mFullId = fullname;
@@ -2122,54 +2116,96 @@ public class CommentsListActivity extends ListActivity
         }
     }
 
+    /**
+     * Class to cache the view content information, so it doesn't have to be loaded while the user is
+     * scrolling up and down in the threads list view.
+     * @see <a href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html">this</a>
+     */
+    private static class ViewHolder {
+        TextView votesView;
+        TextView textFlairView;
+        TextView submitterView;
+        TextView bodyView;
+
+        TextView submissionTimeView;
+        ImageView voteUpView;
+        ImageView voteDownView;
+
+        View indentViews[];
+    }
+
+    /**
+     * Pre-load the view items in a comment's View to implement the ViewHolder pattern.
+     * The views are reused so much that having to
+     * @param theCommentView the Comment View item to load elements for. The ViewHolder will be stored in the view's tag.
+     */
+    private static void loadAndStoreViewHolder(View theCommentView) {
+        ViewHolder vh = new ViewHolder();
+        theCommentView.setTag(vh);
+        vh.votesView = (TextView) theCommentView.findViewById(R.id.votes);
+        vh.textFlairView = (TextView) theCommentView.findViewById(R.id.textFlair);
+        vh.submitterView = (TextView) theCommentView.findViewById(R.id.submitter);
+        vh.bodyView = (TextView) theCommentView.findViewById(R.id.body);
+
+        vh.submissionTimeView = (TextView) theCommentView.findViewById(R.id.submissionTime);
+        vh.voteUpView = (ImageView) theCommentView.findViewById(R.id.vote_up_image);
+        vh.voteDownView = (ImageView) theCommentView.findViewById(R.id.vote_down_image);
+        vh.indentViews = new View[] {
+                theCommentView.findViewById(R.id.left_indent1),
+                theCommentView.findViewById(R.id.left_indent2),
+                theCommentView.findViewById(R.id.left_indent3),
+                theCommentView.findViewById(R.id.left_indent4),
+                theCommentView.findViewById(R.id.left_indent5),
+                theCommentView.findViewById(R.id.left_indent6),
+                theCommentView.findViewById(R.id.left_indent7),
+                theCommentView.findViewById(R.id.left_indent8)
+        };
+    }
     public static void fillCommentsListItemView(View view, ThingInfo item, RedditSettings settings) {
-        // Set the values of the Views for the CommentsListItem
+        if (view.getTag() == null) {
+            loadAndStoreViewHolder(view);
+        }
 
-        TextView votesView = (TextView) view.findViewById(R.id.votes);
-        TextView textFlairView = (TextView) view.findViewById(R.id.textFlair);
-        TextView submitterView = (TextView) view.findViewById(R.id.submitter);
-        TextView bodyView = (TextView) view.findViewById(R.id.body);
-
-        TextView submissionTimeView = (TextView) view.findViewById(R.id.submissionTime);
-        ImageView voteUpView = (ImageView) view.findViewById(R.id.vote_up_image);
-        ImageView voteDownView = (ImageView) view.findViewById(R.id.vote_down_image);
+        ViewHolder vh = (ViewHolder)view.getTag();
 
         try {
-            votesView.setText(Util.showNumPoints(item.getUps() - item.getDowns()));
+            vh.votesView.setText(Util.showNumPoints(item.getUps() - item.getDowns()));
         } catch (NumberFormatException e) {
             // This happens because "ups" comes after the potentially long "replies" object,
             // so the ListView might try to display the View before "ups" in JSON has been parsed.
             if (Constants.LOGGING) Log.e(TAG, "getView, normal comment", e);
         }
-        if (item.getSSAuthor() != null)
-            submitterView.setText(item.getSSAuthor());
-        else
-            submitterView.setText(item.getAuthor());
-        submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), view.getContext().getResources()));
+        if (item.getSSAuthor() != null) {
+            vh.submitterView.setText(item.getSSAuthor());
+        } else {
+            vh.submitterView.setText(item.getAuthor());
+        }
+        vh.submissionTimeView.setText(Util.getTimeAgo(item.getCreated_utc(), view.getContext().getResources()));
 
-        if (item.getSpannedBody() != null)
-            bodyView.setText(item.getSpannedBody());
-        else
-            bodyView.setText(item.getBody());
+        if (item.getSpannedBody() != null) {
+            vh.bodyView.setText(item.getSpannedBody());
+        } else {
+            vh.bodyView.setText(item.getBody());
+        }
 
         setCommentIndent(view, item.getIndent(), settings);
 
         boolean hasFlair = !StringUtils.isEmpty(item.getAuthor_flair_text());
-        textFlairView.setVisibility(hasFlair ? View.VISIBLE : View.GONE);
-        textFlairView.setText(item.getAuthor_flair_text());
+        vh.textFlairView.setVisibility(hasFlair ? View.VISIBLE : View.GONE);
+        vh.textFlairView.setText(item.getAuthor_flair_text());
 
-        if (voteUpView != null && voteDownView != null) {
+        if (vh.voteUpView != null && vh.voteDownView != null) {
             if (item.getLikes() == null || item.isDeletedUser()) {
-                voteUpView.setVisibility(View.GONE);
-                voteDownView.setVisibility(View.GONE);
+                vh.voteUpView.setVisibility(View.GONE);
+                vh.voteDownView.setVisibility(View.GONE);
             }
             else if (Boolean.TRUE.equals(item.getLikes())) {
-                voteUpView.setVisibility(View.VISIBLE);
-                voteDownView.setVisibility(View.GONE);
+                vh.voteUpView.setVisibility(View.VISIBLE);
+                vh.voteDownView.setVisibility(View.GONE);
             }
             else if (Boolean.FALSE.equals(item.getLikes())) {
-                voteUpView.setVisibility(View.GONE);
-                voteDownView.setVisibility(View.VISIBLE);
+                vh.voteUpView.setVisibility(View.GONE);
+                vh.voteDownView.setVisibility(View.VISIBLE);
             }
         }
     }

@@ -7,6 +7,7 @@ import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
+import android.widget.ProgressBar;
 import in.shick.diode.common.Constants;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,11 +28,11 @@ import in.shick.diode.threads.ShowThumbnailsTask.ThumbnailLoadAction;
 
 public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, ThumbnailLoadAction, Void> {
 
-    private ListActivity mActivity;
-    private HttpClient mClient;
-    private Integer mDefaultThumbnailResource;
+    private final ListActivity mActivity;
+    private final HttpClient mClient;
+    private final Integer mDefaultThumbnailResource;
 
-    private static HashMap<String, SoftReference<Bitmap>> cache = new HashMap<String, SoftReference<Bitmap>>();
+    private static final HashMap<String, SoftReference<Bitmap>> cache = new HashMap<String, SoftReference<Bitmap>>();
 
     private static final String TAG = "ShowThumbnailsTask";
 
@@ -42,13 +43,18 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
     }
 
     public static class ThumbnailLoadAction {
-        public ThingInfo thingInfo;
-        public ImageView imageView;  // prefer imageView; if it's null, use threadIndex
-        public int threadIndex;
+        public final ThingInfo thingInfo;
+        public final ImageView imageView;  // prefer imageView; if it's null, use threadIndex
+        public final int threadIndex;
+        public ProgressBar loadBar;
         public ThumbnailLoadAction(ThingInfo thingInfo, ImageView imageView, int threadIndex) {
             this.thingInfo = thingInfo;
             this.imageView = imageView;
             this.threadIndex = threadIndex;
+        }
+        public ThumbnailLoadAction(ThingInfo thingInfo, ImageView imageView, int threadIndex, ProgressBar progressBar) {
+            this(thingInfo, imageView, threadIndex);
+            this.loadBar = progressBar;
         }
     }
 
@@ -63,7 +69,7 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
 
     // TODO use external storage cache if present
     private void loadThumbnail(ThingInfo thingInfo) {
-        if ("default".equals(thingInfo.getThumbnail()) || "self".equals(thingInfo.getThumbnail()) || StringUtils.isEmpty(thingInfo.getThumbnail())) {
+        if (Constants.NSFW_STRING.equalsIgnoreCase(thingInfo.getThumbnail()) || Constants.DEFAULT_STRING.equals(thingInfo.getThumbnail()) || Constants.SUBMIT_KIND_SELF.equals(thingInfo.getThumbnail()) || StringUtils.isEmpty(thingInfo.getThumbnail())) {
             thingInfo.setThumbnailResource(mDefaultThumbnailResource);
         }
         else {
@@ -133,6 +139,7 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
 
     private void refreshThumbnailUI(ThumbnailLoadAction thumbnailLoadAction) {
         ImageView imageView = null;
+        ProgressBar progressBar = thumbnailLoadAction.loadBar;
         if (thumbnailLoadAction.imageView != null) {
             imageView = thumbnailLoadAction.imageView;
         }
@@ -148,8 +155,16 @@ public class ShowThumbnailsTask extends AsyncTask<ThumbnailLoadAction, Thumbnail
                 }
             }
         }
-        if (imageView != null) {
-            ThingInfo thingInfo = thumbnailLoadAction.thingInfo;
+        ThingInfo thingInfo = thumbnailLoadAction.thingInfo;
+        // The ImageView element will have its tag set to the id that it is currently displaying.
+        // When the app reaches this code, the indeterminate progress bar should be visible, and will
+        // need to be hidden when the 'proper' image is loaded.
+        if (imageView != null && thingInfo.getId().equals(imageView.getTag())) {
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
+            }
+            imageView.setVisibility(View.VISIBLE);
+
             if (thingInfo.getThumbnailBitmap() != null)
                 imageView.setImageBitmap(thingInfo.getThumbnailBitmap());
             else if (thingInfo.getThumbnailResource() != null)

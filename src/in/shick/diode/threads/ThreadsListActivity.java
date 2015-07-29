@@ -131,9 +131,6 @@ public final class ThreadsListActivity extends ListActivity {
     private ThingInfo mVoteTargetThing = null;
     private View mNextPreviousView = null;
 
-    private ShowThumbnailsTask mCurrentShowThumbnailsTask = null;
-    private final Object mCurrentShowThumbnailsTaskLock = new Object();
-
     // Navigation that can be cached
     private String mSubreddit = Constants.FRONTPAGE_STRING;
     // The after, before, and count to navigate away from current page of results
@@ -251,15 +248,6 @@ public final class ThreadsListActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // SOPA blackout: Jan 18, 2012 from 8am-8pm EST (1300-0100 UTC)
-        long timeMillis = System.currentTimeMillis();
-        if (timeMillis >= 1326891600000L && timeMillis <= 1326934800000L) {
-            Toast.makeText(this, "Let's Protest SOPA", Toast.LENGTH_LONG).show();
-            Common.launchBrowser(this, "http://www.reddit.com", null, false, true, false, false);
-            finish();
-            return;
-        }
 
         int previousTheme = mSettings.getTheme();
 
@@ -383,14 +371,12 @@ public final class ThreadsListActivity extends ListActivity {
         }
     }
 
-
     final class ThreadsListAdapter extends ArrayAdapter<ThingInfo> {
         static final int THREAD_ITEM_VIEW_TYPE = 0;
         // The number of view types
         static final int VIEW_TYPE_COUNT = 1;
         public boolean mIsLoading = true;
-        private LayoutInflater mInflater;
-        private int mFrequentSeparatorPos = ListView.INVALID_POSITION;
+        private final LayoutInflater mInflater;
 
         public ThreadsListAdapter(Context context, List<ThingInfo> objects) {
             super(context, 0, objects);
@@ -399,7 +385,7 @@ public final class ThreadsListActivity extends ListActivity {
 
         @Override
         public int getItemViewType(int position) {
-            if (position == mFrequentSeparatorPos) {
+            if (position == ListView.INVALID_POSITION) {
                 // We don't want the separator view to be recycled.
                 return IGNORE_ITEM_VIEW_TYPE;
             }
@@ -428,7 +414,6 @@ public final class ThreadsListActivity extends ListActivity {
             } else {
                 view = convertView;
             }
-
             ThingInfo item = this.getItem(position);
 
             // Set the values of the Views for the ThreadsListItem
@@ -438,6 +423,24 @@ public final class ThreadsListActivity extends ListActivity {
 
             return view;
         }
+    }
+
+    /**
+     * Class to cache the view content information, so it doesn't have to be loaded while the user is
+     * scrolling up and down in the threads list view.
+     * @see <a href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html">this</a>
+     */
+    private static class ViewHolder {
+        TextView titleView;
+        TextView votesView;
+        TextView numCommentsSubredditView;
+        TextView nsfwView;
+        ImageView voteUpView;
+        ImageView voteDownView;
+        View thumbnailContainer;
+        FrameLayout thumbnailFrame;
+        ImageView thumbnailImageView;
+        ProgressBar indeterminateProgressBar;
     }
 
     public static void fillThreadsListItemView(
@@ -451,19 +454,27 @@ public final class ThreadsListActivity extends ListActivity {
     ) {
 
         Resources res = activity.getResources();
+        ViewHolder vh;
+        if (view.getTag() == null) {
+            vh = new ViewHolder();
+            vh.titleView = (TextView) view.findViewById(R.id.title);
+            vh.votesView = (TextView) view.findViewById(R.id.votes);
+            vh.numCommentsSubredditView = (TextView) view.findViewById(R.id.numCommentsSubreddit);
+            vh.nsfwView = (TextView) view.findViewById(R.id.nsfw);
+            vh.voteUpView = (ImageView) view.findViewById(R.id.vote_up_image);
+            vh.voteDownView = (ImageView) view.findViewById(R.id.vote_down_image);
+            vh.thumbnailContainer = view.findViewById(R.id.thumbnail_view);
+            vh.thumbnailFrame = (FrameLayout) view.findViewById(R.id.thumbnail_frame);
+            vh.thumbnailImageView = (ImageView) view.findViewById(R.id.thumbnail);
+            vh.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
+            view.setTag(vh);
+        } else {
+            vh = (ViewHolder)view.getTag();
+        }
 
-        TextView titleView = (TextView) view.findViewById(R.id.title);
-        TextView votesView = (TextView) view.findViewById(R.id.votes);
-        TextView numCommentsSubredditView = (TextView) view.findViewById(R.id.numCommentsSubreddit);
-        TextView nsfwView = (TextView) view.findViewById(R.id.nsfw);
-//        TextView submissionTimeView = (TextView) view.findViewById(R.id.submissionTime);
-        ImageView voteUpView = (ImageView) view.findViewById(R.id.vote_up_image);
-        ImageView voteDownView = (ImageView) view.findViewById(R.id.vote_down_image);
-        View thumbnailContainer = view.findViewById(R.id.thumbnail_view);
-        FrameLayout thumbnailFrame = (FrameLayout) view.findViewById(R.id.thumbnail_frame);
-        ImageView thumbnailImageView = (ImageView) view.findViewById(R.id.thumbnail);
-        ProgressBar indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
-
+        // Need to store the Thing's id in the thumbnail image so that the thumbnail loader task
+        // knows that the row is still displaying the requested thumbnail.
+        vh.thumbnailImageView.setTag(item.getId());
         // Set the title and domain using a SpannableStringBuilder
         SpannableStringBuilder builder = new SpannableStringBuilder();
         String title = item.getTitle();
@@ -510,76 +521,74 @@ public final class ThreadsListActivity extends ListActivity {
         }
 
         builder.append(titleSS).append(" ").append(domainSS);
-        titleView.setText(builder);
+        vh.titleView.setText(builder);
 
-        votesView.setText("" + item.getScore());
-        numCommentsSubredditView.setText(Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
+        vh.votesView.setText("" + item.getScore());
+        vh.numCommentsSubredditView.setText(Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
 
-        if(item.isOver_18()) {
-            nsfwView.setVisibility(View.VISIBLE);
-        } else {
-            nsfwView.setVisibility(View.GONE);
-        }
+        vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
 
         // Set the up and down arrow colors based on whether user likes
         if (settings.isLoggedIn()) {
             if (item.getLikes() == null) {
-                voteUpView.setImageResource(R.drawable.vote_up_gray);
-                voteDownView.setImageResource(R.drawable.vote_down_gray);
-                votesView.setTextColor(res.getColor(R.color.gray_75));
+                vh.voteUpView.setImageResource(R.drawable.vote_up_gray);
+                vh.voteDownView.setImageResource(R.drawable.vote_down_gray);
+                vh.votesView.setTextColor(res.getColor(R.color.gray_75));
             } else if (item.getLikes()) {
-                voteUpView.setImageResource(R.drawable.vote_up_red);
-                voteDownView.setImageResource(R.drawable.vote_down_gray);
-                votesView.setTextColor(res.getColor(R.color.arrow_red));
+                vh.voteUpView.setImageResource(R.drawable.vote_up_red);
+                vh.voteDownView.setImageResource(R.drawable.vote_down_gray);
+                vh.votesView.setTextColor(res.getColor(R.color.arrow_red));
             } else {
-                voteUpView.setImageResource(R.drawable.vote_up_gray);
-                voteDownView.setImageResource(R.drawable.vote_down_blue);
-                votesView.setTextColor(res.getColor(R.color.arrow_blue));
+                vh.voteUpView.setImageResource(R.drawable.vote_up_gray);
+                vh.voteDownView.setImageResource(R.drawable.vote_down_blue);
+                vh.votesView.setTextColor(res.getColor(R.color.arrow_blue));
             }
         } else {
-            voteUpView.setImageResource(R.drawable.vote_up_gray);
-            voteDownView.setImageResource(R.drawable.vote_down_gray);
-            votesView.setTextColor(res.getColor(R.color.gray_75));
+            vh.voteUpView.setImageResource(R.drawable.vote_up_gray);
+            vh.voteDownView.setImageResource(R.drawable.vote_down_gray);
+            vh.votesView.setTextColor(res.getColor(R.color.gray_75));
         }
 
         // Thumbnails open links
-        if (thumbnailContainer != null) {
+        if (vh.thumbnailContainer != null) {
             if (Common.shouldLoadThumbnails(activity, settings)) {
-                thumbnailContainer.setVisibility(View.VISIBLE);
+                vh.thumbnailContainer.setVisibility(View.VISIBLE);
 
                 if (item.getUrl() != null) {
                     OnClickListener thumbnailOnClickListener = thumbnailOnClickListenerFactory.getThumbnailOnClickListener(item, activity);
                     if (thumbnailOnClickListener != null) {
-                        thumbnailFrame.setOnClickListener(thumbnailOnClickListener);
+                        vh.thumbnailFrame.setOnClickListener(thumbnailOnClickListener);
                     }
                 }
 
                 // Show thumbnail based on ThingInfo
-                if ("default".equals(item.getThumbnail()) || "self".equals(item.getThumbnail()) || StringUtils.isEmpty(item.getThumbnail())) {
-                    indeterminateProgressBar.setVisibility(View.GONE);
-                    thumbnailImageView.setVisibility(View.VISIBLE);
-                    thumbnailImageView.setImageResource(R.drawable.go_arrow);
+                if (Constants.NSFW_STRING.equalsIgnoreCase(item.getThumbnail()) || Constants.DEFAULT_STRING.equals(item.getThumbnail()) || Constants.SUBMIT_KIND_SELF.equals(item.getThumbnail()) || StringUtils.isEmpty(item.getThumbnail())) {
+                    vh.indeterminateProgressBar.setVisibility(View.GONE);
+                    vh.thumbnailImageView.setVisibility(View.VISIBLE);
+                    vh.thumbnailImageView.setImageResource(R.drawable.go_arrow);
                 }
                 else {
-                    indeterminateProgressBar.setVisibility(View.GONE);
-                    thumbnailImageView.setVisibility(View.VISIBLE);
                     if (item.getThumbnailBitmap() != null) {
-                        thumbnailImageView.setImageBitmap(item.getThumbnailBitmap());
+                        vh.indeterminateProgressBar.setVisibility(View.GONE);
+                        vh.thumbnailImageView.setVisibility(View.VISIBLE);
+                        vh.thumbnailImageView.setImageBitmap(item.getThumbnailBitmap());
                     }
                     else {
-                        thumbnailImageView.setImageBitmap(null);
-                        new ShowThumbnailsTask(activity, client, R.drawable.go_arrow).execute(new ThumbnailLoadAction(item, thumbnailImageView, position));
+                        vh.indeterminateProgressBar.setVisibility(View.VISIBLE);
+                        vh.thumbnailImageView.setVisibility(View.GONE);
+                        vh.thumbnailImageView.setImageBitmap(null);
+                        new ShowThumbnailsTask(activity, client, R.drawable.go_arrow).execute(new ThumbnailLoadAction(item, vh.thumbnailImageView, position, vh.indeterminateProgressBar));
                     }
                 }
 
                 // Set thumbnail background based on current theme
                 if (Util.isLightTheme(settings.getTheme()))
-                    thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_light);
+                    vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_light);
                 else
-                    thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_dark);
+                    vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_dark);
             } else {
                 // if thumbnails disabled, hide thumbnail icon
-                thumbnailContainer.setVisibility(View.GONE);
+                vh.thumbnailContainer.setVisibility(View.GONE);
             }
         }
     }
@@ -843,8 +852,6 @@ public final class ThreadsListActivity extends ListActivity {
                     threadListActivity.mThreadsAdapter.notifyDataSetChanged();
                 }
 
-                threadListActivity.showThumbnails(mThingInfos);
-
                 threadListActivity.updateNextPreviousButtons();
 
                 // Point the list to last thread user was looking at, if any
@@ -880,22 +887,6 @@ public final class ThreadsListActivity extends ListActivity {
         }
     }
 
-    private void showThumbnails(List<ThingInfo> thingInfos) {
-        if (Common.shouldLoadThumbnails(this, mSettings)) {
-            int size = thingInfos.size();
-            ThumbnailLoadAction[] thumbnailLoadActions = new ThumbnailLoadAction[size];
-            for (int i = 0; i < size; i++) {
-                thumbnailLoadActions[i] = new ThumbnailLoadAction(thingInfos.get(i), null, i);
-            }
-            synchronized (mCurrentShowThumbnailsTaskLock) {
-                if (mCurrentShowThumbnailsTask != null)
-                    mCurrentShowThumbnailsTask.cancel(true);
-                mCurrentShowThumbnailsTask = new ShowThumbnailsTask(this, mClient, R.drawable.go_arrow);
-            }
-            mCurrentShowThumbnailsTask.execute(thumbnailLoadActions);
-        }
-    }
-
     private class MyLoginTask extends LoginTask {
         public MyLoginTask(String username, String password) {
             super(username, password, mSettings, mClient, getApplicationContext());
@@ -927,7 +918,7 @@ public final class ThreadsListActivity extends ListActivity {
 
         private int _mPreviousScore;
         private Boolean _mPreviousLikes;
-        private ThingInfo _mTargetThingInfo;
+        private final ThingInfo _mTargetThingInfo;
 
         public MyVoteTask(ThingInfo thingInfo, int direction, String subreddit) {
             super(thingInfo.getName(), direction, subreddit, getApplicationContext(), mSettings, mClient);

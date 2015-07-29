@@ -104,7 +104,7 @@
 		        android:layout_alignLeft="@id/title"
 		        android:layout_marginRight="5dip"
 		        android:textAppearance="?android:attr/textAppearanceSmall"
-		        android:text="nsfw"
+		        android:text="@string/nsfw"
 		        android:textColor="#f00"
 		    />
 		    
@@ -129,7 +129,7 @@
                 android:layout_below="@id/numCommentsSubreddit"
                 android:layout_alignLeft="@id/title"
                 android:layout_marginRight="4dip"
-                android:text="very recently"
+                android:text="@string/just_now"
                 android:visibility="gone"
                 android:singleLine="true"
                 android:ellipsize="marquee"

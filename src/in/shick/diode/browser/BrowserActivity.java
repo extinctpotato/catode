@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -19,7 +18,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import in.shick.diode.R;
 import in.shick.diode.comments.CommentsListActivity;
@@ -46,7 +44,7 @@ public class BrowserActivity extends Activity {
 
     static {
         initCompatibility();
-    };
+    }
 
     private static void initCompatibility() {
         try {
