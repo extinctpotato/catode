@@ -294,10 +294,14 @@ public final class InboxListActivity extends ListActivity
             // Build fromInfoView using Spans. Example (** means bold & different color):
             // from *talklittle_test* sent 20 hours ago
             SpannableStringBuilder builder = new SpannableStringBuilder();
-            SpannableString authorSS = new SpannableString(item.getAuthor());
+            String authorString = item.getAuthor();
+            if (authorString == null) {
+                authorString = "<other>";
+            }
+            SpannableString authorSS = new SpannableString(authorString);
             builder.append("from ");
             // Make the author bold and a different color
-            int authorLen = item.getAuthor().length();
+            int authorLen = authorString.length();
             StyleSpan authorStyleSpan = new StyleSpan(Typeface.BOLD);
             authorSS.setSpan(authorStyleSpan, 0, authorLen, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             ForegroundColorSpan fcs;
