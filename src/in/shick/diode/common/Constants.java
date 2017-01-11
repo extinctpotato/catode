@@ -143,6 +143,7 @@ public class Constants {
     public static final int UNHIDE_CONTEXT_ITEM = 1019;
     public static final int VIEW_SUBREDDIT_CONTEXT_ITEM = 1020;
     public static final int COPY_CONTEXT_ITEM = 1021;
+    public static final int COPY_TEXT_CONTEXT_ITEM = 1022;
 
 
     // Special CSS for webviews to match themes

@@ -262,7 +262,7 @@ public class CommentsListActivity extends ListActivity
                 } else {
                     // http://www.reddit.com/...
                     Matcher m = COMMENT_PATH_PATTERN.matcher(commentPath);
-                    if (m.matches()) {
+                    if (m.find()) {
                         mSubreddit = m.group(1);
                         mThreadId = m.group(2);
                         jumpToCommentId = m.group(3);
@@ -1469,6 +1469,8 @@ public class CommentsListActivity extends ListActivity
 
         ThingInfo item = mCommentsAdapter.getItem(rowId);
 
+        menu.add(0, Constants.COPY_TEXT_CONTEXT_ITEM, Menu.NONE, "Copy Text");
+
         if (rowId == 0) {
             menu.add(0, Constants.SHARE_CONTEXT_ITEM, Menu.NONE, "Share");
             menu.add(0, Constants.COPY_CONTEXT_ITEM, Menu.NONE, R.string.copy);
@@ -1561,6 +1563,7 @@ public class CommentsListActivity extends ListActivity
             intent.setAction(Intent.ACTION_SEND);
             intent.setType("text/plain");
 
+            intent.putExtra(Intent.EXTRA_SUBJECT, getOpThingInfo().getTitle());
             intent.putExtra(Intent.EXTRA_TEXT, getOpThingInfo().getUrl());
 
             try {
@@ -1640,27 +1643,27 @@ public class CommentsListActivity extends ListActivity
             return true;
         case Constants.COPY_CONTEXT_ITEM:
             String url = getOpThingInfo().getUrl();
-            int sdk = android.os.Build.VERSION.SDK_INT;
-            if(sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setText(url);
-            } else {
-                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                android.content.ClipData clip = android.content.ClipData.newPlainText(url,url);
-                clipboard.setPrimaryClip(clip);
-            }
+            setClipboardText(url, url);
             return true;
+
+        case Constants.COPY_TEXT_CONTEXT_ITEM:
+            String commentText = mCommentsAdapter.getItem(rowId).getBody();
+            setClipboardText(commentText, commentText);
+            return true;
+
         case Constants.DIALOG_FULL_CONTEXT:
             setContextOPID(mCommentsAdapter.getItem(rowId).getId());
             // 10k denotes 'full context'
             setContextCount(10000);
             getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
+
         case Constants.DIALOG_VIEW_CONTEXT:
             setContextOPID(mCommentsAdapter.getItem(rowId).getId());
             setContextCount(3);
             getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             return true;
+
         case Constants.DIALOG_THREAD_CLICK:
             // Reset context information so whole thread is shown.
             resetContextInfo();
@@ -1669,6 +1672,17 @@ public class CommentsListActivity extends ListActivity
 
         default:
             return super.onContextItemSelected(item);
+        }
+    }
+
+    private void setClipboardText(String clipLabel, String clipText) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(clipText);
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(clipLabel,clipText);
+            clipboard.setPrimaryClip(clip);
         }
     }
 

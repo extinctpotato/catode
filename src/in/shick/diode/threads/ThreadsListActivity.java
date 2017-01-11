@@ -1081,6 +1081,7 @@ public final class ThreadsListActivity extends ListActivity {
             intent.setAction(Intent.ACTION_SEND);
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_TEXT, _item.getUrl());
+            intent.putExtra(Intent.EXTRA_SUBJECT, _item.getTitle());
             try {
                 startActivity(Intent.createChooser(intent, "Share Link"));
             } catch (android.content.ActivityNotFoundException ex) {
