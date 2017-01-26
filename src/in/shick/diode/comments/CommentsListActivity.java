@@ -1677,7 +1677,7 @@ public class CommentsListActivity extends ListActivity
             intent2.setType("text/plain");
 
             intent2.putExtra(Intent.EXTRA_SUBJECT, getOpThingInfo().getTitle());
-            intent2.putExtra(Intent.EXTRA_TEXT, "https://reddit.com/r/" + mSubreddit + "/" + mThreadId );
+            intent2.putExtra(Intent.EXTRA_TEXT, Constants.REDDIT_BASE_URL + "/r/" + mSubreddit + "/" + mThreadId );
 
             try {
                 startActivity(Intent.createChooser(intent2, getString(R.string.share_comments)));
