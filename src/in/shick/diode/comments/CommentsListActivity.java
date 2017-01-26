@@ -1473,7 +1473,7 @@ public class CommentsListActivity extends ListActivity
 
         if (rowId == 0) {
             menu.add(0, Constants.SHARE_CONTEXT_ITEM, Menu.NONE, "Share");
-            menu.add(0, Constants.SHARE_COMMENTS, Menu.NONE, "Share Comments");
+            menu.add(0, Constants.SHARE_COMMENTS, Menu.NONE, R.string.share_comments);
             menu.add(0, Constants.COPY_CONTEXT_ITEM, Menu.NONE, R.string.copy);
 
             if(getOpThingInfo().isSaved()) {
@@ -1680,7 +1680,7 @@ public class CommentsListActivity extends ListActivity
             intent2.putExtra(Intent.EXTRA_TEXT, "https://reddit.com/r/" + mSubreddit + "/" + mThreadId );
 
             try {
-                startActivity(Intent.createChooser(intent2, "Share Comments"));
+                startActivity(Intent.createChooser(intent2, getString(R.string.share_comments)));
             } catch (android.content.ActivityNotFoundException ex) {
 
             }
