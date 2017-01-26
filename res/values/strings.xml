@@ -181,6 +181,7 @@
 	<string name="view_context">View context</string>
 	<string name="goto_thread">Go to full comments</string>
 	<string name="links_menu_item">Links</string>
+	<string name ="share_comments">Share Comments</string>
 
 	
 	<!-- === Preferences === -->
