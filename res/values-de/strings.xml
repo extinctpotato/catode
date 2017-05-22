@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright 2009 Andrew Shu
+ *
+ * This file is part of "diode".
+ *
+ * "diode" is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * "diode" is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTBILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with "diode".  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<resources>
+
+    <string name="app_name">Diode</string>
+    <string name="user_agent">Diode für Reddit (Android) %s</string>
+ 
+    <!-- Searches -->
+    <string name="menu_search">[beta] Suche</string>
+    <string name="search_title_prefix">[beta] Suchen:</string>
+ 	<string-array name="search_results_sorting">
+        <item>Relevanz</item>
+        <item>Neu</item>
+        <item>Beste</item>
+    </string-array>
+    
+    
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="really_quit">Wirklich beenden?</string>
+    <string name="confirm_logout_title">Abmelden</string>
+    <string name="confirm_logout">Willst du dich wirklich abmelden?</string>
+    
+    <string name="noComments">Hier sind keine Kommentare</string>
+    <string name="noSubreddits">Keine Subreddits</string>
+    
+    <string name="loading_splash_text">Lädt...</string>
+    
+    <string name="pick_subreddit_label">Subreddit Name:</string>
+    <string name="pick_subreddit_button">Los</string>
+    <string name="frontpage">Reddit Startseite</string>
+    
+    <string name="subreddit_layout_srtext_text">Android</string>
+    
+	<string name="login_password_label">Passwort:</string>
+	<string name="login_button">Anmelden</string>
+	<string name="login_remember_checkbox">Angemeldet bleiben?</string>
+	
+	
+	<string name="thread_link_button">Link</string>
+	<string name="thread_comments_button">Kommentare</string>
+	
+	<string name="comment_links_button">Links</string>
+	<string name="comment_save_button">Speichern</string>
+	<string name="reply_save_button">speichern</string>
+	<string name="reply_cancel_button">abbrechen</string>
+	
+	<string name="compose_destination_text">An:</string>
+	<string name="compose_subject_text">Betreff:</string>
+	<string name="compose_message_text">Nachricht:</string>
+	<string name="compose_send_button">Senden</string>
+	<string name="compose_cancel_button">Abbrechen</string>
+	<string name="compose_captcha_text">Bist du ein Mensch? (\'tschuldigung)</string>
+	<string name="compose_captcha_loading">Lade CAPTCHA...</string>
+	
+	<string name="comment_hidden">[+]</string>
+	<string name="click_to_view_all">Klicke hier um die restlichen Kommentare zu sehen.</string>
+	<string name="next_threads">Nächste</string>
+
+	
+	<string name="submit_title_label">Titel</string>
+	<string name="submit_url_label">Url</string>
+	<string name="submit_reddit_label">reddit</string>
+	<string name="submit_captcha_label">Bist du ein Mensch? (\'tschuldigung)</string>
+	<string name="submit_button">Senden</string>
+	
+	
+	
+	
+	<!--  === Menus === -->
+	
+	<string name="compose_message">Nachricht verfassen</string>
+	<string name="dark_theme">Dunkles Thema verwenden</string>
+	<string name="light_theme">Helles Thema verwenden</string>
+	<string name="login">Anmelden</string>
+	<string name="menu_preferences">Einstellungen</string>
+
+	<string name="find_not_found">"%s\" wurde nicht gefunden</string>
+	<string name="find_new_brief">Neu</string>
+
+	<string name="open_browser">Im Browser öffnen</string>
+	<string name="pick_subreddit">Subreddit auswählen</string>
+	<string name="refresh">Neu laden</string>
+	<string name="random_subreddit">Zufälliges Subreddit</string>
+	<string name="share">Teilen</string>
+	<string name="user_profile">%ss Profil</string>
+	<string name="view_comments">Kommentare anzeigen</string>
+	<string name="close_browser">Browser schließen</string>
+	<string name="saved_content">Gespeicherte Kommentare</string>
+	<string name="author">Autor</string>
+	<string name="save_comment">speichern</string>
+	<string name="show_comment">Kommentar zeigen</string>
+	<string name="hide_comment">Kommentar verbergen</string>
+	<string name="links_menu_item">Links</string>
+	<string name="share_comments">Kommentare teilen</string>
+
+	
+	<!-- === Preferences === -->
+	<string name="pref_general_category">Allgemeine Einstellungen</string>
+	<string name="pref_appearance_category">Erscheinung</string>
+
+    <!-- === Browser settings === -->
+    <string name="pref_browser">Browsereinstellungen</string>
+
+
+	
+	<string name="pref_use_external_browser">Externen Browser verwenden</string>
+	
+ 	
+ 	
+	<!-- Settings label -->
+	<string name="pref_theme">Thema</string>
+	<!-- Title of dialog for setting the text size -->
+	<string name="pref_theme_dialogtitle">Thema</string>
+	<!-- Settings text size options; appear in Text size dialog box -->
+	<string-array name="pref_theme_choices">
+        <item>Hell</item>
+        <item>Dunkel</item>
+    </string-array>
+    
+    <string name="pref_text_size_dialogtitle">Schriftgröße</string>
+    <string-array name="pref_text_size_choices">
+    	<item>Mittel</item>
+    	<item>Groß</item>
+    	<item>Größer</item>
+    	<item>Riesig</item>
+   	</string-array>
+    
+    <string name="pref_always_show_next_previous">Navigationsleiste immer anzeigen</string>
+
+	<string name="pref_rotation">Bildschirmrotation</string>
+	<string name="pref_rotation_dialogtitle">Bildschirmrotation</string>
+	<string-array name="pref_rotation_choices">
+        <item>Systemeinstellungen (Vorgabe)</item>
+        <item>Hochformat</item>
+        <item>Querformat</item>
+    </string-array>
+	
+	<string-array name="pref_mail_notification_style_choices">
+		<item>Standard</item>
+		<item>Großer Umschlag</item>
+		<item>Aus</item>
+	</string-array>
+    
+    <string-array name="pref_mail_notification_service_choices">
+    	<item>Aus</item>
+    	<item>Alle 5 Minuten</item>
+    	<item>Alle 30 Minuten</item>
+    	<item>Jede Stunde</item>
+    	<item>Alle 6 Stunden</item>
+    	<item>Alle 24 Stunden</item>
+   	</string-array>
+   	
+   	<string name="pref_load_thumbnails">Zeige Vorschaubilder</string>
+   	
+	<string name="search_button">Suchen</string>
+    <string name="pref_load_thumbnails_only_wifi">Nur im WiFi</string>
+    
+    
+    <!-- === I18N Content Descriptions === -->
+    <string name="show_nsfw">NSFW Links zeigen</string>
+
+    <!-- filters -->
+    <string name="save">Speichern</string>
+    <string name="edit_filter">Filter bearbeiten</string>
+    <string name="delete_filter">Filter löschen</string>
+    <string name="clear_filters">Alles löschen</string>
+    <string name="filter_add_button">Neuer Filter</string>
+    <string name="filter_clear_confirm_title">Alle Filter löschen?</string>
+    <string name="filter_clear_confirm_yes">Löschen</string>
+    <string name="filter_clear_confirm_no">Abbrechen</string>
+
+    <string name="nsfw">nsfw</string>
+    <string name="copy">Url kopieren</string>
+
+	<!-- 'When' strings -->
+	<string name="one_second_ago">vor 1 Sekunde</string>
+	<string name="n_seconds_ago">vor %d Sekunden</string>
+	<string name="one_minute_ago">vor 1 Minute</string>
+	<string name="n_minutes_ago">vor %d Minuten</string>
+	<string name="one_hour_ago">vor 1 Stunde</string>
+	<string name="one_day_ago">vor 1 Tag</string>
+	<string name="one_week_ago">vor 1 Woche</string>
+	<string name="n_weeks_ago">vor %d Wochen</string>
+	<string name="one_month_ago">vor 1 Monat</string>
+	<string name="n_months_ago">vor %d Monaten</string>
+	<string name="one_year_ago">vor 1 Jahr</string>
+	<string name="n_years_ago">vor %d Jahren</string>
+
+</resources>
