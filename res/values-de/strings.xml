@@ -27,7 +27,7 @@
     <string name="menu_search">[beta] Suche</string>
     <string name="search_title_prefix">[beta] Suchen:</string>
  	<string-array name="search_results_sorting">
-        <item></item>
+        <item>Relevanz</item>
         <item>Neu</item>
         <item>Beste</item>
     </string-array>
@@ -110,7 +110,7 @@
 	<string name="show_comment">Kommentar zeigen</string>
 	<string name="hide_comment">Kommentar verbergen</string>
 	<string name="links_menu_item">Links</string>
-	<string name ="share_comments">Kommentare teilen</string>
+	<string name="share_comments">Kommentare teilen</string>
 
 	
 	<!-- === Preferences === -->
@@ -156,13 +156,13 @@
 	
 	<string-array name="pref_mail_notification_style_choices">
 		<item>Standard</item>
-		<item></item>
-		<item></item>
+		<item>Großer Umschlag</item>
+		<item>Aus</item>
 	</string-array>
     
     <string-array name="pref_mail_notification_service_choices">
-    	<item></item>
-    	<item>Alle 5 minuten</item>
+    	<item>Aus</item>
+    	<item>Alle 5 Minuten</item>
     	<item>Alle 30 Minuten</item>
     	<item>Jede Stunde</item>
     	<item>Alle 6 Stunden</item>
