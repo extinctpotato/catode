@@ -26,6 +26,8 @@
     <!-- Searches -->
     <string name="menu_search">[beta] Suche</string>
     <string name="search_title_prefix">[beta] Suchen:</string>
+    <string name="search_hint">[beta] reddit durchsuchen</string>
+    <string name="search_sort_label">Ergebnisse sortieren</string>
  	<string-array name="search_results_sorting">
         <item>Relevanz</item>
         <item>Neu</item>
@@ -35,21 +37,31 @@
     
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="quit">Beenden</string>
     <string name="really_quit">Wirklich beenden?</string>
     <string name="confirm_logout_title">Abmelden</string>
     <string name="confirm_logout">Willst du dich wirklich abmelden?</string>
     
     <string name="noComments">Hier sind keine Kommentare</string>
+    <string name="noMessages">Dein Postfach ist leer.</string>
     <string name="noSubreddits">Keine Subreddits</string>
     
     <string name="loading_splash_text">Lädt...</string>
     
+    <string name="second_age_format" formatted="false">%d Sekunde</string>
+    <string name="minute_age_format" formatted="false">%d Minute</string>
+    <string name="hour_age_format" formatted="false">%d Stunde</string>
+    <string name="day_age_format" formatted="false">%d Tag</string>
+    <string name="month_age_format" formatted="false">%d Monat</string>
+    <string name="year_age_format" formatted="false">%d Jahr</string>
     <string name="pick_subreddit_label">Subreddit Name:</string>
     <string name="pick_subreddit_button">Los</string>
     <string name="frontpage">Reddit Startseite</string>
     
     <string name="subreddit_layout_srtext_text">Android</string>
+    <string name="subreddit_layout_download_text">Herunterladen</string>
     
+	<string name="login_username_label">Benutzername:</string>
 	<string name="login_password_label">Passwort:</string>
 	<string name="login_button">Anmelden</string>
 	<string name="login_remember_checkbox">Angemeldet bleiben?</string>
@@ -59,6 +71,7 @@
 	<string name="thread_comments_button">Kommentare</string>
 	
 	<string name="comment_links_button">Links</string>
+	<string name="comment_reply_button">Antworten</string>
 	<string name="comment_save_button">Speichern</string>
 	<string name="reply_save_button">speichern</string>
 	<string name="reply_cancel_button">abbrechen</string>
@@ -72,35 +85,62 @@
 	<string name="compose_captcha_loading">Lade CAPTCHA...</string>
 	
 	<string name="comment_hidden">[+]</string>
+	<string name="more_comments">Mehr Kommentare laden</string>
 	<string name="click_to_view_all">Klicke hier um die restlichen Kommentare zu sehen.</string>
 	<string name="next_threads">Nächste</string>
+	<string name="previous_threads">Vorherige</string>
 
+	<string name="load_in_progress_toast">Bitte warten. Es lädt noch.</string>
+	<string name="error_voting_toast">Fehler beim bewerten. Bitte versuche es erneut.</string>
 	
 	<string name="submit_title_label">Titel</string>
 	<string name="submit_url_label">Url</string>
+	<string name="submit_text_label">Text (optional)</string>
 	<string name="submit_reddit_label">reddit</string>
 	<string name="submit_captcha_label">Bist du ein Mensch? (\'tschuldigung)</string>
+	<string name="submit_captcha_loading">lade CAPTCHA...</string>
 	<string name="submit_button">Senden</string>
 	
+	<string name="select_link_title">Aktion auswählen</string>
 	
+	<string name="inbox_title">%s\'s Postfach</string>
 	
 	
 	<!--  === Menus === -->
 	
 	<string name="compose_message">Nachricht verfassen</string>
 	<string name="dark_theme">Dunkles Thema verwenden</string>
+	<string name="subscribe">+ Startseite</string>
+	<string name="unsubscribe">- Startseite</string>
+	<string name="inbox">Postfach</string>
 	<string name="light_theme">Helles Thema verwenden</string>
 	<string name="login">Anmelden</string>
+	<string name="logout">Abmelden: %s</string>
 	<string name="menu_preferences">Einstellungen</string>
 
+	<string name="find_brief">Finden</string>
+	<string name="find">Kommentar finden</string>
+	<string name="find_box_hint">Text kommentieren</string>
+	<string name="find_should_wrap">Suche zusammenfassen</string>
 	<string name="find_not_found">"%s\" wurde nicht gefunden</string>
+	<string name="find_new">Neue finden</string>
 	<string name="find_new_brief">Neu</string>
+	<string name="find_next">Nächste finden</string>
+	<string name="find_next_brief">Nächste</string>
 
 	<string name="open_browser">Im Browser öffnen</string>
 	<string name="pick_subreddit">Subreddit auswählen</string>
 	<string name="refresh">Neu laden</string>
 	<string name="random_subreddit">Zufälliges Subreddit</string>
 	<string name="share">Teilen</string>
+	<string name="sort_by_best">Sortieren nach: beste</string>
+	<string name="sort_by_hot">Sortieren nach: beliebt</string>
+	<string name="sort_by_new">Sortieren nach: neu</string>
+	<string name="sort_by_controversial">Sortieren nach: kontrovers</string>
+	<string name="sort_by_top">Sortieren nach: top</string>
+	<string name="sort_by_old">Sortieren nach: alt</string>
+	<string name="submit_link">Link senden</string>
+	<string name="update_captcha">Aktualisierte CAPTCHA</string>
 	<string name="user_profile">%ss Profil</string>
 	<string name="view_comments">Kommentare anzeigen</string>
 	<string name="close_browser">Browser schließen</string>
@@ -119,12 +159,17 @@
 
     <!-- === Browser settings === -->
     <string name="pref_browser">Browsereinstellungen</string>
+    <string name="pref_load_javascript">JavaScript laden</string>
+    <string name="pref_load_plugins">Plugins laden</string>
 
 
+	<string name="pref_homepage_hint">Leer lassen für Standard</string>
 	
 	<string name="pref_use_external_browser">Externen Browser verwenden</string>
 	
+	<string name="pref_confirm_quit">Bestätige Beenden/Abmelden</string>
  	
+	<string name="pref_save_history">Chronik speichern</string>
  	
 	<!-- Settings label -->
 	<string name="pref_theme">Thema</string>
@@ -136,6 +181,7 @@
         <item>Dunkel</item>
     </string-array>
     
+    <string name="pref_text_size">Textgröße</string>
     <string name="pref_text_size_dialogtitle">Schriftgröße</string>
     <string-array name="pref_text_size_choices">
     	<item>Mittel</item>
@@ -144,6 +190,7 @@
     	<item>Riesig</item>
    	</string-array>
     
+    <string name="pref_show_comment_guide_lines">Kommentarrichtlinien</string>
     <string name="pref_always_show_next_previous">Navigationsleiste immer anzeigen</string>
 
 	<string name="pref_rotation">Bildschirmrotation</string>
@@ -182,22 +229,30 @@
     <string name="save">Speichern</string>
     <string name="edit_filter">Filter bearbeiten</string>
     <string name="delete_filter">Filter löschen</string>
+    <string name="filter_name">Filter Name</string>
+    <string name="subreddit_name">Subreddit Name</string>
+    <string name="filter_text">Filter Text</string>
     <string name="clear_filters">Alles löschen</string>
+    <string name="filter_help_text">Links, mit gefilterten Begriffen im Titel, werden nicht angezeigt.</string>
     <string name="filter_add_button">Neuer Filter</string>
     <string name="filter_clear_confirm_title">Alle Filter löschen?</string>
     <string name="filter_clear_confirm_yes">Löschen</string>
     <string name="filter_clear_confirm_no">Abbrechen</string>
 
+    <string name="pref_title_filter">Titelfilter bearbeiten</string>
     <string name="nsfw">nsfw</string>
     <string name="copy">Url kopieren</string>
 
 	<!-- 'When' strings -->
+	<string name="just_now">gerade eben</string>
 	<string name="one_second_ago">vor 1 Sekunde</string>
 	<string name="n_seconds_ago">vor %d Sekunden</string>
 	<string name="one_minute_ago">vor 1 Minute</string>
 	<string name="n_minutes_ago">vor %d Minuten</string>
 	<string name="one_hour_ago">vor 1 Stunde</string>
+	<string name="n_hours_ago">vor %d Stunden</string>
 	<string name="one_day_ago">vor 1 Tag</string>
+	<string name="n_days_ago">vor %d Tagen</string>
 	<string name="one_week_ago">vor 1 Woche</string>
 	<string name="n_weeks_ago">vor %d Wochen</string>
 	<string name="one_month_ago">vor 1 Monat</string>
