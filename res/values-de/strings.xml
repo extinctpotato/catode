@@ -150,7 +150,7 @@
 	<string name="show_comment">Kommentar zeigen</string>
 	<string name="hide_comment">Kommentar verbergen</string>
 	<string name="links_menu_item">Links</string>
-	<string name ="share_comments">Kommentare teilen</string>
+	<string name="share_comments">Kommentare teilen</string>
 
 	
 	<!-- === Preferences === -->
