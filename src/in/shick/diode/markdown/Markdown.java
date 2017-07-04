@@ -79,7 +79,7 @@ public class Markdown {
     static final RunAutomaton autoLinkUrlAutomaton = new RunAutomaton(new RegExp("((https?|ftp):([^'\"> \t\r\n])+)", RegExp.NONE).toAutomaton());
 //    static final Pattern autoLinkEmail = Pattern.compile("<([-.\\w]+\\@[-a-z0-9]+(\\.[-a-z0-9]+)*\\.[a-z]+)>");
 
-    static final RunAutomaton subredditAutomaton = new RunAutomaton(new RegExp("/[rR]/[a-zA-Z0-9]+/?", RegExp.NONE).toAutomaton());
+    static final RunAutomaton subredditAutomaton = new RunAutomaton(new RegExp("[rR]/[a-zA-Z0-9]+/?", RegExp.NONE).toAutomaton());
 
     /**
      * @param txt input
@@ -278,7 +278,7 @@ public class Markdown {
             if (Constants.LOGGING) Log.d(TAG, "pos="+am.start() + " subreddit="+subreddit);
             if (!isOverlapping(am.start(), am.start() + subreddit.length(), startToEndOffsetMap)) {
                 saveStartAndEnd(am.start(), am.start() + subreddit.length(), startToEndOffsetMap);
-                urls.add(new MarkdownURL(am.start(), Util.absolutePathToURL(subreddit), subreddit));
+                urls.add(new MarkdownURL(am.start(), Util.absolutePathToURL(subreddit), "/" + subreddit));
             }
         }
         return txt;
