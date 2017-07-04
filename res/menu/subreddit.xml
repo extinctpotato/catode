@@ -27,7 +27,7 @@
         <item android:id="@+id/user_profile_menu_id" android:title="@string/user_profile" android:icon="@drawable/ic_menu_friendslist" />
         
 		<item android:id="@+id/refresh_menu_id" android:title="@string/refresh" android:icon="@drawable/ic_menu_refresh" android:alphabeticShortcut="r" />
-		<item android:id="@+id/submit_link_menu_id" android:title="@string/submit_link" android:icon="@android:drawable/ic_menu_upload" />
+		<item android:id="@+id/submit_link_menu_id" android:title="@string/submit_link" android:icon="@android:drawable/ic_menu_upload" android:visible="false" />
 		<item android:id="@+id/sort_by_menu_id" android:icon="@android:drawable/ic_menu_sort_by_size" android:alphabeticShortcut="s" />
 		<item android:id="@+id/light_dark_menu_id" />
 		<item android:id="@+id/open_browser_menu_id" android:title="@string/open_browser" />
