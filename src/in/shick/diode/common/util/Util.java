@@ -195,6 +195,8 @@ public class Util {
     public static String absolutePathToURL(String path) {
         if (path.startsWith("/"))
             return Constants.REDDIT_BASE_URL + path;
+        else if (path.startsWith("r/"))
+            return Constants.REDDIT_BASE_URL + "/" + path;
         return path;
     }
 
