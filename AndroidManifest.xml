@@ -48,8 +48,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" android:host="www.reddit.com" android:pathPattern="/r/.*/" />
+                <data android:scheme="https" android:host="www.reddit.com" android:pathPattern="/r/.*/" />
                 <data android:scheme="http" android:host="np.reddit.com" android:pathPattern="/r/.*/" />
+                <data android:scheme="https" android:host="np.reddit.com" android:pathPattern="/r/.*/" />
                 <data android:scheme="http" android:host="redd.it" android:pathPattern="/" />
+                <data android:scheme="https" android:host="redd.it" android:pathPattern="/" />
             </intent-filter>
         </activity>
 	    <activity android:name=".comments.CommentsListActivity">
@@ -58,11 +61,17 @@
 	            <category android:name="android.intent.category.DEFAULT" />
 	            <category android:name="android.intent.category.BROWSABLE" />
 	            <data android:scheme="http" android:host="www.reddit.com" android:pathPattern="/r/.*/comments/.*" />
+	            <data android:scheme="https" android:host="www.reddit.com" android:pathPattern="/r/.*/comments/.*" />
 	            <data android:scheme="http" android:host="np.reddit.com" android:pathPattern="/r/.*/comments/.*" />
+	            <data android:scheme="https" android:host="np.reddit.com" android:pathPattern="/r/.*/comments/.*" />
 	            <data android:scheme="http" android:host="www.reddit.com" android:pathPrefix="/comments/" />
+	            <data android:scheme="https" android:host="www.reddit.com" android:pathPrefix="/comments/" />
 	            <data android:scheme="http" android:host="np.reddit.com" android:pathPrefix="/comments/" />
+	            <data android:scheme="https" android:host="np.reddit.com" android:pathPrefix="/comments/" />
 	            <data android:scheme="http" android:host="www.reddit.com" android:pathPrefix="/tb/" />
+	            <data android:scheme="https" android:host="www.reddit.com" android:pathPrefix="/tb/" />
 	            <data android:scheme="http" android:host="np.reddit.com" android:pathPrefix="/tb/" />
+	            <data android:scheme="https" android:host="np.reddit.com" android:pathPrefix="/tb/" />
 	        </intent-filter>
             <!-- Separate filter because when added to above filter, the host is ignored -->
             <intent-filter>
@@ -70,6 +79,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" android:host="redd.it" android:pathPattern="/..*" />
+                <data android:scheme="https" android:host="redd.it" android:pathPattern="/..*" />
             </intent-filter>
 	    </activity>
 	    <activity android:name=".reddits.PickSubredditActivity"></activity>
@@ -88,7 +98,9 @@
 	            <category android:name="android.intent.category.DEFAULT" />
 	            <category android:name="android.intent.category.BROWSABLE" />
 	            <data android:scheme="http" android:host="www.reddit.com" android:pathPrefix="/user/" />
+	            <data android:scheme="https" android:host="www.reddit.com" android:pathPrefix="/user/" />
 	            <data android:scheme="http" android:host="np.reddit.com" android:pathPrefix="/user/" />
+	            <data android:scheme="https" android:host="np.reddit.com" android:pathPrefix="/user/" />
 	        </intent-filter>
 	    </activity>
 	    <activity android:name=".settings.RedditPreferencesPage"></activity>
