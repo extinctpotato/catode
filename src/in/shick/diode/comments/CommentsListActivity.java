@@ -2076,50 +2076,36 @@ public class CommentsListActivity extends ListActivity
                     });
                 }
             }
-            final CheckBox voteUpButton = (CheckBox) dialog.findViewById(R.id.vote_up_button);
-            final CheckBox voteDownButton = (CheckBox) dialog.findViewById(R.id.vote_down_button);
+
             final Button replyButton = (Button) dialog.findViewById(R.id.reply_button);
             final Button loginButton = (Button) dialog.findViewById(R.id.login_button);
 
             // Only show upvote/downvote if user is logged in
             if (mSettings.isLoggedIn()) {
                 loginButton.setVisibility(View.GONE);
-                voteUpButton.setVisibility(View.VISIBLE);
-                voteDownButton.setVisibility(View.VISIBLE);
-                replyButton.setEnabled(true);
-
-                // Make sure the setChecked() actions don't actually vote just yet.
-                voteUpButton.setOnCheckedChangeListener(null);
-                voteDownButton.setOnCheckedChangeListener(null);
-
-                // Set initial states of the vote buttons based on user's past actions
-                if (likes == null) {
-                    // User is currently neutral
-                    voteUpButton.setChecked(false);
-                    voteDownButton.setChecked(false);
-                } else if (likes == true) {
-                    // User currenty likes it
-                    voteUpButton.setChecked(true);
-                    voteDownButton.setChecked(false);
-                } else {
-                    // User currently dislikes it
-                    voteUpButton.setChecked(false);
-                    voteDownButton.setChecked(true);
-                }
-                // Now we want the user to be able to vote.
-                voteUpButton.setOnCheckedChangeListener(voteUpOnCheckedChangeListener);
-                voteDownButton.setOnCheckedChangeListener(voteDownOnCheckedChangeListener);
 
                 // The "reply" button
-                replyButton.setOnClickListener(replyOnClickListener);
+                if (mVoteTargetThing.isArchived()) {
+                    if (mVoteTargetThing.isCommentKind()) {
+                        Toast.makeText(CommentsListActivity.this, R.string.warn_comment_archived_toast, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(CommentsListActivity.this, R.string.warn_thread_archived_toast, Toast.LENGTH_SHORT).show();
+                    }
+                    replyButton.setEnabled(false);
+                } else {
+                    replyButton.setEnabled(true);
+                    replyButton.setOnClickListener(replyOnClickListener);
+                }
             } else {
                 replyButton.setEnabled(false);
-
-                voteUpButton.setVisibility(View.GONE);
-                voteDownButton.setVisibility(View.GONE);
                 loginButton.setVisibility(View.VISIBLE);
                 loginButton.setOnClickListener(loginOnClickListener);
             }
+            Util.setStateOfUpvoteDownvoteButtons(dialog,
+                    mSettings.isLoggedIn(),
+                    mVoteTargetThing,
+                    voteUpOnCheckedChangeListener,
+                    voteDownOnCheckedChangeListener);
             break;
 
         case Constants.DIALOG_REPLY:
@@ -2246,10 +2232,11 @@ public class CommentsListActivity extends ListActivity
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             removeDialog(Constants.DIALOG_COMMENT_CLICK);
             String thingFullname = mVoteTargetThing.getName();
-            if (isChecked)
+            if (isChecked) {
                 new VoteTask(thingFullname, 1).execute();
-            else
+            } else {
                 new VoteTask(thingFullname, 0).execute();
+            }
         }
     };
     private final CompoundButton.OnCheckedChangeListener voteDownOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {

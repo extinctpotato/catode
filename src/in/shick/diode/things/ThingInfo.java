@@ -53,6 +53,7 @@ public class ThingInfo implements Serializable, Parcelable {
     private String link_flair_text;		//   t
     private String body;					//   c m
     private String body_html;				//   c m
+    private boolean archived;				// t c
     private boolean clicked;				// t
     private String context;					//     m
     private boolean misContext = false;
@@ -277,6 +278,10 @@ public class ThingInfo implements Serializable, Parcelable {
         // Ignore.
     }
 
+    public boolean isArchived() {
+        return archived;
+    }
+
     public boolean isClicked() {
         return clicked;
     }
@@ -335,6 +340,10 @@ public class ThingInfo implements Serializable, Parcelable {
 
     public void setBody_html(String body_html) {
         this.body_html = body_html;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 
     public void setClicked(boolean clicked) {
@@ -570,7 +579,7 @@ public class ThingInfo implements Serializable, Parcelable {
         out.writeValue(link_author);
         out.writeValue(distinguished);
 
-        boolean booleans[] = new boolean[11];
+        boolean booleans[] = new boolean[12];
         booleans[0] = clicked;
         booleans[1] = hidden;
         booleans[2] = is_self;
@@ -582,6 +591,7 @@ public class ThingInfo implements Serializable, Parcelable {
         booleans[8] = mIsHiddenCommentHead;
         booleans[9] = mIsHiddenCommentDescendant;
         booleans[10] = misContext;
+        booleans[11] = archived;
         out.writeBooleanArray(booleans);
     }
 
@@ -618,7 +628,7 @@ public class ThingInfo implements Serializable, Parcelable {
         link_author   = (String) in.readValue(null);
         distinguished = (String) in.readValue(null);
 
-        boolean booleans[] = new boolean[11];
+        boolean booleans[] = new boolean[12];
         in.readBooleanArray(booleans);
         clicked                        = booleans[0];
         hidden                         = booleans[1];
@@ -631,6 +641,7 @@ public class ThingInfo implements Serializable, Parcelable {
         mIsHiddenCommentHead           = booleans[8];
         mIsHiddenCommentDescendant     = booleans[9];
         misContext                     = booleans[10];
+        archived                       = booleans[11];
     }
 
     public static final Parcelable.Creator<ThingInfo> CREATOR
