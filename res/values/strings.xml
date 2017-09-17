@@ -129,6 +129,7 @@
 	<!--  === Menus === -->
 	
 	<string name="compose_message">Compose message</string>
+	<string name="view_saved_posts">View saved posts</string>
 	<string name="dark_theme">Use dark theme</string>
 	<string name="subscribe">+ Frontpage</string>
 	<string name="unsubscribe">- Frontpage</string>

@@ -19,6 +19,7 @@
 
 package in.shick.diode.threads;
 
+import android.net.Uri;
 import in.shick.diode.R;
 import in.shick.diode.comments.CommentsListActivity;
 import in.shick.diode.comments.SavedCommentsActivity;
@@ -144,6 +145,7 @@ public final class ThreadsListActivity extends ListActivity {
     private String mSortByUrl = Constants.ThreadsSort.SORT_BY_HOT_URL;
     private String mSortByUrlExtra = "";
     private String mJumpToThreadId = null;
+    private Uri mSavedUri = null;
     // End navigation variables
     private ObjectStates mObjectStates = null;
     // Menu
@@ -214,15 +216,7 @@ public final class ThreadsListActivity extends ListActivity {
                 else {
                     // Orientation change. Use prior instance.
                     resetUI(new ThreadsListAdapter(this, mObjectStates.mThreadsList));
-                    if (Constants.FRONTPAGE_STRING.equals(mSubreddit)) {
-                        setTitle("reddit.com: what's new online!");
-                    }
-                    else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit)) {
-                        setTitle(getResources().getString(R.string.search_title_prefix) + mSearchQuery);
-                    }
-                    else {
-                        setTitle("/r/" + mSubreddit.trim());
-                    }
+                    setWindowTitle();
                 }
             }
         }
@@ -232,6 +226,9 @@ public final class ThreadsListActivity extends ListActivity {
             Matcher redditContextMatcher = REDDIT_PATH_PATTERN.matcher(getIntent().getData().getPath());
             if (redditContextMatcher.matches()) {
                 mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(redditContextMatcher.group(1));
+            } else if (getIntent().getData().toString().toLowerCase().endsWith("/saved.json")) {
+                mSavedUri = getIntent().getData();
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(getIntent().getData());
             } else {
                 mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSettings.getHomepage());
             }
@@ -242,6 +239,18 @@ public final class ThreadsListActivity extends ListActivity {
             mObjectStates = new ObjectStates();
             mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSettings.getHomepage());
             mObjectStates.mCurrentDownloadThreadsTask.execute();
+        }
+    }
+
+    private void setWindowTitle() {
+        if (Constants.FRONTPAGE_STRING.equals(mSubreddit)) {
+            setTitle("reddit.com: your homepage");
+        } else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit)) {
+            setTitle(getResources().getString(R.string.search_title_prefix) + mSearchQuery);
+        } else if(Constants.REDDIT_SAVED_STRING.equals(mSubreddit)) {
+            setTitle("Your Saved Posts");
+        } else {
+            setTitle("/r/" + mSubreddit.trim());
         }
     }
 
@@ -791,6 +800,26 @@ public final class ThreadsListActivity extends ListActivity {
             attach(ThreadsListActivity.this);
         }
 
+        public MyDownloadThreadsTask(Uri savedURI) {
+            super(getApplicationContext(),
+                    ThreadsListActivity.this.mClient,
+                    ThreadsListActivity.this.mObjectMapper,
+                    ThreadsListActivity.this.mSortByUrl,
+                    ThreadsListActivity.this.mSortByUrlExtra,
+                    Constants.REDDIT_SAVED_STRING, savedURI);
+            attach(ThreadsListActivity.this);
+        }
+
+        public MyDownloadThreadsTask(Uri savedURI, String after, String before, int count) {
+            super(getApplicationContext(),
+                    ThreadsListActivity.this.mClient,
+                    ThreadsListActivity.this.mObjectMapper,
+                    ThreadsListActivity.this.mSortByUrl,
+                    ThreadsListActivity.this.mSortByUrlExtra,
+                    Constants.REDDIT_SAVED_STRING, savedURI, after, before, count);
+            attach(ThreadsListActivity.this);
+        }
+
         public MyDownloadThreadsTask(String subreddit,
                                      String after, String before, int count) {
             super(getApplicationContext(),
@@ -815,6 +844,7 @@ public final class ThreadsListActivity extends ListActivity {
             ThreadsListActivity.this.mCount = mCount;
             ThreadsListActivity.this.mSortByUrl = mSortByUrl;
             ThreadsListActivity.this.mSortByUrlExtra = mSortByUrlExtra;
+            ThreadsListActivity.this.mSavedUri = mDTTSavedURI;
         }
 
         @Override
@@ -829,16 +859,12 @@ public final class ThreadsListActivity extends ListActivity {
                 getWindow().setFeatureInt(Window.FEATURE_PROGRESS, 0);
             }
 
-            if (Constants.FRONTPAGE_STRING.equals(mSubreddit))
-                setTitle("reddit.com: what's new online!");
-            else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit))
-                setTitle(getResources().getString(R.string.search_title_prefix) + mSearchQuery);
-            else
-                setTitle("/r/" + mSubreddit.trim());
         }
 
         @Override
         public void onPostExecute(Boolean success) {
+            setWindowTitle();
+
             threadListActivity.disableLoadingScreen();
 
             if (mContentLength == -1)
@@ -1137,17 +1163,26 @@ public final class ThreadsListActivity extends ListActivity {
             menu.findItem(R.id.login_menu_id).setVisible(false);
 
             if(!mSubreddit.equals(Constants.FRONTPAGE_STRING)) {
-                ArrayList<SubredditInfo> mSubredditsList = CacheInfo.getCachedSubredditList(getApplicationContext());
-                SubredditInfo key = new SubredditInfo();
-                key.name = mSubreddit;
+                if (!mSubreddit.equals(Constants.REDDIT_SAVED_STRING)) {
+                    ArrayList<SubredditInfo> mSubredditsList = CacheInfo.getCachedSubredditList(getApplicationContext());
+                    SubredditInfo key = new SubredditInfo();
+                    key.name = mSubreddit;
 
-                if(mSubredditsList != null && mSubredditsList.contains(key)) {
-                    menu.findItem(R.id.unsubscribe_menu_id).setVisible(true);
-                    menu.findItem(R.id.subscribe_menu_id).setVisible(false);
-                }
-                else {
-                    menu.findItem(R.id.subscribe_menu_id).setVisible(true);
+                    if (mSubredditsList != null && mSubredditsList.contains(key)) {
+                        menu.findItem(R.id.unsubscribe_menu_id).setVisible(true);
+                        menu.findItem(R.id.subscribe_menu_id).setVisible(false);
+                    } else {
+                        menu.findItem(R.id.subscribe_menu_id).setVisible(true);
+                        menu.findItem(R.id.unsubscribe_menu_id).setVisible(false);
+                    }
+                    menu.findItem(R.id.sort_by_menu_id).setVisible(true);
+                    menu.findItem(R.id.open_browser_menu_id).setVisible(true);
+                } else {
+                    // These menu items make no sense when viewing the saved posts.
                     menu.findItem(R.id.unsubscribe_menu_id).setVisible(false);
+                    menu.findItem(R.id.subscribe_menu_id).setVisible(false);
+                    menu.findItem(R.id.sort_by_menu_id).setVisible(false);
+                    menu.findItem(R.id.open_browser_menu_id).setVisible(false);
                 }
             }
 
@@ -1161,8 +1196,7 @@ public final class ThreadsListActivity extends ListActivity {
                 String.format(getResources().getString(R.string.logout), mSettings.getUsername())
             );
             menu.findItem(R.id.saved_comments_menu_id).setVisible(true);
-        }
-        else {
+        } else {
             menu.findItem(R.id.login_menu_id).setVisible(true);
 
             menu.findItem(R.id.unsubscribe_menu_id).setVisible(false);
@@ -1235,7 +1269,11 @@ public final class ThreadsListActivity extends ListActivity {
             break;
         case R.id.refresh_menu_id:
             CacheInfo.invalidateCachedSubreddit(getApplicationContext());
-            mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit);
+            if (mSavedUri == null) {
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit);
+            } else {
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSavedUri);
+            }
             mObjectStates.mCurrentDownloadThreadsTask.execute();
             break;
         case R.id.submit_link_menu_id:
@@ -1442,12 +1480,20 @@ public final class ThreadsListActivity extends ListActivity {
 
     private final OnClickListener downloadAfterOnClickListener = new OnClickListener() {
         public void onClick(View v) {
-            new MyDownloadThreadsTask(mSubreddit, mAfter, null, mCount).execute();
+            if (mSavedUri == null) {
+                new MyDownloadThreadsTask(mSubreddit, mAfter, null, mCount).execute();
+            } else {
+                new MyDownloadThreadsTask(mSavedUri, mAfter, null, mCount).execute();
+            }
         }
     };
     private final OnClickListener downloadBeforeOnClickListener = new OnClickListener() {
         public void onClick(View v) {
-            mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit, null, mBefore, mCount);
+            if (mSavedUri == null) {
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit, null, mBefore, mCount);
+            } else {
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSavedUri, null, mBefore, mCount);
+            }
             mObjectStates.mCurrentDownloadThreadsTask.execute();
         }
     };

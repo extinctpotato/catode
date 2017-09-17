@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import android.net.Uri;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -63,6 +64,8 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
     protected String mSearchQuery;
     protected String mSortSearch; //not implemented yet
 
+    Uri mDTTSavedURI;
+
     protected String mUserError = "Error retrieving subreddit info.";
 
     protected RedditFilterEngine mFilterEngine;
@@ -83,6 +86,20 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
 
     public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
                                String sortByUrl, String sortByUrlExtra,
+                               String subreddit, Uri redditURI) {
+        this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
+        mDTTSavedURI = redditURI;
+    }
+
+    public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
+                               String sortByUrl, String sortByUrlExtra,
+                               String subreddit, Uri redditURI, String after, String before, int count) {
+        this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, after, before, count);
+        mDTTSavedURI = redditURI;
+    }
+
+    public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
+                               String sortByUrl, String sortByUrlExtra,
                                String subreddit) {
         this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
     }
@@ -96,10 +113,12 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
         mOm = om;
         mSortByUrl = sortByUrl;
         mSortByUrlExtra = sortByUrlExtra;
-        if (subreddit != null)
+        mDTTSavedURI = null;
+        if (subreddit != null) {
             mSubreddit = subreddit;
-        else
+        } else {
             mSubreddit = Constants.FRONTPAGE_STRING;
+        }
 
         mAfter = after;
         mBefore = before;
@@ -125,10 +144,12 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
             else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit)) {
                 sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/search/").append(".json?q=")
                 .append(URLEncoder.encode(mSearchQuery, "utf8")).append("&sort=" + mSortSearch);
-            }
-            else {
+            } else if(Constants.REDDIT_SAVED_STRING.equals(mSubreddit)) {
+                // Appending the ? without query params is still valid.
+                sb = new StringBuilder(mDTTSavedURI.toString()).append('?');
+            } else {
                 sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
-                .append(mSubreddit.toString().trim())
+                .append(mSubreddit.trim())
                 .append("/").append(mSortByUrl).append(".json?")
                 .append(mSortByUrlExtra).append("&");
             }

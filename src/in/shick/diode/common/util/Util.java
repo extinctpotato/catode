@@ -454,6 +454,13 @@ public class Util {
                          .toString());
     }
 
+    public static Uri createSavedUri(String username) {
+        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/user/")
+                .append(username)
+                .append("/saved.json")
+                .toString());
+    }
+
     public static Uri createSubmitUri(String subreddit) {
         if (Constants.FRONTPAGE_STRING.equals(subreddit))
             return Uri.parse(Constants.REDDIT_BASE_URL + "/submit");

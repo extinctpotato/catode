@@ -327,9 +327,7 @@ public final class ProfileActivity extends ListActivity
                 ThreadsListActivity.fillThreadsListItemView(
                     position, view, item, ProfileActivity.this, mClient, mSettings, mThumbnailOnClickListenerFactory
                 );
-            }
-
-            else if (getItemViewType(position) == COMMENT_ITEM_VIEW_TYPE) {
+            } else if (getItemViewType(position) == COMMENT_ITEM_VIEW_TYPE) {
                 // Here view may be passed in for re-use, or we make a new one.
                 if (convertView == null) {
                     view = mInflater.inflate(R.layout.comments_list_item, null);
@@ -1054,6 +1052,16 @@ public final class ProfileActivity extends ListActivity
                 showDialog(Constants.DIALOG_LOGIN);
             }
             break;
+            case R.id.saved_menu_id:
+                if (mSettings.isLoggedIn()) {
+                    Intent intent = new Intent(getApplicationContext(), ThreadsListActivity.class);
+                    intent.setData(Util.createSavedUri(mSettings.getUsername()));
+                    startActivity(intent);
+                    Util.overridePendingTransition(null, this,
+                            android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                }
+                break;
+
         case R.id.refresh_menu_id:
             new DownloadProfileTask(mUsername).execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             break;
