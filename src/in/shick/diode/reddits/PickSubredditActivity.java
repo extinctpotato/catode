@@ -243,7 +243,7 @@ public final class PickSubredditActivity extends ListActivity {
 
     private void returnSubreddit(String subreddit) {
         Intent intent = new Intent();
-        intent.setData(Util.createSubredditUri(subreddit.toLowerCase()));
+        intent.setData(Util.createSubredditUri(subreddit.toLowerCase().replaceAll("\\s", "")));
         setResult(RESULT_OK, intent);
         finish();
     }
