@@ -260,8 +260,4 @@
 	<string name="one_year_ago">vor 1 Jahr</string>
 	<string name="n_years_ago">vor %d Jahren</string>
 
-	<!-- Warning strings -->
-	<string name="warn_thread_archived_toast">Kann nicht auf archiviertem Thread abstimmen.</string>
-	<string name="warn_comment_archived_toast">Kann nicht auf archivierten Kommentar abstimmen.</string>
-
 </resources>
