@@ -333,4 +333,8 @@
 	<string name="one_year_ago">1 year ago</string>
 	<string name="n_years_ago">%d years ago</string>
 
+	<!-- Warning strings -->
+	<string name="warn_thread_archived_toast">Can\'t vote on archived thread.</string>
+	<string name="warn_comment_archived_toast">Can\'t vote on archived comment.</string>
+
 </resources>

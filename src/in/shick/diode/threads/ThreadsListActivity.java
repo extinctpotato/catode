@@ -596,8 +596,6 @@ public final class ThreadsListActivity extends ListActivity {
     public static void fillThreadClickDialog(Dialog dialog, ThingInfo thingInfo, RedditSettings settings,
             ThreadClickDialogOnClickListenerFactory threadClickDialogOnClickListenerFactory) {
 
-        final CheckBox voteUpButton = (CheckBox) dialog.findViewById(R.id.vote_up_button);
-        final CheckBox voteDownButton = (CheckBox) dialog.findViewById(R.id.vote_down_button);
         final TextView titleView = (TextView) dialog.findViewById(R.id.title);
         final TextView urlView = (TextView) dialog.findViewById(R.id.url);
         final TextView submissionStuffView = (TextView) dialog.findViewById(R.id.submissionTime_submitter_subreddit);
@@ -615,40 +613,18 @@ public final class ThreadsListActivity extends ListActivity {
         // Only show upvote/downvote if user is logged in
         if (settings.isLoggedIn()) {
             loginButton.setVisibility(View.GONE);
-            voteUpButton.setVisibility(View.VISIBLE);
-            voteDownButton.setVisibility(View.VISIBLE);
-
-            // Remove the OnCheckedChangeListeners because we are about to setChecked(),
-            // and I think the Buttons are recycled, so old listeners will fire
-            // for the previous vote target ThingInfo.
-            voteUpButton.setOnCheckedChangeListener(null);
-            voteDownButton.setOnCheckedChangeListener(null);
-
-            // Set initial states of the vote buttons based on user's past actions
-            if (thingInfo.getLikes() == null) {
-                // User is currently neutral
-                voteUpButton.setChecked(false);
-                voteDownButton.setChecked(false);
-            } else if (thingInfo.getLikes()) {
-                // User currenty likes it
-                voteUpButton.setChecked(true);
-                voteDownButton.setChecked(false);
-            } else {
-                // User currently dislikes it
-                voteUpButton.setChecked(false);
-                voteDownButton.setChecked(true);
+            if (thingInfo.isArchived()) {
+                Toast.makeText(dialog.getContext(), R.string.warn_thread_archived_toast, Toast.LENGTH_SHORT).show();
             }
-            voteUpButton.setOnCheckedChangeListener(
-                threadClickDialogOnClickListenerFactory.getVoteUpOnCheckedChangeListener(thingInfo));
-            voteDownButton.setOnCheckedChangeListener(
-                threadClickDialogOnClickListenerFactory.getVoteDownOnCheckedChangeListener(thingInfo));
         } else {
-            voteUpButton.setVisibility(View.GONE);
-            voteDownButton.setVisibility(View.GONE);
             loginButton.setVisibility(View.VISIBLE);
-            loginButton.setOnClickListener(
-                threadClickDialogOnClickListenerFactory.getLoginOnClickListener());
+            loginButton.setOnClickListener(threadClickDialogOnClickListenerFactory.getLoginOnClickListener());
         }
+        Util.setStateOfUpvoteDownvoteButtons(dialog,
+                settings.isLoggedIn(),
+                thingInfo,
+                threadClickDialogOnClickListenerFactory.getVoteUpOnCheckedChangeListener(thingInfo),
+                threadClickDialogOnClickListenerFactory.getVoteDownOnCheckedChangeListener(thingInfo));
 
         // "link" button behaves differently for regular links vs. self posts and links to comments pages (e.g., bestof)
         if (thingInfo.isIs_self()) {

@@ -21,9 +21,13 @@ package in.shick.diode.common.util;
 
 import java.lang.reflect.Method;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 
@@ -544,6 +548,54 @@ public class Util {
         if (uri == null) return false;
         String host = uri.getHost();
         return host != null && host.equals("market.android.com");
+    }
+
+    // ===============
+    //   UI
+    // ===============
+
+    public static void setStateOfUpvoteDownvoteButtons(Dialog theDialog,
+                                                       boolean isLoggedIn,
+                                                       ThingInfo theThingInfo,
+                                                       CompoundButton.OnCheckedChangeListener upvoteListener,
+                                                       CompoundButton.OnCheckedChangeListener downvoteListener) {
+        final CheckBox voteUpButton = (CheckBox) theDialog.findViewById(R.id.vote_up_button);
+        final CheckBox voteDownButton = (CheckBox) theDialog.findViewById(R.id.vote_down_button);
+        // Only show upvote/downvote if user is logged in
+        if (isLoggedIn) {
+            voteUpButton.setVisibility(View.VISIBLE);
+            voteDownButton.setVisibility(View.VISIBLE);
+
+            // Remove the OnCheckedChangeListeners because we are about to setChecked(),
+            // and I think the Buttons are recycled, so old listeners will fire
+            // for the previous vote target ThingInfo.
+            voteUpButton.setOnCheckedChangeListener(null);
+            voteDownButton.setOnCheckedChangeListener(null);
+
+            // Set initial states of the vote buttons based on user's past actions
+            if (theThingInfo.getLikes() == null) {
+                // User is currently neutral
+                voteUpButton.setChecked(false);
+                voteDownButton.setChecked(false);
+            } else if (theThingInfo.getLikes()) {
+                // User currenty likes it
+                voteUpButton.setChecked(true);
+                voteDownButton.setChecked(false);
+            } else {
+                // User currently dislikes it
+                voteUpButton.setChecked(false);
+                voteDownButton.setChecked(true);
+            }
+            voteUpButton.setEnabled(!theThingInfo.isArchived());
+            voteDownButton.setEnabled(!theThingInfo.isArchived());
+            if (!theThingInfo.isArchived()) {
+                voteUpButton.setOnCheckedChangeListener(upvoteListener);
+                voteDownButton.setOnCheckedChangeListener(downvoteListener);
+            }
+        } else {
+            voteUpButton.setVisibility(View.GONE);
+            voteDownButton.setVisibility(View.GONE);
+        }
     }
 
 }
