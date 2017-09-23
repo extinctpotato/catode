@@ -163,6 +163,10 @@ public class Constants {
     public static final String FRONTPAGE_STRING = "reddit front page";
 
     public static final String REDDIT_SEARCH_STRING = "search";
+    /* Subreddits can't have / or - characters in their name, ensure we don't confuse the /r/saved subreddit
+     * for the special saved.json
+     */
+    public static final String REDDIT_SAVED_STRING = "/saved-posts/";
     public static final String DEFAULT_REDDIT_SEARCH = "bacon";
     public static final String DEFAULT_SEARCH_SORT = "relevant";
 
