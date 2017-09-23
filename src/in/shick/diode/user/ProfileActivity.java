@@ -514,6 +514,22 @@ public final class ProfileActivity extends ListActivity
         }
     }
 
+    /**
+     * Hide or show specific menu items as necessary in a user's profile.
+     */
+    private void hideShowMenuItems(Menu theMenu) {
+        // Only show the 'View saved posts' menu item when the user is logged in AND we're currently viewing their
+        // profile.
+        MenuItem savedMenuItem = theMenu.findItem(R.id.saved_menu_id);
+        if (savedMenuItem != null) {
+            if (mSettings.isLoggedIn() && mSettings.getUsername().equalsIgnoreCase(mUsername)) {
+                savedMenuItem.setVisible(true);
+            } else {
+                savedMenuItem.setVisible(false);
+            }
+        }
+    }
+
 
 
     private class DownloadProfileTask extends AsyncTask<Integer, Long, Void>
@@ -1037,7 +1053,7 @@ public final class ProfileActivity extends ListActivity
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.profile, menu);
-
+        hideShowMenuItems(menu);
         return true;
     }
 

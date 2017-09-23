@@ -109,7 +109,6 @@
 	<!--  === Menus === -->
 	
 	<string name="compose_message">Nachricht verfassen</string>
-	<string name="view_saved_posts">Gespeicherte Beiträge anzeigen</string>
 	<string name="dark_theme">Dunkles Thema verwenden</string>
 	<string name="subscribe">+ Startseite</string>
 	<string name="unsubscribe">- Startseite</string>
