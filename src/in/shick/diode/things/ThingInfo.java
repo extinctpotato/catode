@@ -54,9 +54,21 @@ public class ThingInfo implements Serializable, Parcelable {
     private String body;					//   c m
     private String body_html;				//   c m
     private boolean archived;				// t c
+    private boolean locked;				    // t
     private boolean clicked;				// t
     private String context;					//     m
-    private boolean misContext = false;
+    /**
+     * Denote that this ThingInfo is just a placeholder for the viewing context banner
+     */
+    private boolean mIsContextPlaceholder = false;
+    /**
+     * Denote that this ThingInfo is just a placeholder for the locked notification banner
+     */
+    private boolean mIsLockedPlaceholder = false;
+    /**
+     * Denote that this ThingInfo is just a placeholder for the archived notification banner
+     */
+    private boolean mIsArchivedPlaceholder = false;
     private double created;					// t c m
     private double created_utc;				// t c m
     private String dest;					//     m
@@ -282,6 +294,10 @@ public class ThingInfo implements Serializable, Parcelable {
         return archived;
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
     public boolean isClicked() {
         return clicked;
     }
@@ -346,6 +362,10 @@ public class ThingInfo implements Serializable, Parcelable {
         this.archived = archived;
     }
 
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     public void setClicked(boolean clicked) {
         this.clicked = clicked;
     }
@@ -354,16 +374,36 @@ public class ThingInfo implements Serializable, Parcelable {
         this.context = context;
     }
 
-    public void setIsContext(boolean isContext) {
-        this.misContext = isContext;
+    public void setIsContextPlaceholder(boolean isContext) {
+        this.mIsContextPlaceholder = isContext;
     }
 
-    public boolean isContext() {
-        return this.misContext;
+    public boolean isContextPlaceholder() {
+        return this.mIsContextPlaceholder;
+    }
+
+    public void setIsLockedPlaceholder(boolean isLockedPlaceholder) {
+        this.mIsLockedPlaceholder = isLockedPlaceholder;
+    }
+
+    public boolean isLockedPlaceholder() {
+        return this.mIsLockedPlaceholder;
+    }
+
+    public void setIsArchivedPlaceholder(boolean isArchivedPlaceholder) {
+        this.mIsArchivedPlaceholder = isArchivedPlaceholder;
+    }
+
+    public boolean isArchivedPlaceholder() {
+        return this.mIsArchivedPlaceholder;
     }
 
     public boolean isDeletedUser() {
         return Constants.DELETED_USER.equalsIgnoreCase(this.author);
+    }
+
+    public boolean isPlaceholder() {
+        return this.mIsContextPlaceholder || this.mIsArchivedPlaceholder || this.mIsLockedPlaceholder || this.mIsLoadMoreCommentsPlaceholder;
     }
 
     public void setCreated(double created) {
@@ -579,7 +619,7 @@ public class ThingInfo implements Serializable, Parcelable {
         out.writeValue(link_author);
         out.writeValue(distinguished);
 
-        boolean booleans[] = new boolean[12];
+        boolean booleans[] = new boolean[15];
         booleans[0] = clicked;
         booleans[1] = hidden;
         booleans[2] = is_self;
@@ -590,8 +630,11 @@ public class ThingInfo implements Serializable, Parcelable {
         booleans[7] = mIsLoadMoreCommentsPlaceholder;
         booleans[8] = mIsHiddenCommentHead;
         booleans[9] = mIsHiddenCommentDescendant;
-        booleans[10] = misContext;
+        booleans[10] = mIsContextPlaceholder;
         booleans[11] = archived;
+        booleans[12] = locked;
+        booleans[13] = mIsLockedPlaceholder;
+        booleans[14] = mIsArchivedPlaceholder;
         out.writeBooleanArray(booleans);
     }
 
@@ -628,7 +671,7 @@ public class ThingInfo implements Serializable, Parcelable {
         link_author   = (String) in.readValue(null);
         distinguished = (String) in.readValue(null);
 
-        boolean booleans[] = new boolean[12];
+        boolean booleans[] = new boolean[13];
         in.readBooleanArray(booleans);
         clicked                        = booleans[0];
         hidden                         = booleans[1];
@@ -640,8 +683,11 @@ public class ThingInfo implements Serializable, Parcelable {
         mIsLoadMoreCommentsPlaceholder = booleans[7];
         mIsHiddenCommentHead           = booleans[8];
         mIsHiddenCommentDescendant     = booleans[9];
-        misContext                     = booleans[10];
+        mIsContextPlaceholder = booleans[10];
         archived                       = booleans[11];
+        locked                         = booleans[12];
+        mIsLockedPlaceholder           = booleans[13];
+        mIsArchivedPlaceholder         = booleans[14];
     }
 
     public static final Parcelable.Creator<ThingInfo> CREATOR

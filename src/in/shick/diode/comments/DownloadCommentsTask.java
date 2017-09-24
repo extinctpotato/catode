@@ -342,10 +342,24 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
                     // Need to add a fake comment to get it to draw in the comments list properly, without
                     // 'hacking' the adapter to work properly.
                     ThingInfo tempInfo = new ThingInfo();
-                    tempInfo.setIsContext(true);
+                    tempInfo.setIsContextPlaceholder(true);
                     // Set the parent ID to allow the user to view the parent thread.
                     tempInfo.setParent_id(contextOP.getParent_id());
                     tempInfo.setId(mJumpToCommentId);
+                    mActivity.mObjectStates.mCommentsList.add(1, tempInfo);
+                }
+
+                // Archived should always take precedence over locked, since archived is more restrictive than locked
+                // (You can still vote when a post is locked.)
+                if (data.isArchived()) {
+                    ThingInfo tempInfo = new ThingInfo();
+                    tempInfo.setIsArchivedPlaceholder(true);
+                    mActivity.mObjectStates.mCommentsList.add(1, tempInfo);
+                } else if (data.isLocked()) {
+                    // Need to add a fake comment to get it to draw in the comments list properly, without
+                    // 'hacking' the adapter to work properly.
+                    ThingInfo tempInfo = new ThingInfo();
+                    tempInfo.setIsLockedPlaceholder(true);
                     mActivity.mObjectStates.mCommentsList.add(1, tempInfo);
                 }
             }

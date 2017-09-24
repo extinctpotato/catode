@@ -49,6 +49,7 @@ import in.shick.diode.user.ProfileActivity;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -523,8 +524,10 @@ public final class ThreadsListActivity extends ListActivity {
         builder.append(titleSS).append(" ").append(domainSS);
         vh.titleView.setText(builder);
 
-        vh.votesView.setText("" + item.getScore());
-        vh.numCommentsSubredditView.setText(Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
+        vh.votesView.setText(String.format(Locale.US, "%d", item.getScore()));
+        // Lock icon emoji
+        String preText = item.isLocked() ? "\uD83D\uDD12 " : "";
+        vh.numCommentsSubredditView.setText(preText + Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
 
         vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
 
@@ -613,9 +616,6 @@ public final class ThreadsListActivity extends ListActivity {
         // Only show upvote/downvote if user is logged in
         if (settings.isLoggedIn()) {
             loginButton.setVisibility(View.GONE);
-            if (thingInfo.isArchived()) {
-                Toast.makeText(dialog.getContext(), R.string.warn_thread_archived_toast, Toast.LENGTH_SHORT).show();
-            }
         } else {
             loginButton.setVisibility(View.VISIBLE);
             loginButton.setOnClickListener(threadClickDialogOnClickListenerFactory.getLoginOnClickListener());
