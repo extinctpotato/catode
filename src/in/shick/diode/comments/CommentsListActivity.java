@@ -77,7 +77,6 @@ import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -94,7 +93,6 @@ import android.webkit.CookieSyncManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -424,8 +422,10 @@ public class CommentsListActivity extends ListActivity
         public static final int MORE_ITEM_VIEW_TYPE = 2;
         public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 3;
         public static final int VIEWING_SINGLE_VIEW_TYPE = 4;
+        public static final int ARCHIVED_THREAD_VIEW_TYPE = 5;
+        public static final int LOCKED_THREAD_VIEW_TYPE = 6;
         // The number of view types
-        public static final int VIEW_TYPE_COUNT = 5;
+        public static final int VIEW_TYPE_COUNT = 7;
 
         public boolean mIsLoading = true;
 
@@ -454,8 +454,12 @@ public class CommentsListActivity extends ListActivity
                 return HIDDEN_ITEM_HEAD_VIEW_TYPE;
             } else if (item.isLoadMoreCommentsPlaceholder()) {
                 return MORE_ITEM_VIEW_TYPE;
-            } else if (item.isContext()) {
+            } else if (item.isContextPlaceholder()) {
                 return VIEWING_SINGLE_VIEW_TYPE;
+            } else if (item.isArchivedPlaceholder()) {
+                return ARCHIVED_THREAD_VIEW_TYPE;
+            } else if (item.isLockedPlaceholder()) {
+                return LOCKED_THREAD_VIEW_TYPE;
             }
 
             return COMMENT_ITEM_VIEW_TYPE;
@@ -561,12 +565,30 @@ public class CommentsListActivity extends ListActivity
 
                     setCommentIndent(view, item.getIndent(), mSettings);
 
-                } else if (item.isContext()) {
+                } else if (item.isContextPlaceholder()) {
                     if (view == null) {
                         view = mInflater.inflate(R.layout.viewing_single_comment_list_item, null);
                         loadAndStoreViewHolder(view);
                     }
                     setContextOPID(item.getId());
+                } else if (item.isArchivedPlaceholder()) {
+                    if (view == null) {
+                        view = mInflater.inflate(R.layout.warning_banner_thread_list_item, null);
+                        TextView mainText = (TextView)view.findViewById(R.id.main_text);
+                        mainText.setText(R.string.archived_thread_warning);
+                        TextView subText = (TextView)view.findViewById(R.id.sub_text);
+                        subText.setText(R.string.unable_to_vote_or_comment);
+                        loadAndStoreViewHolder(view);
+                    }
+                } else if (item.isLockedPlaceholder()) {
+                    if (view == null) {
+                        view = mInflater.inflate(R.layout.warning_banner_thread_list_item, null);
+                        TextView mainText = (TextView)view.findViewById(R.id.main_text);
+                        mainText.setText(R.string.locked_thread_warning);
+                        TextView subText = (TextView)view.findViewById(R.id.sub_text);
+                        subText.setText(R.string.unable_to_comment);
+                        loadAndStoreViewHolder(view);
+                    }
                 } else {  // Regular comment
                     // Here view may be passed in for re-use, or we make a new one.
                     if (view == null) {
@@ -602,8 +624,9 @@ public class CommentsListActivity extends ListActivity
     } // End of CommentsListAdapter
 
     private ThingInfo getOpThingInfo() {
-        if (!CollectionUtils.isEmpty(mObjectStates.mCommentsList))
+        if (!CollectionUtils.isEmpty(mObjectStates.mCommentsList)) {
             return mObjectStates.mCommentsList.get(0);
+        }
         return null;
     }
 
@@ -648,7 +671,7 @@ public class CommentsListActivity extends ListActivity
             return;
         }
         // Mark the OP post/regular comment as selected
-        if (!item.isContext()) {
+        if (!item.isContextPlaceholder() && !item.isArchivedPlaceholder() && !item.isLockedPlaceholder() ) {
             mVoteTargetThing = item;
             mReplyTargetName = mVoteTargetThing.getName();
         }
@@ -659,10 +682,10 @@ public class CommentsListActivity extends ListActivity
             .execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
         } else {
             // Clicking the comment-context warning takes you to the whole comments thread.
-            if (item.isContext()) {
+            if (item.isContextPlaceholder()) {
                 resetContextInfo();
                 getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
-            } else {
+            } else if (!item.isPlaceholder()){
                 // Lazy-load the URL list to make the list-loading more 'snappy'.
                 if (mVoteTargetThing.getUrls() != null && mVoteTargetThing.getUrls().isEmpty()) {
                     Markdown.getURLs(mVoteTargetThing.getBody(), mVoteTargetThing.getUrls());
@@ -1498,7 +1521,7 @@ public class CommentsListActivity extends ListActivity
         } else if (isHiddenCommentHeadPosition(rowId)) {
             menu.add(0, Constants.DIALOG_SHOW_COMMENT, Menu.NONE, R.string.show_comment);
             menu.add(0, Constants.DIALOG_FOCUS_PARENT, Menu.NONE, R.string.focus_parent_comment);
-        } else if (item.isContext()) {
+        } else if (item.isContextPlaceholder()) {
             // If the top-level context item has a parent comment, then there's more context to be viewed.
             if (item.getParent_id() != null && item.isParentAComment()) {
                 menu.add(0, Constants.DIALOG_FULL_CONTEXT, Menu.NONE, R.string.view_full_context);
@@ -1994,6 +2017,7 @@ public class CommentsListActivity extends ListActivity
     protected void onPrepareDialog(int id, Dialog dialog) {
         super.onPrepareDialog(id, dialog);
         StringBuilder sb;
+        final ThingInfo opThingInfo = getOpThingInfo();
 
         switch (id) {
         case Constants.DIALOG_LOGIN:
@@ -2008,25 +2032,23 @@ public class CommentsListActivity extends ListActivity
         case Constants.DIALOG_COMMENT_CLICK:
             if (mVoteTargetThing == null)
                 break;
-            Boolean likes;
             final TextView titleView = (TextView) dialog.findViewById(R.id.title);
             final TextView urlView = (TextView) dialog.findViewById(R.id.url);
             final TextView submissionStuffView = (TextView) dialog.findViewById(R.id.submissionTime_submitter_subreddit);
             final Button linkButton = (Button) dialog.findViewById(R.id.thread_link_button);
             linkButton.setEnabled(false);
 
-            if (mVoteTargetThing == getOpThingInfo()) {
-                likes = mVoteTargetThing.getLikes();
+            if (mVoteTargetThing == opThingInfo) {
                 titleView.setVisibility(View.VISIBLE);
-                titleView.setText(getOpThingInfo().getTitle());
+                titleView.setText(opThingInfo == null ? "" : opThingInfo.getTitle());
                 urlView.setVisibility(View.VISIBLE);
-                urlView.setText(getOpThingInfo().getUrl());
+                urlView.setText(opThingInfo == null ? "" : opThingInfo.getUrl());
                 submissionStuffView.setVisibility(View.VISIBLE);
-                sb = new StringBuilder(Util.getTimeAgo(getOpThingInfo().getCreated_utc(), getResources()))
-                .append(" by ").append(getOpThingInfo().getAuthor());
+                sb = new StringBuilder(opThingInfo == null ? "" : Util.getTimeAgo(opThingInfo.getCreated_utc(), getResources()))
+                .append(" by ").append(opThingInfo == null ? "" : opThingInfo.getAuthor());
                 submissionStuffView.setText(sb);
                 // For self posts, you're already there!
-                if (getOpThingInfo().getDomain().toLowerCase().startsWith("self.")) {
+                if (opThingInfo != null && opThingInfo.getDomain().toLowerCase().startsWith("self.")) {
                     linkButton.setText(R.string.comment_links_button);
                     // Lazy-load the URL list to make the list-loading more 'snappy'.
                     if (mVoteTargetThing.getUrls() != null && mVoteTargetThing.getUrls().isEmpty()) {
@@ -2043,23 +2065,26 @@ public class CommentsListActivity extends ListActivity
                         });
                     }
                 } else {
-                    final String url = getOpThingInfo().getUrl();
-                    linkButton.setText(R.string.thread_link_button);
-                    linkButton.setOnClickListener(new OnClickListener() {
-                        public void onClick(View v) {
-                            removeDialog(Constants.DIALOG_COMMENT_CLICK);
-                            setLinkClicked(getOpThingInfo());
-                            Common.launchBrowser(CommentsListActivity.this, url,
-                                                 Util.createThreadUri(getOpThingInfo()).toString(),
-                                                 false, false, mSettings.isUseExternalBrowser(),
-                                                 mSettings.isSaveHistory());
-                        }
-                    });
-                    linkButton.setEnabled(true);
+                    if (opThingInfo != null) {
+                        final String url = opThingInfo.getUrl();
+                        linkButton.setText(R.string.thread_link_button);
+                        linkButton.setOnClickListener(new OnClickListener() {
+                            public void onClick(View v) {
+                                removeDialog(Constants.DIALOG_COMMENT_CLICK);
+                                setLinkClicked(opThingInfo);
+                                Common.launchBrowser(CommentsListActivity.this, url,
+                                        Util.createThreadUri(opThingInfo).toString(),
+                                        false, false, mSettings.isUseExternalBrowser(),
+                                        mSettings.isSaveHistory());
+                            }
+                        });
+                        linkButton.setEnabled(true);
+                    } else {
+                        Log.w(TAG, "opThingInfo was null");
+                    }
                 }
             } else {
-                titleView.setText("Comment by " + mVoteTargetThing.getAuthor());
-                likes = mVoteTargetThing.getLikes();
+                titleView.setText(String.format(getResources().getString(R.string.comment_by_string), mVoteTargetThing.getAuthor()));
                 urlView.setVisibility(View.INVISIBLE);
                 submissionStuffView.setVisibility(View.INVISIBLE);
 
@@ -2086,11 +2111,8 @@ public class CommentsListActivity extends ListActivity
 
                 // The "reply" button
                 if (mVoteTargetThing.isArchived()) {
-                    if (mVoteTargetThing.isCommentKind()) {
-                        Toast.makeText(CommentsListActivity.this, R.string.warn_comment_archived_toast, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(CommentsListActivity.this, R.string.warn_thread_archived_toast, Toast.LENGTH_SHORT).show();
-                    }
+                    replyButton.setEnabled(false);
+                } else if (opThingInfo != null && opThingInfo.isLocked()) {
                     replyButton.setEnabled(false);
                 } else {
                     replyButton.setEnabled(true);

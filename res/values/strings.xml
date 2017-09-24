@@ -68,7 +68,6 @@
     <string name="frontpage">reddit front page</string>
     
     <string name="subreddit_layout_srtext_text">Android</string>
-    <string name="subreddit_layout_statustext_text"></string>
     <string name="subreddit_layout_download_text">Download</string>
     
 	<string name="login_username_label">Username:</string>
@@ -101,6 +100,10 @@
 	<string name="more_comments">load more comments</string>
 	<string name="context_warning">You are viewing a single comment\'s thread.</string>
 	<string name="click_to_view_all">Click here to view the rest of the comments.</string>
+	<string name="locked_thread_warning">This post is locked.</string>
+	<string name="unable_to_comment">You won\'t be able to comment.</string>
+	<string name="archived_thread_warning">This is an archived post.</string>
+	<string name="unable_to_vote_or_comment">You won\'t be able to vote or comment.</string>
 	<string name="next_threads">next</string>
 	<string name="previous_threads">prev</string>
 
@@ -334,8 +337,7 @@
 	<string name="one_year_ago">1 year ago</string>
 	<string name="n_years_ago">%d years ago</string>
 
-	<!-- Warning strings -->
-	<string name="warn_thread_archived_toast">Can\'t vote on archived thread.</string>
-	<string name="warn_comment_archived_toast">Can\'t vote on archived comment.</string>
+	<!-- Miscellaneous Strings -->
+	<string name="comment_by_string">Comment by %s</string>
 
 </resources>
