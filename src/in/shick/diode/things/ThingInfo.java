@@ -43,6 +43,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class ThingInfo implements Serializable, Parcelable {
     static final long serialVersionUID = 40;
+    private static final int BOOLEAN_ARRAY_SIZE = 15;
 
     // thread: t
     // comment: c
@@ -619,7 +620,7 @@ public class ThingInfo implements Serializable, Parcelable {
         out.writeValue(link_author);
         out.writeValue(distinguished);
 
-        boolean booleans[] = new boolean[15];
+        boolean booleans[] = new boolean[BOOLEAN_ARRAY_SIZE];
         booleans[0] = clicked;
         booleans[1] = hidden;
         booleans[2] = is_self;
@@ -671,7 +672,7 @@ public class ThingInfo implements Serializable, Parcelable {
         link_author   = (String) in.readValue(null);
         distinguished = (String) in.readValue(null);
 
-        boolean booleans[] = new boolean[13];
+        boolean booleans[] = new boolean[BOOLEAN_ARRAY_SIZE];
         in.readBooleanArray(booleans);
         clicked                        = booleans[0];
         hidden                         = booleans[1];
@@ -683,7 +684,7 @@ public class ThingInfo implements Serializable, Parcelable {
         mIsLoadMoreCommentsPlaceholder = booleans[7];
         mIsHiddenCommentHead           = booleans[8];
         mIsHiddenCommentDescendant     = booleans[9];
-        mIsContextPlaceholder = booleans[10];
+        mIsContextPlaceholder          = booleans[10];
         archived                       = booleans[11];
         locked                         = booleans[12];
         mIsLockedPlaceholder           = booleans[13];
