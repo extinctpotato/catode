@@ -1714,17 +1714,6 @@ public class CommentsListActivity extends ListActivity
         }
     }
 
-    private void setClipboardText(String clipLabel, String clipText) {
-        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setText(clipText);
-        } else {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText(clipLabel,clipText);
-            clipboard.setPrimaryClip(clip);
-        }
-    }
-
     private void hideComment(int rowId) {
         ThingInfo headComment = mCommentsAdapter.getItem(rowId);
         int myIndent = headComment.getIndent();
