@@ -242,6 +242,11 @@ public class BrowserActivity extends Activity {
             finish();
             break;
 
+        case R.id.copy_url_menu_id:
+            if (mUri != null) {
+                Util.copyPlainTextToClipboard(this, mUri.toString());
+            }
+            break;
         case R.id.view_comments_menu_id:
             if (mThreadUrl == null)
                 break;

@@ -1666,13 +1666,12 @@ public class CommentsListActivity extends ListActivity
             showDialog(Constants.DIALOG_REPORT);
             return true;
         case Constants.COPY_CONTEXT_ITEM:
-            String url = getOpThingInfo().getUrl();
-            setClipboardText(url, url);
+            Util.copyPlainTextToClipboard(this, getOpThingInfo().getUrl());
             return true;
 
         case Constants.COPY_TEXT_CONTEXT_ITEM:
             String commentText = mCommentsAdapter.getItem(rowId).getBody();
-            setClipboardText(commentText, commentText);
+            Util.copyPlainTextToClipboard(this, commentText);
             return true;
 
         case Constants.DIALOG_FULL_CONTEXT:
