@@ -449,7 +449,7 @@ public class SavedCommentsActivity extends Activity
                         {
                             if (which >= 0)
                             {
-                                Common.launchBrowser(SavedCommentsActivity.this, urls.get(which),
+                                Common.launchBrowser(mSettings,SavedCommentsActivity.this, urls.get(which),
                                                      null, false, false, mSettings.isUseExternalBrowser(),
                                                      mSettings.isSaveHistory());
                             }

@@ -1093,7 +1093,7 @@ public final class ThreadsListActivity extends ListActivity {
 
         case Constants.OPEN_IN_BROWSER_CONTEXT_ITEM:
             setLinkClicked(_item);
-            Common.launchBrowser(this, _item.getUrl(), Util.createThreadUri(_item).toString(), false, true, true, mSettings.isSaveHistory());
+            Common.launchBrowser(mSettings, this, _item.getUrl(), Util.createThreadUri(_item).toString(), false, true, true, mSettings.isSaveHistory());
             return true;
 
         case Constants.SAVE_CONTEXT_ITEM:
@@ -1266,7 +1266,7 @@ public final class ThreadsListActivity extends ListActivity {
                 url = Constants.REDDIT_BASE_URL;
             else
                 url = Constants.REDDIT_BASE_URL + "/r/" + mSubreddit;
-            Common.launchBrowser(this, url, null, false, true, true, false);
+            Common.launchBrowser(mSettings, this, url, null, false, true, true, false);
             break;
         case R.id.light_dark_menu_id:
             mSettings.setTheme(Util.getInvertedTheme(mSettings.getTheme()));
@@ -1530,6 +1530,7 @@ public final class ThreadsListActivity extends ListActivity {
                     mJumpToThreadId = threadThingInfo.getId();
                     setLinkClicked(threadThingInfo);
                     Common.launchBrowser(
+                        mSettings,
                         activity,
                         threadThingInfo.getUrl(),
                         Util.createThreadUri(threadThingInfo).toString(),
@@ -1560,7 +1561,7 @@ public final class ThreadsListActivity extends ListActivity {
                 public void onClick(View v) {
                     removeDialog(Constants.DIALOG_THREAD_CLICK);
                     setLinkClicked(thingInfo);
-                    Common.launchBrowser(ThreadsListActivity.this, thingInfo.getUrl(),
+                    Common.launchBrowser(mSettings,ThreadsListActivity.this, thingInfo.getUrl(),
                                          Util.createThreadUri(thingInfo).toString(),
                                          false, false, useExternalBrowser, mSettings.isSaveHistory());
                 }

@@ -1440,7 +1440,7 @@ public class CommentsListActivity extends ListActivity
         case R.id.open_browser_menu_id:
             String url = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
             .append(mSubreddit).append("/comments/").append(mThreadId).toString();
-            Common.launchBrowser(this, url, url, false, true, true, false);
+            Common.launchBrowser(mSettings, this, url, url, false, true, true, false);
             break;
         case R.id.op_delete_menu_id:
             mReplyTargetName = getOpThingInfo().getName();
@@ -2060,7 +2060,7 @@ public class CommentsListActivity extends ListActivity
                             public void onClick(View v) {
                                 removeDialog(Constants.DIALOG_COMMENT_CLICK);
                                 setLinkClicked(opThingInfo);
-                                Common.launchBrowser(CommentsListActivity.this, url,
+                                Common.launchBrowser(mSettings, CommentsListActivity.this, url,
                                         Util.createThreadUri(opThingInfo).toString(),
                                         false, false, mSettings.isUseExternalBrowser(),
                                         mSettings.isSaveHistory());
@@ -2291,6 +2291,7 @@ public class CommentsListActivity extends ListActivity
                 public void onClick(View v) {
                     setLinkClicked(threadThingInfo);
                     Common.launchBrowser(
+                        mSettings,
                         activity,
                         threadThingInfo.getUrl(),
                         Util.createThreadUri(threadThingInfo).toString(),

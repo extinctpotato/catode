@@ -70,8 +70,13 @@ public class BrowserActivity extends Activity {
         WebSettings settings = webview.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setJavaScriptEnabled(mSettings.isLoadJavascript());
-        if (mSettings.isOverwriteUA())
+        // imgur links will force the UA to 'desktop'
+        String forcedUA = getIntent().getStringExtra(Constants.EXTRA_FORCE_UA_STRING);
+        if (mSettings.isOverwriteUA()) {
             settings.setUserAgentString(mSettings.getUseragent());
+        } else if (forcedUA != null) {
+            settings.setUserAgentString(forcedUA);
+        }
 
         settings.setUseWideViewPort(true);
         trySetDomStorageEnabled(settings);
@@ -235,7 +240,7 @@ public class BrowserActivity extends Activity {
         case R.id.open_browser_menu_id:
             if (mUri == null)
                 break;
-            Common.launchBrowser(this, mUri.toString(), null, false, true, true, false);
+            Common.launchBrowser(mSettings, this, mUri.toString(), null, false, true, true, false);
             break;
 
         case R.id.close_browser_menu_id:

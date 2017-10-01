@@ -93,6 +93,7 @@ public class Constants {
     public static final String EXTRA_SUBREDDIT = "subreddit";
     public static final String EXTRA_THREAD_URL = "thread_url";
     public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_FORCE_UA_STRING = "forceUA";
 
     // User-defined result codes
     public static final int RESULT_LOGIN_REQUIRED = Activity.RESULT_FIRST_USER;
@@ -323,6 +324,7 @@ public class Constants {
     public static final String BROWSER_UA = "useragent";
     public static final String PREF_LOAD_JS = "load_javascript";
     public static final String PREF_LOAD_PLUGINS = "load_plugins";
+    public static final String PREF_IMGUR_DIRECT = "imgur_direct";
 
     public static final String PREF_SAVE_HISTORY = "save_history";
     public static final String PREF_ALWAYS_SHOW_NEXT_PREVIOUS = "always_show_next_previous";
