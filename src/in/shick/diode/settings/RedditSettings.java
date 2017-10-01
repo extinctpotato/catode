@@ -67,7 +67,7 @@ public class RedditSettings {
     /**
      * Should the browser attempt to load imgur images directly?
      */
-    private boolean loadImgurImagesDirectly = false;
+    private boolean loadImgurImagesDirectly = true;
 
     private int threadDownloadLimit = Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT;
     private String commentsSortByUrl = Constants.CommentsSort.SORT_BY_BEST_URL;
@@ -235,7 +235,7 @@ public class RedditSettings {
         this.setUseragent(sessionPrefs.getString(Constants.BROWSER_UA,Constants.BROWSER_UA_STRING));
         this.setLoadJS(sessionPrefs.getBoolean(Constants.PREF_LOAD_JS, true));
         this.setLoadPlugins(sessionPrefs.getBoolean(Constants.PREF_LOAD_PLUGINS, true));
-        this.setLoadImgurImagesDirectly(sessionPrefs.getBoolean(Constants.PREF_IMGUR_DIRECT, false));
+        this.setLoadImgurImagesDirectly(sessionPrefs.getBoolean(Constants.PREF_IMGUR_DIRECT, true));
 
         // Use external browser instead of BrowserActivity
         this.setUseExternalBrowser(sessionPrefs.getBoolean(Constants.PREF_USE_EXTERNAL_BROWSER, false));

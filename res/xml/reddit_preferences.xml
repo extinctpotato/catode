@@ -147,7 +147,7 @@
 
     <CheckBoxPreference
         android:key="imgur_direct"
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:title="@string/pref_imgur_direct" />
 
 </PreferenceScreen>
