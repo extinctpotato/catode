@@ -1666,13 +1666,12 @@ public class CommentsListActivity extends ListActivity
             showDialog(Constants.DIALOG_REPORT);
             return true;
         case Constants.COPY_CONTEXT_ITEM:
-            String url = getOpThingInfo().getUrl();
-            setClipboardText(url, url);
+            Util.copyPlainTextToClipboard(this, getOpThingInfo().getUrl());
             return true;
 
         case Constants.COPY_TEXT_CONTEXT_ITEM:
             String commentText = mCommentsAdapter.getItem(rowId).getBody();
-            setClipboardText(commentText, commentText);
+            Util.copyPlainTextToClipboard(this, commentText);
             return true;
 
         case Constants.DIALOG_FULL_CONTEXT:
@@ -1712,17 +1711,6 @@ public class CommentsListActivity extends ListActivity
 
         default:
             return super.onContextItemSelected(item);
-        }
-    }
-
-    private void setClipboardText(String clipLabel, String clipText) {
-        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setText(clipText);
-        } else {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText(clipLabel,clipText);
-            clipboard.setPrimaryClip(clip);
         }
     }
 
