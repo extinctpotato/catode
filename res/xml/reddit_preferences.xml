@@ -145,4 +145,9 @@
         android:defaultValue="true"
         android:title="@string/pref_load_javascript" />
 
+    <CheckBoxPreference
+        android:key="imgur_direct"
+        android:defaultValue="true"
+        android:title="@string/pref_imgur_direct" />
+
 </PreferenceScreen>

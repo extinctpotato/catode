@@ -200,6 +200,7 @@
     <string name="pref_overwrite_useragent">Overwrite User-Agent</string>
     <string name="pref_load_javascript">Load Javascript</string>
     <string name="pref_load_plugins">Load Plugins</string>
+    <string name="pref_imgur_direct">Open Imgur Images Directly</string>
 
 	<string name="pref_homepage">Default starting reddit</string>
 

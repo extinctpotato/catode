@@ -85,6 +85,8 @@ public class Common {
     private static final ObjectMapper mObjectMapper =
         new ObjectMapper().configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+    private static final Pattern m_imgurRegex = Pattern.compile("^https?:\\/\\/(?:i\\.|m\\.|edge\\.|www\\.)*imgur\\.com\\/(?:r\\/\\w+\\/)*(?!gallery)(?!removalrequest)(?!random)(?!memegen)((?:\\w{5}|\\w{7})(?:[&,](?:\\w{5}|\\w{7}))*)(?:#\\d+)?[a-z]?(\\.(?:jpe?g|gif|png|gifv))?(\\?.*)?$");
+
     public static void showErrorToast(String error, int duration, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Toast t = new Toast(context);
@@ -282,7 +284,7 @@ public class Common {
         DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
             public final void onClick(DialogInterface dialog, int which) {
                 if (which >= 0) {
-                    Common.launchBrowser(theContext, urls.get(which),
+                    Common.launchBrowser(settings, theContext, urls.get(which),
                                          Util.createThreadUri(theItem).toString(),
                                          false, false, settings.isUseExternalBrowser(),
                                          settings.isSaveHistory());
@@ -499,15 +501,19 @@ public class Common {
         notificationManager.cancel(Constants.NOTIFICATION_HAVE_MAIL);
     }
 
+
     /**
      *
-     * @param url
-     * @param context
+     * @param settings The {@link RedditSettings} object used to for preference-retrieving.
+     * @param context The {@link Context} object to use, as necessary.
+     * @param url The URL to launch in the browser.
+     * @param threadUrl The (optional) URL of the comments thread for the 'View comments' menu option in the browser.
      * @param requireNewTask set this to true if context is not an Activity
-     * @param bypassParser
-     * @param useExternalBrowser
+     * @param bypassParser Should URI parsing be bypassed, usually true in the case an external browser is being launched.
+     * @param useExternalBrowser Should the external browser app be launched instead of the internal one.
+     * @param saveHistory Should the URL be entered into the browser history?
      */
-    public static void launchBrowser(Context context, String url, String threadUrl,
+    public static void launchBrowser(RedditSettings settings, Context context, String url, String threadUrl,
                                      boolean requireNewTask, boolean bypassParser, boolean useExternalBrowser,
                                      boolean saveHistory) {
 
@@ -517,6 +523,26 @@ public class Common {
             }
         } catch (Exception ex) {
             if (Constants.LOGGING) Log.i(TAG, "Browser.updateVisitedHistory error", ex);
+        }
+        boolean forceDesktopUserAgent = false;
+        if (!bypassParser && settings != null && settings.isLoadImgurImagesDirectly()) {
+            Matcher m = m_imgurRegex.matcher(url);
+            if (m.matches() && m.group(1) != null) {
+                // We've determined it's an imgur link, no need to parse it further.
+                bypassParser = true;
+                url = "http://i.imgur.com/" + m.group(1);
+                if (!StringUtils.isEmpty(m.group(2))) {
+                    String extension = m.group(2);
+                    if (".gifv".equalsIgnoreCase(extension)) {
+                        extension = ".mp4";
+                    }
+                    url += extension;
+                } else {
+                    // Need to give images an extension, or imgur will redirect to the mobile site.
+                    url += ".png";
+                }
+                forceDesktopUserAgent = true;
+            }
         }
 
         Uri uri = Uri.parse(url);
@@ -581,22 +607,29 @@ public class Common {
         uri = Util.optimizeMobileUri(uri);
 
         // Some URLs should always be opened externally, if BrowserActivity doesn't support their content.
-        if (Util.isYoutubeUri(uri) || Util.isAndroidMarketUri(uri))
+        if (Util.isYoutubeUri(uri) || Util.isAndroidMarketUri(uri)) {
             useExternalBrowser = true;
+        }
 
         if (useExternalBrowser) {
             Intent browser = new Intent(Intent.ACTION_VIEW, uri);
             browser.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-            if (requireNewTask)
+            if (requireNewTask) {
                 browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             context.startActivity(browser);
         } else {
             Intent browser = new Intent(context, BrowserActivity.class);
             browser.setData(uri);
-            if (threadUrl != null)
+            if (forceDesktopUserAgent) {
+                browser.putExtra(Constants.EXTRA_FORCE_UA_STRING, "desktop");
+            }
+            if (threadUrl != null) {
                 browser.putExtra(Constants.EXTRA_THREAD_URL, threadUrl);
-            if (requireNewTask)
+            }
+            if (requireNewTask) {
                 browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             context.startActivity(browser);
         }
     }

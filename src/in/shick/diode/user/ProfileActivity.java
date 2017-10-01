@@ -1242,6 +1242,7 @@ public final class ProfileActivity extends ListActivity
 //					mJumpToThreadId = jumpToId;
                     setLinkClicked(threadThingInfo);
                     Common.launchBrowser(
+                        mSettings,
                         activity,
                         threadThingInfo.getUrl(),
                         Util.createThreadUri(threadThingInfo).toString(),
@@ -1274,7 +1275,7 @@ public final class ProfileActivity extends ListActivity
                 public void onClick(View v) {
                     removeDialog(Constants.DIALOG_THREAD_CLICK);
                     // Launch Intent to goto the URL
-                    Common.launchBrowser(ProfileActivity.this, info.getUrl(),
+                    Common.launchBrowser(mSettings,ProfileActivity.this, info.getUrl(),
                                          Util.createThreadUri(info).toString(),
                                          false, false, fUseExternalBrowser, mSettings.isSaveHistory());
                 }
