@@ -20,6 +20,7 @@
 
 <resources>
 
+    <string name="app_label">reddit is fun</string>
     <string name="app_name">Diode</string>
     <string name="user_agent">Diode für Reddit (Android) %s</string>
  
@@ -33,6 +34,12 @@
         <item>Neu</item>
         <item>Beste</item>
     </string-array>
+    <string name="search_tips_text">reddit:\' {name}\' findet nur Sachen, die in {name} gepostet wurden\n
+                       autor:\' {username}\' gibt nur Sachen zurück, die von {username} gesendet wurden\n
+                       site:\' {domain}\' liefert nur Links zu Seiten auf {domain}\n
+                       url:\' {text}\' sucht nach {text} in url\n
+                       selftext:\' {text}}\' sucht nach {text} im Inhalt des Selbstpostings\n
+                       is_self: {1|0} enthält (1) oder schließt (0) aus selbst gepostete Beiträge over18:{1|0} enthält (1) oder schließt (0) Ergebnisse aus, die mit NSFW markiert sind</string>
     
     
     <string name="yes">Ja</string>
@@ -42,12 +49,14 @@
     <string name="confirm_logout_title">Abmelden</string>
     <string name="confirm_logout">Willst du dich wirklich abmelden?</string>
     
+    <string name="noThreads">Hier gibt es keine Threads</string>
     <string name="noComments">Hier sind keine Kommentare</string>
     <string name="noMessages">Dein Postfach ist leer.</string>
     <string name="noSubreddits">Keine Subreddits</string>
     
     <string name="loading_splash_text">Lädt...</string>
     
+    <string name="subscriber_count_format" formatted="false">%s Abos.</string>
     <string name="second_age_format" formatted="false">%d Sekunde</string>
     <string name="minute_age_format" formatted="false">%d Minute</string>
     <string name="hour_age_format" formatted="false">%d Stunde</string>
@@ -66,9 +75,12 @@
 	<string name="login_button">Anmelden</string>
 	<string name="login_remember_checkbox">Angemeldet bleiben?</string>
 	
+	<string name="vote_up_button">Aufwerten</string>
+	<string name="vote_down_button">Abwerten</string>
 	
 	<string name="thread_link_button">Link</string>
 	<string name="thread_comments_button">Kommentare</string>
+	<string name="thread_time_submitter">%1$s von</string>
 	
 	<string name="comment_links_button">Links</string>
 	<string name="comment_reply_button">Antworten</string>
@@ -86,12 +98,23 @@
 	
 	<string name="comment_hidden">[+]</string>
 	<string name="more_comments">Mehr Kommentare laden</string>
-	<string name="click_to_view_all">Klicke hier um die restlichen Kommentare zu sehen.</string>
+	<string name="context_warning">Du siehst den Thread eines einzelnen Kommentars.</string>
+	<string name="click_to_view_all">Klicke hier um die übrigen Kommentare zu sehen.</string>
+	<string name="locked_thread_warning">Dieser Beitrag ist geschlossen.</string>
+	<string name="unable_to_comment">Du wirst nicht kommentieren können.</string>
+	<string name="archived_thread_warning">Dies ist ein archivierter Beitrag</string>
+	<string name="unable_to_vote_or_comment">Du wirst nicht abstimmen oder kommentieren können.</string>
 	<string name="next_threads">Nächste</string>
 	<string name="previous_threads">Vorherige</string>
 
 	<string name="load_in_progress_toast">Bitte warten. Es lädt noch.</string>
 	<string name="error_voting_toast">Fehler beim bewerten. Bitte versuche es erneut.</string>
+	<string name="mail_notification_unscheduled">Reddit mail Benachrichtigungen sind ausgeschaltet.</string>
+	<string name="mail_notification_scheduled_5min">Reddit mail prüft jetzt alle 5 Minuten.</string>
+	<string name="mail_notification_scheduled_30min">Reddit mail prüft jetzt alle 30 Minuten.</string>
+	<string name="mail_notification_scheduled_1hour">Reddit mail prüft jetzt jede Stunde.</string>
+	<string name="mail_notification_scheduled_6hours">Reddit mail prüft jetzt alle 6 Stunden.</string>
+	<string name="mail_notification_scheduled_1day">Reddit mail prüft jetzt alle 24 Stunden.</string>
 	
 	<string name="submit_title_label">Titel</string>
 	<string name="submit_url_label">Url</string>
@@ -103,12 +126,13 @@
 	
 	<string name="select_link_title">Aktion auswählen</string>
 	
-	<string name="inbox_title">%s\'s Postfach</string>
+	<string name="inbox_title">%ss Postfach</string>
 	
 	
 	<!--  === Menus === -->
 	
 	<string name="compose_message">Nachricht verfassen</string>
+	<string name="view_saved_posts">Gespeicherte Beiträge anzeigen</string>
 	<string name="dark_theme">Dunkles Thema verwenden</string>
 	<string name="subscribe">+ Startseite</string>
 	<string name="unsubscribe">- Startseite</string>
@@ -128,6 +152,9 @@
 	<string name="find_next">Nächste finden</string>
 	<string name="find_next_brief">Nächste</string>
 
+	<string name="op">OP</string>
+	<string name="op_edit">OP bearbeiten</string>
+	<string name="op_delete">Thread löschen</string>
 	<string name="open_browser">Im Browser öffnen</string>
 	<string name="pick_subreddit">Subreddit auswählen</string>
 	<string name="refresh">Neu laden</string>
@@ -143,12 +170,20 @@
 	<string name="update_captcha">Aktualisierte CAPTCHA</string>
 	<string name="user_profile">%ss Profil</string>
 	<string name="view_comments">Kommentare anzeigen</string>
+	<string name="view_subreddit">Subreddit anzeigen</string>
 	<string name="close_browser">Browser schließen</string>
 	<string name="saved_content">Gespeicherte Kommentare</string>
 	<string name="author">Autor</string>
+	<string name="body">Body</string>
 	<string name="save_comment">speichern</string>
+	<string name="unsave_comment">unsicher</string>
+	<string name="view_saved_comment">anzeigen</string>
+	<string name="focus_parent_comment">Parent fokussieren</string>
 	<string name="show_comment">Kommentar zeigen</string>
 	<string name="hide_comment">Kommentar verbergen</string>
+	<string name="view_full_context">Vollständigen Kontext anzeigen</string>
+	<string name="view_context">Kontext anzeigen</string>
+	<string name="goto_thread">Gehe zu allen Kommentaren</string>
 	<string name="links_menu_item">Links</string>
 	<string name="share_comments">Kommentare teilen</string>
 
@@ -156,12 +191,18 @@
 	<!-- === Preferences === -->
 	<string name="pref_general_category">Allgemeine Einstellungen</string>
 	<string name="pref_appearance_category">Erscheinung</string>
+	<string name="pref_mail_category">Reddit mail</string>
 
     <!-- === Browser settings === -->
     <string name="pref_browser">Browsereinstellungen</string>
+    <string name="pref_useragent">User-Agent Zeichenkette</string>
+    <string name="pref_useragent_string">Mozilla/5.0 AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile</string>
+    <string name="pref_overwrite_useragent">User-Agent überschreiben</string>
     <string name="pref_load_javascript">JavaScript laden</string>
     <string name="pref_load_plugins">Plugins laden</string>
+    <string name="pref_imgur_direct">Imgur-Bilder direkt öffnen</string>
 
+	<string name="pref_homepage">Standard Reddit</string>
 
 	<string name="pref_homepage_hint">Leer lassen für Standard</string>
 	
@@ -201,12 +242,16 @@
         <item>Querformat</item>
     </string-array>
 	
+	<string name="pref_mail_notification_style">Mail Benachrichtigungsstil</string>
+	<string name="pref_mail_notification_style_dialogtitle">Mail Benachrichtigungsstil</string>
 	<string-array name="pref_mail_notification_style_choices">
 		<item>Standard</item>
 		<item>Großer Umschlag</item>
 		<item>Aus</item>
 	</string-array>
     
+    <string name="pref_mail_notification_service">Mail außerhalb der App prüfen</string>
+    <string name="pref_mail_notification_service_dialogtitle">Mail außerhalb der App prüfen</string>
     <string-array name="pref_mail_notification_service_choices">
     	<item>Aus</item>
     	<item>Alle 5 Minuten</item>
@@ -220,9 +265,13 @@
    	
 	<string name="search_button">Suchen</string>
     <string name="pref_load_thumbnails_only_wifi">Nur im WiFi</string>
+    <string name="pref_thumbnail_category">Thumbnail Einstellungen</string>
     
     
     <!-- === I18N Content Descriptions === -->
+    <string name="vote_up_arrow_content_description">Aufwertpfeil</string>
+    <string name="vote_down_arrow_content_description">Abwertpfeil</string>
+    <string name="thumbnail_content_description">Thumbnail (klicke um den Link zu sehen)</string>
     <string name="show_nsfw">NSFW Links zeigen</string>
 
     <!-- filters -->
@@ -239,6 +288,7 @@
     <string name="filter_clear_confirm_yes">Löschen</string>
     <string name="filter_clear_confirm_no">Abbrechen</string>
 
+    <string name="pref_filters_category">Links filtern</string>
     <string name="pref_title_filter">Titelfilter bearbeiten</string>
     <string name="nsfw">nsfw</string>
     <string name="copy">Url kopieren</string>
@@ -259,5 +309,8 @@
 	<string name="n_months_ago">vor %d Monaten</string>
 	<string name="one_year_ago">vor 1 Jahr</string>
 	<string name="n_years_ago">vor %d Jahren</string>
+
+	<!-- Miscellaneous Strings -->
+	<string name="comment_by_string">Kommentare von %s</string>
 
 </resources>
