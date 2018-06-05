@@ -212,7 +212,7 @@ public class Constants {
         public static final String SORT_BY_NEW = "new";
         public static final String SORT_BY_CONTROVERSIAL = "controversial";
         public static final String SORT_BY_TOP = "top";
-        public static final String SORT_BY_HOT_URL = "";
+        public static final String SORT_BY_HOT_URL = "hot/";
         public static final String SORT_BY_NEW_URL = "new/";
         public static final String SORT_BY_CONTROVERSIAL_URL = "controversial/";
         public static final String SORT_BY_TOP_URL = "top/";
