@@ -325,6 +325,7 @@ public class Constants {
     public static final String PREF_LOAD_JS = "load_javascript";
     public static final String PREF_LOAD_PLUGINS = "load_plugins";
     public static final String PREF_IMGUR_DIRECT = "imgur_direct";
+    public static final String PREF_VREDDIT_DIRECT = "vreddit_direct";
 
     public static final String PREF_SAVE_HISTORY = "save_history";
     public static final String PREF_ALWAYS_SHOW_NEXT_PREVIOUS = "always_show_next_previous";

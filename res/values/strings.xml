@@ -201,6 +201,9 @@
     <string name="pref_load_javascript">Load Javascript</string>
     <string name="pref_load_plugins">Load Plugins</string>
     <string name="pref_imgur_direct">Open Imgur Images Directly</string>
+    
+    <string name="pref_vreddit_direct">Load v.redd.it links directly</string>
+    <string name="pref_vreddit_direct_hint">Audio will not work</string>
 
 	<string name="pref_homepage">Default starting reddit</string>
 
