@@ -544,6 +544,12 @@ public class Common {
                 forceDesktopUserAgent = true;
             }
         }
+        if(settings != null && settings.isLoadVredditLinksDirectly()) {
+        	if(url.contains("v.redd.it")) {
+        		url += "/DASH_600_K";
+        	}
+        }
+
 
         Uri uri = Uri.parse(url);
 

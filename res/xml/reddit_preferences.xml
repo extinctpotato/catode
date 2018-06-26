@@ -149,5 +149,11 @@
         android:key="imgur_direct"
         android:defaultValue="true"
         android:title="@string/pref_imgur_direct" />
+    
+    <CheckBoxPreference 
+        android:key="vreddit_direct"
+        android:defaultValue="false"
+        android:title="@string/pref_vreddit_direct" 
+        android:summary="@string/pref_vreddit_direct_hint"/>
 
 </PreferenceScreen>
