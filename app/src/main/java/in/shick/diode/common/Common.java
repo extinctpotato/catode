@@ -546,7 +546,7 @@ public class Common {
         }
         if(settings != null && settings.isLoadVredditLinksDirectly()) {
         	if(url.contains("v.redd.it")) {
-        		url += "/DASH_600_K";
+        		url += "/DASH_480";
         	}
         }
 
