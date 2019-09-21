@@ -780,6 +780,10 @@ public class CommentsListActivity extends ListActivity
         mContextOPID = contextOPID;
     }
 
+    private String getContextOPID() {
+        return mContextOPID;
+    }
+
     private void setContextCount(int contextCount) {
         mContextCount = contextCount;
     }
@@ -1748,6 +1752,14 @@ public class CommentsListActivity extends ListActivity
         default:
             return super.onContextItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        String contextOPID = getContextOPID();
+        resetContextInfo();
+        getNewDownloadCommentsTask().withPositionTo(contextOPID);
+        getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
     }
 
     private void hideComment(int rowId) {
