@@ -20,6 +20,7 @@
 package in.shick.diode.comments;
 
 
+import android.content.ActivityNotFoundException;
 import android.text.SpannableStringBuilder;
 import in.shick.diode.R;
 import in.shick.diode.common.CacheInfo;
@@ -109,6 +110,8 @@ import android.widget.Toast;
  */
 public class CommentsListActivity extends ListActivity
     implements View.OnCreateContextMenuListener {
+
+    private String mSelectedThingId = "";
 
     public static class ObjectStates {
         DownloadCommentsTask mDownloadCommentsTask = null;
@@ -416,16 +419,21 @@ public class CommentsListActivity extends ListActivity
         return mCommentsAdapter != null && mCommentsAdapter.getItemViewType(position) == CommentsListAdapter.MORE_ITEM_VIEW_TYPE;
     }
 
+    private boolean isContinueThisThreadPosition(int position) {
+        return mCommentsAdapter != null && mCommentsAdapter.getItemViewType(position) == CommentsListAdapter.CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE;
+    }
+
     final class CommentsListAdapter extends ArrayAdapter<ThingInfo> {
         public static final int OP_ITEM_VIEW_TYPE = 0;
         public static final int COMMENT_ITEM_VIEW_TYPE = 1;
         public static final int MORE_ITEM_VIEW_TYPE = 2;
-        public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 3;
-        public static final int VIEWING_SINGLE_VIEW_TYPE = 4;
-        public static final int ARCHIVED_THREAD_VIEW_TYPE = 5;
-        public static final int LOCKED_THREAD_VIEW_TYPE = 6;
+        public static final int CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE = 3;
+        public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 4;
+        public static final int VIEWING_SINGLE_VIEW_TYPE = 5;
+        public static final int ARCHIVED_THREAD_VIEW_TYPE = 6;
+        public static final int LOCKED_THREAD_VIEW_TYPE = 7;
         // The number of view types
-        public static final int VIEW_TYPE_COUNT = 7;
+        public static final int VIEW_TYPE_COUNT = 8;
 
         public boolean mIsLoading = true;
 
@@ -454,6 +462,8 @@ public class CommentsListActivity extends ListActivity
                 return HIDDEN_ITEM_HEAD_VIEW_TYPE;
             } else if (item.isLoadMoreCommentsPlaceholder()) {
                 return MORE_ITEM_VIEW_TYPE;
+            } else if (item.isContinueThisThreadPlaceholder()) {
+                return CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE;
             } else if (item.isContextPlaceholder()) {
                 return VIEWING_SINGLE_VIEW_TYPE;
             } else if (item.isArchivedPlaceholder()) {
@@ -571,6 +581,14 @@ public class CommentsListActivity extends ListActivity
                         loadAndStoreViewHolder(view);
                     }
                     setContextOPID(item.getId());
+                }
+                else if (isContinueThisThreadPosition(position)) {
+                    if (view == null) {
+                        view = mInflater.inflate(R.layout.continue_this_thread_view, null);
+                        loadAndStoreViewHolder(view);
+                    }
+                    setContextOPID(item.getId());
+                    setCommentIndent(view, item.getIndent(), mSettings);
                 } else if (item.isArchivedPlaceholder()) {
                     if (view == null) {
                         view = mInflater.inflate(R.layout.warning_banner_thread_list_item, null);
@@ -638,6 +656,12 @@ public class CommentsListActivity extends ListActivity
         this.mShouldClearReply = shouldClearReply;
     }
 
+    public void setToPosition(String thingId) {
+        if(!StringUtils.isEmpty(thingId)) {
+            getListView().setSelection(findThingIdPosition(thingId));
+        }
+    }
+
     private static void setCommentIndent(View commentListItemView, int indentLevel, RedditSettings settings) {
         View[] indentViews = ((ViewHolder)commentListItemView.getTag()).indentViews;
         for (int i = 0; i < indentLevel && i < indentViews.length; i++) {
@@ -676,6 +700,12 @@ public class CommentsListActivity extends ListActivity
             mReplyTargetName = mVoteTargetThing.getName();
         }
 
+        if(isContinueThisThreadPosition(position)) {
+            setContextOPID(item.getId());
+            setContextCount(1);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+        } else
+
         if (isLoadMoreCommentsPosition(position)) {
             // Use this constructor to tell it to load more comments inline
             getNewDownloadCommentsTask().prepareLoadMoreComments(item.getId(), position, item.getIndent())
@@ -684,6 +714,7 @@ public class CommentsListActivity extends ListActivity
             // Clicking the comment-context warning takes you to the whole comments thread.
             if (item.isContextPlaceholder()) {
                 resetContextInfo();
+                getNewDownloadCommentsTask().withPositionTo(item.getId());
                 getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             } else if (!item.isPlaceholder()){
                 // Lazy-load the URL list to make the list-loading more 'snappy'.
@@ -747,6 +778,10 @@ public class CommentsListActivity extends ListActivity
 
     private void setContextOPID(String contextOPID) {
         mContextOPID = contextOPID;
+    }
+
+    private String getContextOPID() {
+        return mContextOPID;
     }
 
     private void setContextCount(int contextCount) {
@@ -1431,7 +1466,7 @@ public class CommentsListActivity extends ListActivity
         case R.id.refresh_menu_id:
             CacheInfo.invalidateCachedThread(getApplicationContext());
             DownloadCommentsTask downloadCommentsTask = getNewDownloadCommentsTask();
-            if(downloadCommentsTask.getStatus() != AsyncTask.Status.RUNNING)
+            if(downloadCommentsTask.getStatus() != Status.RUNNING)
                 downloadCommentsTask.execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
             break;
         case R.id.sort_by_menu_id:
@@ -1491,6 +1526,11 @@ public class CommentsListActivity extends ListActivity
         int rowId = (int) info.id;
 
         ThingInfo item = mCommentsAdapter.getItem(rowId);
+
+        if(isContinueThisThreadPosition(rowId)) {
+            menu.add(0, Constants.DIALOG_FULL_CONTEXT, Menu.NONE, R.string.view_full_context);
+            return;
+        }
 
         menu.add(0, Constants.COPY_TEXT_CONTEXT_ITEM, Menu.NONE, "Copy Text");
 
@@ -1592,7 +1632,7 @@ public class CommentsListActivity extends ListActivity
 
             try {
                 startActivity(Intent.createChooser(intent, "Share Link"));
-            } catch (android.content.ActivityNotFoundException ex) {
+            } catch (ActivityNotFoundException ex) {
 
             }
 
@@ -1703,7 +1743,7 @@ public class CommentsListActivity extends ListActivity
 
             try {
                 startActivity(Intent.createChooser(intent2, getString(R.string.share_comments)));
-            } catch (android.content.ActivityNotFoundException ex) {
+            } catch (ActivityNotFoundException ex) {
 
             }
             return true;
@@ -1712,6 +1752,14 @@ public class CommentsListActivity extends ListActivity
         default:
             return super.onContextItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        String contextOPID = getContextOPID();
+        resetContextInfo();
+        getNewDownloadCommentsTask().withPositionTo(contextOPID);
+        getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
     }
 
     private void hideComment(int rowId) {
@@ -1776,6 +1824,17 @@ public class CommentsListActivity extends ListActivity
 
         String not_found_msg = getResources().getString(R.string.find_not_found, search_text);
         Toast.makeText(CommentsListActivity.this, not_found_msg, Toast.LENGTH_LONG).show();
+    }
+
+    private int findThingIdPosition(String thingId) {
+        for(int i=0; i<mCommentsAdapter.getCount(); i++) {
+            ThingInfo ci = mCommentsAdapter.getItem(i);
+            if(ci == null) continue;
+            if(ci.getId()!=null && ci.getId().equals(thingId)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private boolean getFoundPosition(int start_index, int end_index, String search_text) {
@@ -2329,7 +2388,7 @@ public class CommentsListActivity extends ListActivity
     /**
      * Called to "thaw" re-animate the app from a previous onSaveInstanceState().
      *
-     * @see android.app.Activity#onRestoreInstanceState
+     * @see Activity#onRestoreInstanceState
      */
     @Override
     protected void onRestoreInstanceState(Bundle state) {

@@ -68,6 +68,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     private String mSubreddit;
     private String mThreadId;
     private String mThreadTitle;
+    private String mThingInfoIdToPositionTo;
     private RedditSettings mSettings;
     private HttpClient mClient;
 
@@ -127,6 +128,11 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         this.mJumpToCommentContext = contextAmount;
     }
 
+    public DownloadCommentsTask withPositionTo(String thingId) {
+        this.mThingInfoIdToPositionTo = StringUtils.isEmpty(thingId) ? "" : thingId;
+        return this;
+    }
+
     /**
      * "load more comments" starting at this position
      * @param moreChildrenId The reddit thing-id of the "more" children comment
@@ -137,6 +143,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
         mMoreChildrenId = moreChildrenId;
         mPositionOffset = morePosition;
         mIndentation = indentation;
+        mThingInfoIdToPositionTo = "";
         return this;
     }
 
@@ -449,8 +456,18 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
 
         // Handle "more" entry
         if (Constants.MORE_KIND.equals(commentThingListing.getKind())) {
-            ci.setLoadMoreCommentsPlaceholder(true);
-            if (Constants.LOGGING) Log.v(TAG, "new more position at " + (insertedCommentIndex));
+            if(!Constants.CONTINUE_THIS_THREAD_KIND_ID.equals(commentThingListing.getData().getId())) {
+                ci.setLoadMoreCommentsPlaceholder(true);
+                if (Constants.LOGGING) Log.v(TAG, "new more position at " + (insertedCommentIndex));
+
+            }
+            else {
+                ci.setIsContinueThisThreadPlaceholder(true);
+                ci.setId(ci.getParent_id().replace(Constants.COMMENT_KIND+"_", ""));
+                if (Constants.LOGGING) Log.v(TAG, "new continue this thread position at " + (insertedCommentIndex));
+
+            }
+
             return insertedCommentIndex;
         }
 
@@ -504,6 +521,7 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
      * Process the slow steps and refresh each new comment
      */
     private void processDeferredComments() {
+        mProcessCommentsTask.withPositionTo(mThingInfoIdToPositionTo);
         mProcessCommentsTask.execute();
     }
 
