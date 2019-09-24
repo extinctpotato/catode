@@ -204,7 +204,6 @@ public class Constants {
     public static final String SUBMIT_KIND_POLL = "poll";
 
     public static final String DEFAULT_STRING   = "default";
-    public static final String CONTINUE_THIS_THREAD_KIND_ID = "_";
 
     // Sorting things
     public static final class ThreadsSort {

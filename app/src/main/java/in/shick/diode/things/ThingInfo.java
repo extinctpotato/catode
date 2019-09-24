@@ -120,7 +120,6 @@ public class ThingInfo implements Serializable, Parcelable {
     private boolean mIsLoadMoreCommentsPlaceholder = false;
     private boolean mIsHiddenCommentHead = false;
     private boolean mIsHiddenCommentDescendant = false;
-    private boolean mIsContinueThisThreadPlaceholder = false;
 
     public ThingInfo() {
         super();
@@ -332,10 +331,6 @@ public class ThingInfo implements Serializable, Parcelable {
         return mIsLoadMoreCommentsPlaceholder;
     }
 
-    public boolean isContinueThisThreadPlaceholder() {
-        return mIsContinueThisThreadPlaceholder;
-    }
-
     public boolean isHiddenCommentHead() {
         return mIsHiddenCommentHead;
     }
@@ -470,10 +465,6 @@ public class ThingInfo implements Serializable, Parcelable {
 
     public void setLoadMoreCommentsPlaceholder(boolean loadMoreCommentsPlaceholder) {
         mIsLoadMoreCommentsPlaceholder = loadMoreCommentsPlaceholder;
-    }
-
-    public void setIsContinueThisThreadPlaceholder(boolean mIsContinueThisThreadPlaceholder) {
-        this.mIsContinueThisThreadPlaceholder = mIsContinueThisThreadPlaceholder;
     }
 
     public void setName(String name) {

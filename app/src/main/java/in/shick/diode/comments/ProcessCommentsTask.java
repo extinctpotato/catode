@@ -11,7 +11,6 @@ import java.util.LinkedList;
 
 import in.shick.diode.R;
 import in.shick.diode.common.Constants;
-import in.shick.diode.common.util.StringUtils;
 import in.shick.diode.common.util.Util;
 import in.shick.diode.things.ThingInfo;
 
@@ -20,9 +19,6 @@ public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
     private static final String TAG = "ProcessCommentsSubTask";
 
     private final CommentsListActivity mActivity;
-
-    private String mThingInfoIdToPositionTo="";
-
 
     /**
      * List holding the deferred processing list starting from the first object to handle
@@ -51,12 +47,6 @@ public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
      */
     public ProcessCommentsTask(CommentsListActivity commentsListActivity) {
         this.mActivity = commentsListActivity;
-        this.mThingInfoIdToPositionTo = "";
-    }
-
-    public ProcessCommentsTask withPositionTo(String thingId) {
-        this.mThingInfoIdToPositionTo = StringUtils.isEmpty(thingId) ? "" : thingId;
-        return this;
     }
 
     public void addDeferred(DeferredCommentProcessing deferredCommentProcessing) {
@@ -97,18 +87,6 @@ public class ProcessCommentsTask extends AsyncTask<Void, Integer, Void> {
         }
         cleanupQueues();
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        positionToThingId();
-    }
-
-    private void positionToThingId() {
-        if(mActivity!=null && !StringUtils.isEmpty(mThingInfoIdToPositionTo )) {
-            mActivity.setToPosition(mThingInfoIdToPositionTo);
-        }
     }
 
     private void cleanupQueues() {
