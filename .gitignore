@@ -3,5 +3,6 @@ app/*.iml
 .idea/
 .gradle/
 app/build/
+app/release/
 local.properties
 build/
