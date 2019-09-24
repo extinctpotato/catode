@@ -4,3 +4,4 @@ app/*.iml
 .gradle/
 app/build/
 local.properties
+build/
