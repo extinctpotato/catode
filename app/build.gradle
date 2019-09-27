@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "in.shick.diode"
-        versionCode 25
-        versionName "1.3.2.1"
+        versionCode 26
+        versionName "1.3.2.2"
         minSdkVersion 4
         targetSdkVersion 26
     }
