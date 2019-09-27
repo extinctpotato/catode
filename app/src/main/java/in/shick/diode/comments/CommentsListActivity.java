@@ -420,12 +420,13 @@ public class CommentsListActivity extends ListActivity
         public static final int OP_ITEM_VIEW_TYPE = 0;
         public static final int COMMENT_ITEM_VIEW_TYPE = 1;
         public static final int MORE_ITEM_VIEW_TYPE = 2;
-        public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 3;
-        public static final int VIEWING_SINGLE_VIEW_TYPE = 4;
-        public static final int ARCHIVED_THREAD_VIEW_TYPE = 5;
-        public static final int LOCKED_THREAD_VIEW_TYPE = 6;
+        public static final int CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE = 3;
+        public static final int HIDDEN_ITEM_HEAD_VIEW_TYPE = 4;
+        public static final int VIEWING_SINGLE_VIEW_TYPE = 5;
+        public static final int ARCHIVED_THREAD_VIEW_TYPE = 6;
+        public static final int LOCKED_THREAD_VIEW_TYPE = 7;
         // The number of view types
-        public static final int VIEW_TYPE_COUNT = 7;
+        public static final int VIEW_TYPE_COUNT = 8;
 
         public boolean mIsLoading = true;
 
@@ -454,6 +455,8 @@ public class CommentsListActivity extends ListActivity
                 return HIDDEN_ITEM_HEAD_VIEW_TYPE;
             } else if (item.isLoadMoreCommentsPlaceholder()) {
                 return MORE_ITEM_VIEW_TYPE;
+            } else if (item.isContinueThisThreadPlaceholder()) {
+                return CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE;
             } else if (item.isContextPlaceholder()) {
                 return VIEWING_SINGLE_VIEW_TYPE;
             } else if (item.isArchivedPlaceholder()) {
@@ -571,6 +574,13 @@ public class CommentsListActivity extends ListActivity
                         loadAndStoreViewHolder(view);
                     }
                     setContextOPID(item.getId());
+                }
+                else if (isContinueThisThreadPosition(position)) {
+                    if (view == null) {
+                        view = mInflater.inflate(R.layout.continue_this_thread_view, null);
+                        loadAndStoreViewHolder(view);
+                    }
+                    setCommentIndent(view, item.getIndent(), mSettings);
                 } else if (item.isArchivedPlaceholder()) {
                     if (view == null) {
                         view = mInflater.inflate(R.layout.warning_banner_thread_list_item, null);
@@ -638,6 +648,12 @@ public class CommentsListActivity extends ListActivity
         this.mShouldClearReply = shouldClearReply;
     }
 
+    public void setToPosition(String thingId) {
+        if(!StringUtils.isEmpty(thingId)) {
+            getListView().setSelection(findThingIdPosition(thingId));
+        }
+    }
+
     private static void setCommentIndent(View commentListItemView, int indentLevel, RedditSettings settings) {
         View[] indentViews = ((ViewHolder)commentListItemView.getTag()).indentViews;
         for (int i = 0; i < indentLevel && i < indentViews.length; i++) {
@@ -676,6 +692,12 @@ public class CommentsListActivity extends ListActivity
             mReplyTargetName = mVoteTargetThing.getName();
         }
 
+        if(isContinueThisThreadPosition(position)) {
+            setContextOPID(item.getId());
+            setContextCount(1);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+        } else
+
         if (isLoadMoreCommentsPosition(position)) {
             // Use this constructor to tell it to load more comments inline
             getNewDownloadCommentsTask().prepareLoadMoreComments(item.getId(), position, item.getIndent())
@@ -696,6 +718,10 @@ public class CommentsListActivity extends ListActivity
             }
         }
     }
+
+    private boolean isContinueThisThreadPosition(int position) {
+         return mCommentsAdapter != null && mCommentsAdapter.getItemViewType(position) == CommentsListAdapter.CONTINUE_THIS_THREAD_ITEM_VIEW_TYPE;
+     }
 
     /**
      * Resets the output UI list contents, retains session state.
@@ -743,6 +769,10 @@ public class CommentsListActivity extends ListActivity
     private void resetContextInfo() {
         mContextOPID = null;
         mContextCount = 0;
+    }
+
+    private String getContextOPID() {
+        return mContextOPID;
     }
 
     private void setContextOPID(String contextOPID) {
@@ -1492,6 +1522,11 @@ public class CommentsListActivity extends ListActivity
 
         ThingInfo item = mCommentsAdapter.getItem(rowId);
 
+        if(isContinueThisThreadPosition(rowId)) {
+            menu.add(0, Constants.DIALOG_FULL_CONTEXT, Menu.NONE, R.string.view_full_context);
+            return;
+        }
+
         menu.add(0, Constants.COPY_TEXT_CONTEXT_ITEM, Menu.NONE, "Copy Text");
 
         if (rowId == 0) {
@@ -1714,6 +1749,18 @@ public class CommentsListActivity extends ListActivity
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        String contextOPID = getContextOPID();
+        if(contextOPID == null) {
+            super.onBackPressed();
+        } else {
+            resetContextInfo();
+            getNewDownloadCommentsTask().withPositionTo(contextOPID);
+            getNewDownloadCommentsTask().execute(Constants.DEFAULT_COMMENT_DOWNLOAD_LIMIT);
+        }
+    }
+
     private void hideComment(int rowId) {
         ThingInfo headComment = mCommentsAdapter.getItem(rowId);
         int myIndent = headComment.getIndent();
@@ -1776,6 +1823,17 @@ public class CommentsListActivity extends ListActivity
 
         String not_found_msg = getResources().getString(R.string.find_not_found, search_text);
         Toast.makeText(CommentsListActivity.this, not_found_msg, Toast.LENGTH_LONG).show();
+    }
+
+    private int findThingIdPosition(String thingId) {
+        for(int i=0; i<mCommentsAdapter.getCount(); i++) {
+            ThingInfo ci = mCommentsAdapter.getItem(i);
+            if(ci == null) continue;
+            if(ci.getId()!=null && ci.getId().equals(thingId)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private boolean getFoundPosition(int start_index, int end_index, String search_text) {
