@@ -57,6 +57,7 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
     protected String mLastAfter = null;
     protected String mLastBefore = null;
     protected int mLastCount = 0;
+    protected boolean mIsSearch = false;
     protected RedditSettings mSettings = new RedditSettings();
 
     //the GET parameters to be passed when performing a search
@@ -82,6 +83,15 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
         this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
         mSearchQuery = query;
         mSortSearch = sort;
+    }
+
+    public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
+                               String sortByUrl, String sortByUrlExtra,
+                               String subreddit, String query, String sort, boolean isSearch) {
+        this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
+        mSearchQuery = query;
+        mSortSearch = sort;
+        mIsSearch = isSearch;
     }
 
     public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
@@ -136,23 +146,42 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
             // If refreshing or something, use the previously used URL to get the threads.
             // Picking a new subreddit will erase the saved URL, getting rid of after= and before=.
             // subreddit.length != 0 means you are going Next or Prev, which creates new URL.
+
+            //Load front page task
             if (Constants.FRONTPAGE_STRING.equals(mSubreddit)) {
                 sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/").append(mSortByUrl)
                 .append(".json?").append(mSortByUrlExtra).append("&");
             }
-            //prepare a search query
-            else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit)) {
-                sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/search/").append(".json?q=")
-                .append(URLEncoder.encode(mSearchQuery, "utf8")).append("&sort=" + mSortSearch);
-            } else if(Constants.REDDIT_SAVED_STRING.equals(mSubreddit)) {
+
+            else if (mIsSearch) { //Search task
+                //No subreddit specified, search all of reddit
+                if (Constants.REDDIT_SEARCH_STRING.equals(mSubreddit) || mSubreddit == null) {
+                    sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/search/").append(".json?q=")
+                            .append(URLEncoder.encode(mSearchQuery, "utf8"))
+                            .append("&sort=" + mSortSearch);
+                } else {
+                    //Only search within specified subreddit
+                    sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/" + mSubreddit.trim() + "/search").append(".json?q=")
+                            .append(URLEncoder.encode(mSearchQuery, "utf8"))
+                            .append("&sort=" + mSortSearch)
+                            .append("&restrict_sr=on");
+                }
+            }
+
+            //Saved posts task
+            else if(Constants.REDDIT_SAVED_STRING.equals(mSubreddit)) {
                 // Appending the ? without query params is still valid.
                 sb = new StringBuilder(mDTTSavedURI.toString()).append('?');
-            } else {
+            }
+
+            //Load specified subreddit task
+            else {
                 sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
                 .append(mSubreddit.trim())
                 .append("/").append(mSortByUrl).append(".json?")
                 .append(mSortByUrlExtra).append("&");
             }
+
             // "before" always comes back null unless you provide correct "count"
             if (mAfter != null) {
                 // count: 25, 50, ...

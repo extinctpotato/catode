@@ -337,7 +337,7 @@ public final class ThreadsListActivity extends ListActivity {
                 //rather than having to use regex to split apart a string
                 //could probably do away with the "subreddit" field since we're
                 //using a modified constructor anyways
-                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(intent.getExtras().getString("searchurl"), intent.getExtras().getString("query"),intent.getExtras().getString("sort"));
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(intent.getExtras().getString("searchurl"), intent.getExtras().getString("query"),intent.getExtras().getString("sort"), true);
                 mObjectStates.mCurrentDownloadThreadsTask.execute();
             }
             break;
@@ -766,13 +766,13 @@ public final class ThreadsListActivity extends ListActivity {
             attach(ThreadsListActivity.this);
         }
 
-        public MyDownloadThreadsTask(String subreddit, String query, String sort) {
+        public MyDownloadThreadsTask(String subreddit, String query, String sort, boolean isSearch) {
             super(getApplicationContext(),
-                  ThreadsListActivity.this.mClient,
-                  ThreadsListActivity.this.mObjectMapper,
-                  ThreadsListActivity.this.mSortByUrl,
-                  ThreadsListActivity.this.mSortByUrlExtra,
-                  subreddit, query, sort);
+                    ThreadsListActivity.this.mClient,
+                    ThreadsListActivity.this.mObjectMapper,
+                    ThreadsListActivity.this.mSortByUrl,
+                    ThreadsListActivity.this.mSortByUrlExtra,
+                    subreddit, query, sort, isSearch);
             attach(ThreadsListActivity.this);
         }
 
@@ -1296,7 +1296,9 @@ public final class ThreadsListActivity extends ListActivity {
             Common.goHome(this);
             break;
         case R.id.search:
-            startActivityForResult(new Intent(this, RedditSearchActivity.class), Constants.ACTIVITY_SEARCH_REDDIT);
+            Intent intent = new Intent(this, RedditSearchActivity.class);
+            if (!mSubreddit.equals(Constants.FRONTPAGE_STRING)) intent.putExtra("subreddit", mSubreddit);
+            startActivityForResult(intent, Constants.ACTIVITY_SEARCH_REDDIT);
             break;
         case R.id.saved_comments_menu_id:
             Intent toSC = new Intent(getApplicationContext(), SavedCommentsActivity.class);

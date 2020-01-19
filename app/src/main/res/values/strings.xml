@@ -29,7 +29,8 @@
     <string name="search_title_prefix">[beta] Search: </string>
     <string name="search_hint">[beta] Search reddit</string>
     <string name="search_sort_label">Sort results by </string>
- 	<string-array name="search_results_sorting">
+	<string name="search_subreddit_hint">[Optional] subreddit</string>
+	<string-array name="search_results_sorting">
         <item>relevant</item>
         <item>new</item>
         <item>top</item>
