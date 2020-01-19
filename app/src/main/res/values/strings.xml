@@ -345,5 +345,7 @@
 
 	<!-- Miscellaneous Strings -->
 	<string name="comment_by_string">Comment by %s</string>
+    <string name="channel_name">Inbox</string>
+	<string name="channel_id">inbox</string>
 
 </resources>

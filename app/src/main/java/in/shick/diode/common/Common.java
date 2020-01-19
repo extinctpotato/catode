@@ -30,6 +30,7 @@ import android.app.*;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.telephony.PhoneNumberUtils;
 import android.text.Html;
 import android.view.ContextThemeWrapper;
@@ -480,25 +481,65 @@ public class Common {
 
 
     public static void newMailNotification(Context context, String mailNotificationStyle, int count) {
+
+        createNotificationChannel(context);
+
         Intent nIntent = new Intent(context, InboxActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, nIntent, 0);
-        Notification notification = new Notification(R.drawable.mail, Constants.HAVE_MAIL_TICKER, System.currentTimeMillis());
-        if (Constants.PREF_MAIL_NOTIFICATION_STYLE_BIG_ENVELOPE.equals(mailNotificationStyle)) {
+
+        Notification notification;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setContentTitle(Constants.HAVE_MAIL_TITLE);
+            builder.setContentText(count + (count == 1 ? " unread message" : " unread messages"));
+            builder.setContentIntent(contentIntent);
+            builder.setSmallIcon(R.drawable.mail);
+            builder.setTicker(Constants.HAVE_MAIL_TICKER);
+            builder.setDefaults(Notification.DEFAULT_SOUND);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId(context.getString(R.string.channel_id));
+            }
+            notification = builder.getNotification();
+        } else {
+            notification =  new Notification(R.drawable.mail, Constants.HAVE_MAIL_TICKER, System.currentTimeMillis());
+
             RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.big_envelope_notification);
             notification.contentView = contentView;
-        } else {
-            notification.setLatestEventInfo(context, Constants.HAVE_MAIL_TITLE,
-                                            count + (count == 1 ? " unread message" : " unread messages"), contentIntent);
+
+            //Had to remove for upgrading to Q, as we'd rather support newer than Honeycomb than older. Fixes welcome.
+
+/*            if (Constants.PREF_MAIL_NOTIFICATION_STYLE_BIG_ENVELOPE.equals(mailNotificationStyle)) {
+                RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.big_envelope_notification);
+                notification.contentView = contentView;
+            } else {
+                notification.extras.putString(Notification.EXTRA_TITLE, Constants.HAVE_MAIL_TITLE);
+                notification.setLatestEventInfo(context, Constants.HAVE_MAIL_TITLE,
+                        count + (count == 1 ? " unread message" : " unread messages"), contentIntent);
+            }*/
+            notification.defaults |= Notification.DEFAULT_SOUND;
+            notification.contentIntent = contentIntent;
         }
-        notification.defaults |= Notification.DEFAULT_SOUND;
+
         notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
-        notification.contentIntent = contentIntent;
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Constants.NOTIFICATION_HAVE_MAIL, notification);
     }
     public static void cancelMailNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(Constants.NOTIFICATION_HAVE_MAIL);
+    }
+
+    public static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context.getString(R.string.channel_name);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(context.getString(R.string.channel_id), name, importance);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 
