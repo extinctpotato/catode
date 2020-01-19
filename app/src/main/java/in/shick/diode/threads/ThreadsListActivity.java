@@ -1297,7 +1297,7 @@ public final class ThreadsListActivity extends ListActivity {
             break;
         case R.id.search:
             Intent intent = new Intent(this, RedditSearchActivity.class);
-            if (!mSubreddit.equals(Constants.FRONTPAGE_STRING)) intent.putExtra("subreddit", mSubreddit);
+            if (!mSubreddit.equals(Constants.FRONTPAGE_STRING) && !mSubreddit.equals(Constants.REDDIT_SEARCH_STRING)) intent.putExtra("subreddit", mSubreddit);
             startActivityForResult(intent, Constants.ACTIVITY_SEARCH_REDDIT);
             break;
         case R.id.saved_comments_menu_id:
