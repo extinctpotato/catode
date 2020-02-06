@@ -147,6 +147,7 @@ public final class ThreadsListActivity extends ListActivity {
     private String mSortByUrlExtra = "";
     private String mJumpToThreadId = null;
     private Uri mSavedUri = null;
+    private boolean mIsSearch = false;
     // End navigation variables
     private ObjectStates mObjectStates = null;
     // Menu
@@ -333,11 +334,24 @@ public final class ThreadsListActivity extends ListActivity {
             break;
         case Constants.ACTIVITY_SEARCH_REDDIT:
             if(resultCode==Activity.RESULT_OK) {
+
+                mSortByUrl = intent.getExtras().getString("sort");
+                Log.d(TAG, mSortByUrl);
+                if (mSortByUrl.equals(Constants.ThreadsSort.SORT_BY_NEW)) {
+                    Log.d(TAG, "setting extra");
+                    mSortByUrlExtra = Constants.ThreadsSort.SORT_BY_NEW_NEW_URL;
+                }
+
+
                 //changed it so each piece of data is passed separately as extras in the intent
                 //rather than having to use regex to split apart a string
                 //could probably do away with the "subreddit" field since we're
                 //using a modified constructor anyways
-                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(intent.getExtras().getString("searchurl"), intent.getExtras().getString("query"),intent.getExtras().getString("sort"), true);
+                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(intent.getExtras().getString("searchurl"),
+                        intent.getExtras().getString("query"),
+                        true);
+
+                mIsSearch = true;
                 mObjectStates.mCurrentDownloadThreadsTask.execute();
             }
             break;
@@ -766,13 +780,22 @@ public final class ThreadsListActivity extends ListActivity {
             attach(ThreadsListActivity.this);
         }
 
-        public MyDownloadThreadsTask(String subreddit, String query, String sort, boolean isSearch) {
+        public MyDownloadThreadsTask(String subreddit, String query, boolean isSearch) {
             super(getApplicationContext(),
                     ThreadsListActivity.this.mClient,
                     ThreadsListActivity.this.mObjectMapper,
                     ThreadsListActivity.this.mSortByUrl,
                     ThreadsListActivity.this.mSortByUrlExtra,
-                    subreddit, query, sort, isSearch);
+                    subreddit, query, isSearch);
+            attach(ThreadsListActivity.this);
+        }
+        public MyDownloadThreadsTask(String subreddit, String query, String after, String before, boolean isSearch) {
+            super(getApplicationContext(),
+                    ThreadsListActivity.this.mClient,
+                    ThreadsListActivity.this.mObjectMapper,
+                    ThreadsListActivity.this.mSortByUrl,
+                    ThreadsListActivity.this.mSortByUrlExtra,
+                    subreddit, query, after, before, isSearch);
             attach(ThreadsListActivity.this);
         }
 
@@ -1458,7 +1481,9 @@ public final class ThreadsListActivity extends ListActivity {
 
     private final OnClickListener downloadAfterOnClickListener = new OnClickListener() {
         public void onClick(View v) {
-            if (mSavedUri == null) {
+            if (mIsSearch) {
+                new MyDownloadThreadsTask(mSubreddit, mSearchQuery, mAfter, null, true).execute();
+            } else if (mSavedUri == null) {
                 new MyDownloadThreadsTask(mSubreddit, mAfter, null, mCount).execute();
             } else {
                 new MyDownloadThreadsTask(mSavedUri, mAfter, null, mCount).execute();
@@ -1467,7 +1492,9 @@ public final class ThreadsListActivity extends ListActivity {
     };
     private final OnClickListener downloadBeforeOnClickListener = new OnClickListener() {
         public void onClick(View v) {
-            if (mSavedUri == null) {
+            if (mIsSearch) {
+                new MyDownloadThreadsTask(mSubreddit, mSearchQuery, null, mBefore, true).execute();
+            } else if (mSavedUri == null) {
                 mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit, null, mBefore, mCount);
             } else {
                 mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSavedUri, null, mBefore, mCount);

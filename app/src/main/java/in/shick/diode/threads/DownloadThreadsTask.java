@@ -79,18 +79,24 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
 
     public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
                                String sortByUrl, String sortByUrlExtra,
-                               String subreddit, String query, String sort) {
+                               String subreddit, String query) {
         this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
         mSearchQuery = query;
-        mSortSearch = sort;
     }
 
     public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
                                String sortByUrl, String sortByUrlExtra,
-                               String subreddit, String query, String sort, boolean isSearch) {
+                               String subreddit, String query, boolean isSearch) {
         this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, null, null, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
         mSearchQuery = query;
-        mSortSearch = sort;
+        mIsSearch = isSearch;
+    }
+
+    public DownloadThreadsTask(Context context, HttpClient client, ObjectMapper om,
+                               String sortByUrl, String sortByUrlExtra,
+                               String subreddit, String query, String after, String before, boolean isSearch) {
+        this(context, client, om, sortByUrl, sortByUrlExtra, subreddit, after, before, Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT);
+        mSearchQuery = query;
         mIsSearch = isSearch;
     }
 
@@ -130,6 +136,8 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
             mSubreddit = Constants.FRONTPAGE_STRING;
         }
 
+        mSortSearch = sortByUrl;
+
         mAfter = after;
         mBefore = before;
         mCount = count;
@@ -157,14 +165,22 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
                 //No subreddit specified, search all of reddit
                 if (Constants.REDDIT_SEARCH_STRING.equals(mSubreddit) || mSubreddit == null) {
                     sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/search/").append(".json?q=")
-                            .append(URLEncoder.encode(mSearchQuery, "utf8"))
-                            .append("&sort=" + mSortSearch);
+                            .append(URLEncoder.encode(mSearchQuery, "utf8"));
+
+
+                        if (mSortSearch.endsWith("/")) mSortSearch = mSortSearch.substring(0, mSortSearch.length() - 1);
+                        sb.append("&sort=" + mSortSearch);
                 } else {
                     //Only search within specified subreddit
                     sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/" + mSubreddit.trim() + "/search").append(".json?q=")
-                            .append(URLEncoder.encode(mSearchQuery, "utf8"))
-                            .append("&sort=" + mSortSearch)
-                            .append("&restrict_sr=on");
+                            .append(URLEncoder.encode(mSearchQuery, "utf8"));
+
+                    if (mSortSearch.endsWith("/")) mSortSearch = mSortSearch.substring(0, mSortSearch.length() - 1);
+
+                    sb.append("&sort=" + mSortSearch);
+
+
+                    sb.append("&restrict_sr=on");
                 }
             }
 
@@ -185,13 +201,13 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
             // "before" always comes back null unless you provide correct "count"
             if (mAfter != null) {
                 // count: 25, 50, ...
-                sb = sb.append("count=").append(mCount)
+                sb = sb.append("&count=").append(mCount)
                      .append("&after=").append(mAfter).append("&");
                 isAfter = true;
             }
             else if (mBefore != null) {
                 // count: nothing, 26, 51, ...
-                sb = sb.append("count=").append(mCount + 1 - Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT)
+                sb = sb.append("&count=").append(mCount + 1 - Constants.DEFAULT_THREAD_DOWNLOAD_LIMIT)
                      .append("&before=").append(mBefore).append("&");
                 isBefore = true;
             }
