@@ -22,6 +22,7 @@ public class RedditSearchActivity extends Activity implements OnClickListener, O
 
     private Button btn;
     private EditText searchText;
+    private EditText searchSubreddit;
     private Spinner sortBy;
     private String mSort = Constants.DEFAULT_SEARCH_SORT; //default to show most relevant results first
 
@@ -44,12 +45,28 @@ public class RedditSearchActivity extends Activity implements OnClickListener, O
 
         searchText = (EditText) findViewById(R.id.searchText);
         searchText.setOnKeyListener(this);
+
+        searchSubreddit = (EditText) findViewById(R.id.searchSubreddit);
+        String subreddit = getIntent().getStringExtra("subreddit");
+        if (subreddit != null && !subreddit.trim().equals("")) {
+            searchSubreddit.setText(subreddit);
+        }
     }
 
     private void activityDone()
     {
         Intent intent = new Intent();
-        intent.putExtra("searchurl", "search");
+
+        String subreddit = searchSubreddit.getText().toString();
+        if (subreddit.equals("")) {
+            intent.putExtra("searchurl", "search");
+        } else {
+            intent.putExtra("searchurl", subreddit);
+        }
+
+//        intent.putExtra("searchurl", "search");
+
+
         String query = searchText.getText().toString();
         if(query == null) {
             query = Constants.DEFAULT_REDDIT_SEARCH;

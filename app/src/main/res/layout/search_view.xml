@@ -10,6 +10,19 @@
         </EditText>
         <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/searchButton" android:text="@string/search_button"></Button>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/searchSubreddit"
+            android:layout_weight="1"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_subreddit_hint">
+
+        </EditText>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
