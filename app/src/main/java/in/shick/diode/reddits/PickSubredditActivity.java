@@ -94,37 +94,10 @@ public final class PickSubredditActivity extends ListActivity {
     private final Object mCurrentTaskLock = new Object();
 
     public static final String[] DEFAULT_SUBREDDITS = {
-        Constants.FRONTPAGE_STRING,
-        "all",
-        "diode",
-        "pics",
-        "funny",
-        "politics",
-        "gaming",
-        "askreddit",
-        "worldnews",
-        "videos",
-        "iama",
-        "todayilearned",
-        "wtf",
-        "aww",
-        "technology",
-        "science",
-        "music",
-        "askscience",
-        "movies",
-        "bestof",
-        "fffffffuuuuuuuuuuuu",
-        "programming",
-        "comics",
-        "offbeat",
-        "environment",
-        "business",
-        "entertainment",
-        "economics",
-        "trees",
-        "linux",
-        "android"
+            Constants.FRONTPAGE_STRING,
+            "all",
+            "diode",
+            "askreddit"
     };
 
     // A list of special subreddits that can be viewed, but cannot be used for submissions. They inherit from the FakeSubreddit class
