@@ -45,9 +45,9 @@ public class HideTask extends AsyncTask<Void, Void, Boolean> {
         this.mContext = mContext;
         this.mHide = hide;
         if (hide) {
-            mUrl = Constants.REDDIT_BASE_URL + "/api/hide";
+            mUrl = Constants.HN_BASE_URL + "/api/hide";
         } else {
-            mUrl = Constants.REDDIT_BASE_URL + "/api/unhide";
+            mUrl = Constants.HN_BASE_URL + "/api/unhide";
         }
     }
 

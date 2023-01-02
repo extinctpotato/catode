@@ -157,14 +157,14 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
 
             //Load front page task
             if (Constants.FRONTPAGE_STRING.equals(mSubreddit)) {
-                sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/").append(mSortByUrl)
+                sb = new StringBuilder(Constants.HN_BASE_URL + "/").append(mSortByUrl)
                 .append(".json?").append(mSortByUrlExtra).append("&");
             }
 
             else if (mIsSearch) { //Search task
                 //No subreddit specified, search all of reddit
                 if (Constants.REDDIT_SEARCH_STRING.equals(mSubreddit) || mSubreddit == null) {
-                    sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/search/").append(".json?q=")
+                    sb = new StringBuilder(Constants.HN_BASE_URL + "/search/").append(".json?q=")
                             .append(URLEncoder.encode(mSearchQuery, "utf8"));
 
 
@@ -172,7 +172,7 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
                         sb.append("&sort=" + mSortSearch);
                 } else {
                     //Only search within specified subreddit
-                    sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/" + mSubreddit.trim() + "/search").append(".json?q=")
+                    sb = new StringBuilder(Constants.HN_BASE_URL + "/r/" + mSubreddit.trim() + "/search").append(".json?q=")
                             .append(URLEncoder.encode(mSearchQuery, "utf8"));
 
                     if (mSortSearch.endsWith("/")) mSortSearch = mSortSearch.substring(0, mSortSearch.length() - 1);
@@ -192,7 +192,7 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
 
             //Load specified subreddit task
             else {
-                sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
+                sb = new StringBuilder(Constants.HN_BASE_URL + "/r/")
                 .append(mSubreddit.trim())
                 .append("/").append(mSortByUrl).append(".json?")
                 .append(mSortByUrlExtra).append("&");

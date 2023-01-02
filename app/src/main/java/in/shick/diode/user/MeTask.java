@@ -17,7 +17,7 @@ public abstract class MeTask extends AsyncTask<Void, Void, Object> {
 
     private static final String TAG = "MeTask";
 
-    private static final String REQUEST_URL = Constants.REDDIT_BASE_URL + "/api/me.json";
+    private static final String REQUEST_URL = Constants.HN_BASE_URL + "/api/me.json";
 
     protected HttpClient mClient;
     protected long mContentLength = 0;

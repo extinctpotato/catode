@@ -255,7 +255,7 @@ public final class PickSubredditActivity extends ListActivity {
                 ArrayList<SubredditInfo> reddits = null;
                 if(refresh) {
 
-                    HttpGet request = new HttpGet(Constants.REDDIT_BASE_URL + "/subreddits/mine/subscriber.json?limit=100");
+                    HttpGet request = new HttpGet(Constants.HN_BASE_URL + "/subreddits/mine/subscriber.json?limit=100");
                     // Set timeout to 15 seconds
                     HttpParams params = request.getParams();
                     HttpConnectionParams.setConnectionTimeout(params, 15000);
@@ -275,7 +275,7 @@ public final class PickSubredditActivity extends ListActivity {
                         sr.description = ee.get("title").getTextValue();
                         sr.nsfw = ee.get("over18").getBooleanValue();
                         sr.subscribers = ee.get("subscribers").getIntValue();
-                        sr.url = new URL(Constants.REDDIT_BASE_URL + ee.get("url").getTextValue());
+                        sr.url = new URL(Constants.HN_BASE_URL + ee.get("url").getTextValue());
                         sr.created = new Date((long) ee.get("created").getIntValue() * 1000);
                         reddits.add(sr);
                     }

@@ -509,7 +509,7 @@ public final class InboxListActivity extends ListActivity
 
             try {
                 String url;
-                StringBuilder sb = new StringBuilder(Constants.REDDIT_BASE_URL + "/message/")
+                StringBuilder sb = new StringBuilder(Constants.HN_BASE_URL + "/message/")
                 .append(mWhichInbox)
                 .append("/.json?");
 
@@ -555,7 +555,7 @@ public final class InboxListActivity extends ListActivity
                 // XXX: HACK: http://code.reddit.com/ticket/709
                 // Marking messages as read is currently broken (even with mark=true)
                 // For now, just send an extra request to the regular non-JSON inbox
-                mClient.execute(new HttpGet(Constants.REDDIT_BASE_URL + "/message/" + mWhichInbox));
+                mClient.execute(new HttpGet(Constants.HN_BASE_URL + "/message/" + mWhichInbox));
 
                 mLastCount = mCount;
                 if (isAfter)
@@ -741,7 +741,7 @@ public final class InboxListActivity extends ListActivity
                 // Votehash is currently unused by reddit
 //    				nvps.add(new BasicNameValuePair("vh", "0d4ab0ffd56ad0f66841c15609e9a45aeec6b015"));
 
-                HttpPost httppost = new HttpPost(Constants.REDDIT_BASE_URL + "/api/read_message");
+                HttpPost httppost = new HttpPost(Constants.HN_BASE_URL + "/api/read_message");
                 httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
                 if (Constants.LOGGING) Log.d(TAG, nvps.toString());
@@ -852,7 +852,7 @@ public final class InboxListActivity extends ListActivity
                 // Votehash is currently unused by reddit
 //    				nvps.add(new BasicNameValuePair("vh", "0d4ab0ffd56ad0f66841c15609e9a45aeec6b015"));
 
-                HttpPost httppost = new HttpPost(Constants.REDDIT_BASE_URL + "/api/comment");
+                HttpPost httppost = new HttpPost(Constants.HN_BASE_URL + "/api/comment");
                 httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
                 if (Constants.LOGGING) Log.d(TAG, nvps.toString());

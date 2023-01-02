@@ -198,9 +198,9 @@ public class Util {
 
     public static String absolutePathToURL(String path) {
         if (path.startsWith("/"))
-            return Constants.REDDIT_BASE_URL + path;
+            return Constants.HN_BASE_URL + path;
         else if (path.startsWith("r/"))
-            return Constants.REDDIT_BASE_URL + "/" + path;
+            return Constants.HN_BASE_URL + "/" + path;
         return path;
     }
 
@@ -428,7 +428,7 @@ public class Util {
     // ===============
     static Uri createCommentUriNoContext(String linkId, String commentId)
     {
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/comments/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/comments/")
                          .append(linkId)
                          .append("/z/")
                          .append(commentId)
@@ -446,7 +446,7 @@ public class Util {
 
 
     static Uri createCommentUri(String linkId, String commentId, int commentContext) {
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/comments/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/comments/")
                          .append(linkId)
                          .append("/z/")
                          .append(commentId)
@@ -464,13 +464,13 @@ public class Util {
     }
 
     public static Uri createProfileUri(String username) {
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/user/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/user/")
                          .append(username)
                          .toString());
     }
 
     public static Uri createSavedUri(String username) {
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/user/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/user/")
                 .append(username)
                 .append("/saved.json")
                 .toString());
@@ -478,9 +478,9 @@ public class Util {
 
     public static Uri createSubmitUri(String subreddit) {
         if (Constants.FRONTPAGE_STRING.equals(subreddit))
-            return Uri.parse(Constants.REDDIT_BASE_URL + "/submit");
+            return Uri.parse(Constants.HN_BASE_URL + "/submit");
 
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/r/")
                          .append(subreddit)
                          .append("/submit")
                          .toString());
@@ -492,9 +492,9 @@ public class Util {
 
     public static Uri createSubredditUri(String subreddit) {
         if (Constants.FRONTPAGE_STRING.equals(subreddit))
-            return Uri.parse(Constants.REDDIT_BASE_URL + "/");
+            return Uri.parse(Constants.HN_BASE_URL + "/");
 
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/r/")
                          .append(subreddit)
                          .toString());
     }
@@ -504,7 +504,7 @@ public class Util {
     }
 
     public static Uri createThreadUri(String subreddit, String threadId) {
-        return Uri.parse(new StringBuilder(Constants.REDDIT_BASE_URL + "/r/")
+        return Uri.parse(new StringBuilder(Constants.HN_BASE_URL + "/r/")
                          .append(subreddit)
                          .append("/comments/")
                          .append(threadId)

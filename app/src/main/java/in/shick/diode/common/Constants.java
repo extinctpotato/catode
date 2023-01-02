@@ -364,12 +364,11 @@ public class Constants {
 
 
     // Reddit's base URL, without trailing slash
-    public static final String REDDIT_BASE_URL = "https://www.reddit.com";
-    public static final String REDDIT_SSL_BASE_URL = "https://www.reddit.com";
+    public static final String HN_BASE_URL = "https://hacker-news.firebaseio.com";
     public static final String REDDIT_LOGIN_URL = "https://www.reddit.com/api/login";
 
     // A short HTML file returned by reddit, so we can get the modhash
-    public static final String MODHASH_URL = REDDIT_BASE_URL + "/r";
+    public static final String MODHASH_URL = HN_BASE_URL + "/r";
     public static final String NSFW_STRING = "nsfw";
 
 

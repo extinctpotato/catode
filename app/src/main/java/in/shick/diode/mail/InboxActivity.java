@@ -253,7 +253,7 @@ public class InboxActivity extends TabActivity {
         Dialog _mDialog;
 
         public MyCaptchaCheckRequiredTask(Dialog dialog) {
-            super(Constants.REDDIT_BASE_URL + "/message/compose/", mClient);
+            super(Constants.HN_BASE_URL + "/message/compose/", mClient);
             _mDialog = dialog;
         }
 

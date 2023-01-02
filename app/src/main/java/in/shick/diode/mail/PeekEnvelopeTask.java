@@ -45,7 +45,7 @@ public class PeekEnvelopeTask extends MeTask {
             if (!me.isHas_mail() && !me.isHas_mod_mail())
                 return 0;
 
-            HttpGet request = new HttpGet(Constants.REDDIT_BASE_URL + "/message/inbox/.json?mark=false");
+            HttpGet request = new HttpGet(Constants.HN_BASE_URL + "/message/inbox/.json?mark=false");
             HttpResponse response = mClient.execute(request);
             entity = response.getEntity();
 

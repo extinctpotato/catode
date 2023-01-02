@@ -90,7 +90,6 @@ import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -1286,9 +1285,9 @@ public final class ThreadsListActivity extends ListActivity {
         case R.id.open_browser_menu_id:
             String url;
             if (mSubreddit.equals(Constants.FRONTPAGE_STRING))
-                url = Constants.REDDIT_BASE_URL;
+                url = Constants.HN_BASE_URL;
             else
-                url = Constants.REDDIT_BASE_URL + "/r/" + mSubreddit;
+                url = Constants.HN_BASE_URL + "/r/" + mSubreddit;
             Common.launchBrowser(mSettings, this, url, null, false, true, true, false);
             break;
         case R.id.light_dark_menu_id:

@@ -191,7 +191,7 @@ public class SubmitLinkActivity extends TabActivity {
             submitLinkReddit.setText("");
             submitTextReddit.setText("");
             submitLinkTitle.setText(submissionProperties.title);
-            mSubmitUrl = Constants.REDDIT_BASE_URL + "/submit";
+            mSubmitUrl = Constants.HN_BASE_URL + "/submit";
         } else {
             String submitPath = null;
             Uri data = getIntent().getData();
@@ -403,7 +403,7 @@ public class SubmitLinkActivity extends TabActivity {
                 // Votehash is currently unused by reddit
 //    				nvps.add(new BasicNameValuePair("vh", "0d4ab0ffd56ad0f66841c15609e9a45aeec6b015"));
 
-                HttpPost httppost = new HttpPost(Constants.REDDIT_BASE_URL + "/api/submit");
+                HttpPost httppost = new HttpPost(Constants.HN_BASE_URL + "/api/submit");
                 httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
                 // The progress dialog is non-cancelable, so set a shorter timeout than system's
                 HttpParams params = httppost.getParams();

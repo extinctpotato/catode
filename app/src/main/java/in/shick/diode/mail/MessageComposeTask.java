@@ -84,7 +84,7 @@ public abstract class MessageComposeTask extends AsyncTask<String, Void, Boolean
                 nvps.add(new BasicNameValuePair("captcha", _mCaptcha.toString()));
             }
 
-            HttpPost httppost = new HttpPost(Constants.REDDIT_BASE_URL + "/api/compose");
+            HttpPost httppost = new HttpPost(Constants.HN_BASE_URL + "/api/compose");
             httppost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
             if (Constants.LOGGING) Log.d(TAG, nvps.toString());

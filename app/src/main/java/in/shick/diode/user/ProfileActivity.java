@@ -604,7 +604,7 @@ public final class ProfileActivity extends ListActivity
                     mKarma = getKarma();
 
                 String url;
-                StringBuilder sb = new StringBuilder(Constants.REDDIT_BASE_URL).append("/user/").append(mUsername.trim()).append("/.json?");
+                StringBuilder sb = new StringBuilder(Constants.HN_BASE_URL).append("/user/").append(mUsername.trim()).append("/.json?");
 
                 if (mSortByUrl != null)
                     sb = sb.append(mSortByUrl).append("&");
@@ -690,7 +690,7 @@ public final class ProfileActivity extends ListActivity
          * @return [linkKarma, commentKarma]
          */
         private int[] getKarma() throws IOException {
-            String url = new StringBuilder(Constants.REDDIT_BASE_URL).append("/user/").append(mUsername.trim()).append("/about.json").toString();
+            String url = new StringBuilder(Constants.HN_BASE_URL).append("/user/").append(mUsername.trim()).append("/about.json").toString();
 
             if (Constants.LOGGING) Log.d(TAG, "karma url=" + url);
 
@@ -974,7 +974,7 @@ public final class ProfileActivity extends ListActivity
         Dialog _mDialog;
 
         public MyCaptchaCheckRequiredTask(Dialog dialog) {
-            super(Constants.REDDIT_BASE_URL + "/message/compose/", mClient);
+            super(Constants.HN_BASE_URL + "/message/compose/", mClient);
             _mDialog = dialog;
         }
 
