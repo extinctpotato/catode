@@ -559,15 +559,6 @@ public class Common {
                                      boolean saveHistory) {
 
 
-        //https://developer.android.com/about/versions/marshmallow/android-6.0-changes.html#behavior-bookmark-browser
-        //No more global history
-/*        try {
-            if (saveHistory) {
-                Browser.updateVisitedHistory(context.getContentResolver(), url, true);
-            }
-        } catch (Exception ex) {
-            if (Constants.LOGGING) Log.i(TAG, "Browser.updateVisitedHistory error", ex);
-        }*/
         boolean forceDesktopUserAgent = false;
         if (!bypassParser && settings != null && settings.isLoadImgurImagesDirectly()) {
             Matcher m = m_imgurRegex.matcher(url);
@@ -686,21 +677,6 @@ public class Common {
 
     public static boolean isClicked(Context context, String url) {
         Cursor cursor = null;
-
-        //https://developer.android.com/about/versions/marshmallow/android-6.0-changes.html#behavior-bookmark-browser
-        //No more global history
-        /*        try {
-            cursor = context.getContentResolver().query(
-                         Browser.BOOKMARKS_URI,
-                         Browser.HISTORY_PROJECTION,
-                         Browser.HISTORY_PROJECTION[Browser.HISTORY_PROJECTION_URL_INDEX] + "=?",
-                         new String[] { url },
-                         null
-                     );
-        } catch (Exception ex) {
-            if (Constants.LOGGING) Log.w(TAG, "Error querying Android Browser for history; manually revoked permission?", ex);
-            return false;
-        }*/
 
         if (cursor != null) {
             boolean isClicked = cursor.moveToFirst();  // returns true if cursor is not empty
