@@ -213,11 +213,6 @@ public abstract class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean>
             }
 
             url = sb.toString();
-            /*CharSequence text = (CharSequence)url;
-            int duration = Toast.LENGTH_LONG;
-            Toast toast = Toast.makeText(mContext, text, duration);
-            toast.show();*/
-            //https://pay.reddit.com/.json?&
             if (Constants.LOGGING) Log.d(TAG, "url=" + url);
 
             InputStream in = null;
