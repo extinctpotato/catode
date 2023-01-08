@@ -44,6 +44,7 @@ import in.shick.diode.search.RedditSearchActivity;
 import in.shick.diode.settings.RedditPreferencesPage;
 import in.shick.diode.settings.RedditSettings;
 import in.shick.diode.submit.SubmitLinkActivity;
+import in.shick.diode.things.HnItem;
 import in.shick.diode.things.ThingInfo;
 import in.shick.diode.threads.ShowThumbnailsTask.ThumbnailLoadAction;
 import in.shick.diode.user.ProfileActivity;
@@ -112,6 +113,7 @@ public final class ThreadsListActivity extends ListActivity {
     private static class ObjectStates {
         public MyDownloadThreadsTask mCurrentDownloadThreadsTask = null;
         public ArrayList<ThingInfo> mThreadsList = null;
+        public ArrayList<HnItem> mHnItemList = null;
     }
 
     private static final String TAG = "ThreadsListActivity";
@@ -722,6 +724,7 @@ public final class ThreadsListActivity extends ListActivity {
             if (threadsAdapter == null) {
                 // Reset the list to be empty.
                 mObjectStates.mThreadsList = new ArrayList<ThingInfo>();
+                mObjectStates.mHnItemList = new ArrayList<HnItem>();
                 mThreadsAdapter = new ThreadsListAdapter(this, mObjectStates.mThreadsList);
             } else {
                 mThreadsAdapter = threadsAdapter;
@@ -873,6 +876,7 @@ public final class ThreadsListActivity extends ListActivity {
             if (success) {
                 synchronized (THREAD_ADAPTER_LOCK) {
                     mObjectStates.mThreadsList.addAll(mThingInfos);
+                    mObjectStates.mHnItemList.addAll(mHnItemsList);
                     threadListActivity.mThreadsAdapter.notifyDataSetChanged();
                 }
 
