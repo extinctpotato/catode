@@ -161,7 +161,7 @@ public class Constants {
     // Strings
     public static final String NO_STRING = "no";
 
-    public static final String FRONTPAGE_STRING = "reddit front page";
+    public static final String FRONTPAGE_STRING = "topstories";
 
     public static final String REDDIT_SEARCH_STRING = "search";
     /* Subreddits can't have / or - characters in their name, ensure we don't confuse the /r/saved subreddit

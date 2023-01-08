@@ -94,20 +94,13 @@ public final class PickSubredditActivity extends ListActivity {
     private final Object mCurrentTaskLock = new Object();
 
     public static final String[] DEFAULT_SUBREDDITS = {
-            Constants.FRONTPAGE_STRING,
-            "all",
-            "diode",
-            "askreddit"
+            "topstories",
+            "newstories",
+            "beststories",
+            "askstories",
+            "showstories",
+            "jobstories"
     };
-
-    // A list of special subreddits that can be viewed, but cannot be used for submissions. They inherit from the FakeSubreddit class
-    // in the redditdev source, so we use the same naming here. Note: Should we add r/Random and r/Friends?
-    public static final String[] FAKE_SUBREDDITS = {
-        Constants.FRONTPAGE_STRING,
-        "all"
-    };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
