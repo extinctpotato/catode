@@ -2,6 +2,8 @@ package in.shick.diode.things;
 
 import java.util.List;
 
+import in.shick.diode.common.Constants;
+
 public class HnItem {
     private Long id;
     private boolean deleted;
@@ -139,4 +141,12 @@ public class HnItem {
     private String title;
     private List<Integer> parts;
     private Long descendants;
+
+    public Boolean isThreadKind() {
+        return getType().startsWith(Constants.THREAD_KIND);
+    }
+
+    // Placeholder just to satisfy the interface.
+    public Boolean isClicked() { return false; }
+    public Boolean getLikes() { return false; }
 }
