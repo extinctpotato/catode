@@ -247,13 +247,9 @@ public final class ThreadsListActivity extends ListActivity {
 
     private void setWindowTitle() {
         if (Constants.FRONTPAGE_STRING.equals(mSubreddit)) {
-            setTitle("reddit.com: your homepage");
-        } else if(Constants.REDDIT_SEARCH_STRING.equals(mSubreddit)) {
-            setTitle(getResources().getString(R.string.search_title_prefix) + mSearchQuery);
-        } else if(Constants.REDDIT_SAVED_STRING.equals(mSubreddit)) {
-            setTitle("Your Saved Posts");
+            setTitle(Constants.HN);
         } else {
-            setTitle("/r/" + mSubreddit.trim());
+            setTitle(Constants.HN + " " + mSubreddit.trim());
         }
     }
 
