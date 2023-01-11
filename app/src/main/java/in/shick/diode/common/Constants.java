@@ -54,8 +54,8 @@ public class Constants {
     public static final String USER_PATH_PATTERN_STRING = "/user/([^/]+)/?$";
 
 
-    public static final String COMMENT_KIND = "t1";
-    public static final String THREAD_KIND = "t3";
+    public static final String COMMENT_KIND = "comment";
+    public static final String THREAD_KIND = "story";
     public static final String MESSAGE_KIND = "t4";
     public static final String SUBREDDIT_KIND = "t5";
     public static final String MORE_KIND = "more";
@@ -371,5 +371,5 @@ public class Constants {
     public static final String MODHASH_URL = HN_BASE_URL + "/r";
     public static final String NSFW_STRING = "nsfw";
 
-
+    public static final String HN = "Hacker News";
 }
