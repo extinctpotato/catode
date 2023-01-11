@@ -89,6 +89,7 @@ import in.shick.diode.login.LoginDialog;
 import in.shick.diode.login.LoginTask;
 import in.shick.diode.mail.MessageComposeTask;
 import in.shick.diode.settings.RedditSettings;
+import in.shick.diode.things.HnItem;
 import in.shick.diode.things.Listing;
 import in.shick.diode.things.ListingData;
 import in.shick.diode.things.ThingInfo;
@@ -206,7 +207,7 @@ public final class ProfileActivity extends ListActivity
                 }
             } else {
                 // Orientation change. Use prior instance.
-                resetUI(new ThingsListAdapter(this, mThingsList));
+                //resetUI(new ThingsListAdapter(this, mThingsList));
                 setTitle(String.format(getResources().getString(R.string.user_profile), mUsername));
             }
             return;
@@ -272,7 +273,7 @@ public final class ProfileActivity extends ListActivity
 
 
 
-    private final class ThingsListAdapter extends ArrayAdapter<ThingInfo> {
+    private final class ThingsListAdapter extends ArrayAdapter<HnItem> {
         static final int THREAD_ITEM_VIEW_TYPE = 0;
         static final int COMMENT_ITEM_VIEW_TYPE = 1;
 
@@ -284,11 +285,11 @@ public final class ProfileActivity extends ListActivity
 
         @Override
         public int getItemViewType(int position) {
-            ThingInfo item = getItem(position);
-            if (item.getName().startsWith(Constants.THREAD_KIND)) {
+            HnItem item = getItem(position);
+            if (item.getType().startsWith(Constants.THREAD_KIND)) {
                 return THREAD_ITEM_VIEW_TYPE;
             }
-            if (item.getName().startsWith(Constants.COMMENT_KIND)) {
+            if (item.getType().startsWith(Constants.COMMENT_KIND)) {
                 return COMMENT_ITEM_VIEW_TYPE;
             }
             return COMMENT_ITEM_VIEW_TYPE;
@@ -305,7 +306,7 @@ public final class ProfileActivity extends ListActivity
             return super.isEmpty();
         }
 
-        public ThingsListAdapter(Context context, List<ThingInfo> objects) {
+        public ThingsListAdapter(Context context, List<HnItem> objects) {
             super(context, 0, objects);
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -314,7 +315,7 @@ public final class ProfileActivity extends ListActivity
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = null;
 
-            ThingInfo item = this.getItem(position);
+            HnItem item = this.getItem(position);
 
             if (getItemViewType(position) == THREAD_ITEM_VIEW_TYPE) {
                 // Here view may be passed in for re-use, or we make a new one.
@@ -335,7 +336,7 @@ public final class ProfileActivity extends ListActivity
                     view = convertView;
                 }
 
-                CommentsListActivity.fillCommentsListItemView(view, item, mSettings);
+                //CommentsListActivity.fillCommentsListItemView(view, item, mSettings);
                 view.setPadding(15, 5, 0, 5);
             }
 
@@ -350,12 +351,12 @@ public final class ProfileActivity extends ListActivity
      */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ThingInfo item = mThingsAdapter.getItem(position);
+        HnItem item = mThingsAdapter.getItem(position);
 
         // Mark the message/comment as selected
-        mVoteTargetThingInfo = item;
+        //mVoteTargetThingInfo = item;
 
-        if (item.getName().startsWith(Constants.THREAD_KIND)) {
+        if (item.getType().startsWith(Constants.THREAD_KIND)) {
             showDialog(Constants.DIALOG_THREAD_CLICK);
         } else {
             openContextMenu(v);
@@ -367,10 +368,10 @@ public final class ProfileActivity extends ListActivity
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
         int rowId = (int) info.id;
-        ThingInfo item = mThingsAdapter.getItem(rowId);
+        HnItem item = mThingsAdapter.getItem(rowId);
 
         // Mark the message/comment as selected
-        mVoteTargetThingInfo = item;
+        //mVoteTargetThingInfo = item;
 
         if (item.isThreadKind()) {
             menu.add(0, Constants.DIALOG_THREAD_CLICK, Menu.NONE, R.string.goto_thread);
@@ -454,8 +455,8 @@ public final class ProfileActivity extends ListActivity
         synchronized (MESSAGE_ADAPTER_LOCK) {
             if (messagesAdapter == null) {
                 // Reset the list to be empty.
-                mThingsList = new ArrayList<ThingInfo>();
-                mThingsAdapter = new ThingsListAdapter(this, mThingsList);
+                //mThingsList = new ArrayList<ThingInfo>();
+                //mThingsAdapter = new ThingsListAdapter(this, mThingsList);
             } else {
                 mThingsAdapter = messagesAdapter;
             }
@@ -803,10 +804,10 @@ public final class ProfileActivity extends ListActivity
             synchronized (mCurrentDownloadThingsTaskLock) {
                 mCurrentDownloadThingsTask = null;
             }
-            synchronized(MESSAGE_ADAPTER_LOCK) {
-                for (ThingInfo mi : _mThingInfos)
-                    mThingsAdapter.add(mi);
-            }
+            //synchronized(MESSAGE_ADAPTER_LOCK) {
+            //    for (ThingInfo mi : _mThingInfos)
+            //        mThingsAdapter.add(mi);
+            //}
 
             if (_mContentLength == -1)
                 getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);

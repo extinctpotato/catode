@@ -131,7 +131,7 @@ public final class ThreadsListActivity extends ListActivity {
     private final RedditSettings mSettings = new RedditSettings();
 
     // UI State
-    private ThingInfo mVoteTargetThing = null;
+    private HnItem mVoteTargetThing = null;
     private View mNextPreviousView = null;
 
     // Navigation that can be cached
@@ -218,7 +218,7 @@ public final class ThreadsListActivity extends ListActivity {
                 }
                 else {
                     // Orientation change. Use prior instance.
-                    resetUI(new ThreadsListAdapter(this, mObjectStates.mThreadsList));
+                    resetUI(new ThreadsListAdapter(this, mObjectStates.mHnItemList));
                     setWindowTitle();
                 }
             }
@@ -396,14 +396,14 @@ public final class ThreadsListActivity extends ListActivity {
         }
     }
 
-    final class ThreadsListAdapter extends ArrayAdapter<ThingInfo> {
+    final class ThreadsListAdapter extends ArrayAdapter<HnItem> {
         static final int THREAD_ITEM_VIEW_TYPE = 0;
         // The number of view types
         static final int VIEW_TYPE_COUNT = 1;
         public boolean mIsLoading = true;
         private final LayoutInflater mInflater;
 
-        public ThreadsListAdapter(Context context, List<ThingInfo> objects) {
+        public ThreadsListAdapter(Context context, List<HnItem> objects) {
             super(context, 0, objects);
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -439,7 +439,7 @@ public final class ThreadsListActivity extends ListActivity {
             } else {
                 view = convertView;
             }
-            ThingInfo item = this.getItem(position);
+            HnItem item = this.getItem(position);
 
             // Set the values of the Views for the ThreadsListItem
             fillThreadsListItemView(
@@ -471,7 +471,7 @@ public final class ThreadsListActivity extends ListActivity {
     public static void fillThreadsListItemView(
         int position,
         View view,
-        ThingInfo item,
+        HnItem item,
         ListActivity activity,
         HttpClient client,
         RedditSettings settings,
@@ -511,17 +511,17 @@ public final class ThreadsListActivity extends ListActivity {
                                                Util.getTextAppearanceResource(settings.getTheme(), android.R.style.TextAppearance_Large)),
                         0, titleLen, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        String domain = item.getDomain();
+        String domain = item.getUrl();
         if (domain == null)
             domain = "";
-        String flair = item.getLink_flair_text();
+        String flair = null;
         if(flair == null) {
             flair = "";
         } else {
             flair = "[" + flair + "] ";
         }
         int domainLen = domain.length() + flair.length();
-        SpannableString domainSS = new SpannableString(flair+"("+item.getDomain()+")");
+        SpannableString domainSS = new SpannableString(flair+"("+item.getUrl()+")");
         domainSS.setSpan(new TextAppearanceSpan(activity,
                                                 Util.getTextAppearanceResource(settings.getTheme(), android.R.style.TextAppearance_Small)),
                          0, domainLen+2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -550,10 +550,10 @@ public final class ThreadsListActivity extends ListActivity {
 
         vh.votesView.setText(String.format(Locale.US, "%d", item.getScore()));
         // Lock icon emoji
-        String preText = item.isLocked() ? "\uD83D\uDD12 " : "";
-        vh.numCommentsSubredditView.setText(preText + Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
+        String preText = item.isDead() ? "\uD83D\uDD12 " : "";
+        //vh.numCommentsSubredditView.setText(preText + Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
 
-        vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
+        //vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
 
         // Set the up and down arrow colors based on whether user likes
         if (settings.isLoggedIn()) {
@@ -578,45 +578,46 @@ public final class ThreadsListActivity extends ListActivity {
 
         // Thumbnails open links
         if (vh.thumbnailContainer != null) {
-            if (Common.shouldLoadThumbnails(activity, settings)) {
-                vh.thumbnailContainer.setVisibility(View.VISIBLE);
+            vh.thumbnailContainer.setVisibility(View.GONE);
+            //if (Common.shouldLoadThumbnails(activity, settings)) {
+            //    vh.thumbnailContainer.setVisibility(View.VISIBLE);
 
-                if (item.getUrl() != null) {
-                    OnClickListener thumbnailOnClickListener = thumbnailOnClickListenerFactory.getThumbnailOnClickListener(item, activity);
-                    if (thumbnailOnClickListener != null) {
-                        vh.thumbnailFrame.setOnClickListener(thumbnailOnClickListener);
-                    }
-                }
+            //    if (item.getUrl() != null) {
+            //        OnClickListener thumbnailOnClickListener = thumbnailOnClickListenerFactory.getThumbnailOnClickListener(item, activity);
+            //        if (thumbnailOnClickListener != null) {
+            //            vh.thumbnailFrame.setOnClickListener(thumbnailOnClickListener);
+            //        }
+            //    }
 
-                // Show thumbnail based on ThingInfo
-                if (Constants.NSFW_STRING.equalsIgnoreCase(item.getThumbnail()) || Constants.DEFAULT_STRING.equals(item.getThumbnail()) || Constants.SUBMIT_KIND_SELF.equals(item.getThumbnail()) || StringUtils.isEmpty(item.getThumbnail())) {
-                    vh.indeterminateProgressBar.setVisibility(View.GONE);
-                    vh.thumbnailImageView.setVisibility(View.VISIBLE);
-                    vh.thumbnailImageView.setImageResource(R.drawable.go_arrow);
-                }
-                else {
-                    if (item.getThumbnailBitmap() != null) {
-                        vh.indeterminateProgressBar.setVisibility(View.GONE);
-                        vh.thumbnailImageView.setVisibility(View.VISIBLE);
-                        vh.thumbnailImageView.setImageBitmap(item.getThumbnailBitmap());
-                    }
-                    else {
-                        vh.indeterminateProgressBar.setVisibility(View.VISIBLE);
-                        vh.thumbnailImageView.setVisibility(View.GONE);
-                        vh.thumbnailImageView.setImageBitmap(null);
-                        new ShowThumbnailsTask(activity, client, R.drawable.go_arrow).execute(new ThumbnailLoadAction(item, vh.thumbnailImageView, position, vh.indeterminateProgressBar));
-                    }
-                }
+            //    // Show thumbnail based on ThingInfo
+            //    if (Constants.NSFW_STRING.equalsIgnoreCase(item.getThumbnail()) || Constants.DEFAULT_STRING.equals(item.getThumbnail()) || Constants.SUBMIT_KIND_SELF.equals(item.getThumbnail()) || StringUtils.isEmpty(item.getThumbnail())) {
+            //        vh.indeterminateProgressBar.setVisibility(View.GONE);
+            //        vh.thumbnailImageView.setVisibility(View.VISIBLE);
+            //        vh.thumbnailImageView.setImageResource(R.drawable.go_arrow);
+            //    }
+            //    else {
+            //        if (item.getThumbnailBitmap() != null) {
+            //            vh.indeterminateProgressBar.setVisibility(View.GONE);
+            //            vh.thumbnailImageView.setVisibility(View.VISIBLE);
+            //            vh.thumbnailImageView.setImageBitmap(item.getThumbnailBitmap());
+            //        }
+            //        else {
+            //            vh.indeterminateProgressBar.setVisibility(View.VISIBLE);
+            //            vh.thumbnailImageView.setVisibility(View.GONE);
+            //            vh.thumbnailImageView.setImageBitmap(null);
+            //            new ShowThumbnailsTask(activity, client, R.drawable.go_arrow).execute(new ThumbnailLoadAction(item, vh.thumbnailImageView, position, vh.indeterminateProgressBar));
+            //        }
+            //    }
 
-                // Set thumbnail background based on current theme
-                if (Util.isLightTheme(settings.getTheme()))
-                    vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_light);
-                else
-                    vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_dark);
-            } else {
-                // if thumbnails disabled, hide thumbnail icon
-                vh.thumbnailContainer.setVisibility(View.GONE);
-            }
+            //    // Set thumbnail background based on current theme
+            //    if (Util.isLightTheme(settings.getTheme()))
+            //        vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_light);
+            //    else
+            //        vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_dark);
+            //} else {
+            //    // if thumbnails disabled, hide thumbnail icon
+            //    vh.thumbnailContainer.setVisibility(View.GONE);
+            //}
         }
     }
 
@@ -688,11 +689,11 @@ public final class ThreadsListActivity extends ListActivity {
      */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ThingInfo item = mThreadsAdapter.getItem(position);
+        HnItem item = mThreadsAdapter.getItem(position);
 
         // Mark the thread as selected
         mVoteTargetThing = item;
-        mJumpToThreadId = item.getId();
+        mJumpToThreadId = item.getId().toString();
 
         showDialog(Constants.DIALOG_THREAD_CLICK);
     }
@@ -725,7 +726,7 @@ public final class ThreadsListActivity extends ListActivity {
                 // Reset the list to be empty.
                 mObjectStates.mThreadsList = new ArrayList<ThingInfo>();
                 mObjectStates.mHnItemList = new ArrayList<HnItem>();
-                mThreadsAdapter = new ThreadsListAdapter(this, mObjectStates.mThreadsList);
+                mThreadsAdapter = new ThreadsListAdapter(this, mObjectStates.mHnItemList);
             } else {
                 mThreadsAdapter = threadsAdapter;
             }
@@ -1040,7 +1041,7 @@ public final class ThreadsListActivity extends ListActivity {
                 synchronized (THREAD_ADAPTER_LOCK) {
                     // Remove from list even if unhiding--because the only place you can
                     // unhide from is the list of Hidden threads.
-                    mThreadsAdapter.remove(mTargetThreadInfo);
+                    //mThreadsAdapter.remove(mTargetThreadInfo);
                     mThreadsAdapter.notifyDataSetChanged();
                 }
             }
@@ -1067,7 +1068,7 @@ public final class ThreadsListActivity extends ListActivity {
 
         AdapterView.AdapterContextMenuInfo info;
         info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        ThingInfo _item = mThreadsAdapter.getItem(info.position);
+        HnItem _item = mThreadsAdapter.getItem(info.position);
 
         mVoteTargetThing = _item;
 
@@ -1075,20 +1076,20 @@ public final class ThreadsListActivity extends ListActivity {
         menu.add(0, Constants.SHARE_CONTEXT_ITEM, 0, R.string.share);
         menu.add(0, Constants.OPEN_IN_BROWSER_CONTEXT_ITEM, 0, R.string.open_browser);
 
-        if(mSettings.isLoggedIn()) {
-            if(!_item.isSaved()) {
-                menu.add(0, Constants.SAVE_CONTEXT_ITEM, 0, "Save");
-            } else {
-                menu.add(0, Constants.UNSAVE_CONTEXT_ITEM, 0, "Unsave");
-            }
-            menu.add(0, Constants.HIDE_CONTEXT_ITEM, 0, "Hide");
-        }
+        //if(mSettings.isLoggedIn()) {
+        //    if(!_item.isSaved()) {
+        //        menu.add(0, Constants.SAVE_CONTEXT_ITEM, 0, "Save");
+        //    } else {
+        //        menu.add(0, Constants.UNSAVE_CONTEXT_ITEM, 0, "Unsave");
+        //    }
+        //    menu.add(0, Constants.HIDE_CONTEXT_ITEM, 0, "Hide");
+        //}
 
         // Make sure the user isn't '[deleted]'
-        if (!_item.isDeletedUser()) {
-            menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
-                     String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
-        }
+        //if (!_item.isDeletedUser()) {
+        //    menu.add(0, Constants.DIALOG_VIEW_PROFILE, Menu.NONE,
+        //             String.format(getResources().getString(R.string.user_profile), _item.getAuthor()));
+        //}
     }
 
     @Override
@@ -1096,57 +1097,58 @@ public final class ThreadsListActivity extends ListActivity {
         AdapterView.AdapterContextMenuInfo info;
         info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        ThingInfo _item = mThreadsAdapter.getItem(info.position);
+        HnItem _item = mThreadsAdapter.getItem(info.position);
 
-        switch (item.getItemId()) {
-        case Constants.VIEW_SUBREDDIT_CONTEXT_ITEM:
-            mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(_item.getSubreddit());
-            mObjectStates.mCurrentDownloadThreadsTask.execute();
-            return true;
+        //switch (item.getItemId()) {
+        //case Constants.VIEW_SUBREDDIT_CONTEXT_ITEM:
+        //    //mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(_item.getSubreddit());
+        //    //mObjectStates.mCurrentDownloadThreadsTask.execute();
+        //    return true;
 
-        case Constants.SHARE_CONTEXT_ITEM:
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, _item.getUrl());
-            intent.putExtra(Intent.EXTRA_SUBJECT, _item.getTitle());
-            try {
-                startActivity(Intent.createChooser(intent, "Share Link"));
-            } catch (android.content.ActivityNotFoundException ex) {
-                if (Constants.LOGGING) Log.e(TAG, "Share Link", ex);
-            }
-            return true;
+        //case Constants.SHARE_CONTEXT_ITEM:
+        //    Intent intent = new Intent();
+        //    intent.setAction(Intent.ACTION_SEND);
+        //    intent.setType("text/plain");
+        //    intent.putExtra(Intent.EXTRA_TEXT, _item.getUrl());
+        //    intent.putExtra(Intent.EXTRA_SUBJECT, _item.getTitle());
+        //    try {
+        //        startActivity(Intent.createChooser(intent, "Share Link"));
+        //    } catch (android.content.ActivityNotFoundException ex) {
+        //        if (Constants.LOGGING) Log.e(TAG, "Share Link", ex);
+        //    }
+        //    return true;
 
-        case Constants.OPEN_IN_BROWSER_CONTEXT_ITEM:
-            setLinkClicked(_item);
-            Common.launchBrowser(mSettings, this, _item.getUrl(), Util.createThreadUri(_item).toString(), false, true, true, mSettings.isSaveHistory());
-            return true;
+        //case Constants.OPEN_IN_BROWSER_CONTEXT_ITEM:
+        //    setLinkClicked(_item);
+        //    Common.launchBrowser(mSettings, this, _item.getUrl(), Util.createThreadUri(_item).toString(), false, true, true, mSettings.isSaveHistory());
+        //    return true;
 
-        case Constants.SAVE_CONTEXT_ITEM:
-            new SaveTask(true, _item, mSettings, getApplicationContext()).execute();
-            return true;
+        //case Constants.SAVE_CONTEXT_ITEM:
+        //    new SaveTask(true, _item, mSettings, getApplicationContext()).execute();
+        //    return true;
 
-        case Constants.UNSAVE_CONTEXT_ITEM:
-            new SaveTask(false, _item, mSettings, getApplicationContext()).execute();
-            return true;
+        //case Constants.UNSAVE_CONTEXT_ITEM:
+        //    new SaveTask(false, _item, mSettings, getApplicationContext()).execute();
+        //    return true;
 
-        case Constants.HIDE_CONTEXT_ITEM:
-            new MyHideTask(true, _item, mSettings, getApplicationContext()).execute();
-            return true;
+        //case Constants.HIDE_CONTEXT_ITEM:
+        //    new MyHideTask(true, _item, mSettings, getApplicationContext()).execute();
+        //    return true;
 
-        case Constants.UNHIDE_CONTEXT_ITEM:
-            new MyHideTask(false, _item, mSettings, getApplicationContext()).execute();
+        //case Constants.UNHIDE_CONTEXT_ITEM:
+        //    new MyHideTask(false, _item, mSettings, getApplicationContext()).execute();
 
-        case Constants.DIALOG_VIEW_PROFILE:
-            assert(!_item.isDeletedUser());
-            Intent i = new Intent(this, ProfileActivity.class);
-            i.setData(Util.createProfileUri(_item.getAuthor()));
-            startActivity(i);
-            return true;
+        //case Constants.DIALOG_VIEW_PROFILE:
+        //    assert(!_item.isDeletedUser());
+        //    Intent i = new Intent(this, ProfileActivity.class);
+        //    i.setData(Util.createProfileUri(_item.getAuthor()));
+        //    startActivity(i);
+        //    return true;
 
-        default:
-            return super.onContextItemSelected(item);
-        }
+        //default:
+        //    return super.onContextItemSelected(item);
+        //}
+        return true;
 
     }
 
@@ -1427,7 +1429,7 @@ public final class ThreadsListActivity extends ListActivity {
         case Constants.DIALOG_THREAD_CLICK:
             if (mVoteTargetThing == null)
                 break;
-            fillThreadClickDialog(dialog, mVoteTargetThing, mSettings, mThreadClickDialogOnClickListenerFactory);
+            //fillThreadClickDialog(dialog, mVoteTargetThing, mSettings, mThreadClickDialogOnClickListenerFactory);
             break;
 
         case Constants.DIALOG_SORT_BY:
@@ -1663,7 +1665,7 @@ public final class ThreadsListActivity extends ListActivity {
         state.putString(Constants.LAST_AFTER_KEY, mLastAfter);
         state.putString(Constants.LAST_BEFORE_KEY, mLastBefore);
         state.putInt(Constants.THREAD_LAST_COUNT_KEY, mLastCount);
-        state.putParcelable(Constants.VOTE_TARGET_THING_INFO_KEY, mVoteTargetThing);
+        //state.putParcelable(Constants.VOTE_TARGET_THING_INFO_KEY, mVoteTargetThing);
     }
 
     /**
