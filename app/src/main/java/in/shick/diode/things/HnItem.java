@@ -1,10 +1,14 @@
 package in.shick.diode.things;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.List;
 
 import in.shick.diode.common.Constants;
 
-public class HnItem {
+public class HnItem implements Serializable, Parcelable {
     private Long id;
     private boolean deleted;
     private String type;
@@ -149,4 +153,14 @@ public class HnItem {
     // Placeholder just to satisfy the interface.
     public Boolean isClicked() { return false; }
     public Boolean getLikes() { return false; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+    }
 }
