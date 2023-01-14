@@ -36,8 +36,6 @@ import in.shick.diode.things.Listing;
 import in.shick.diode.things.ListingData;
 import in.shick.diode.things.ThingInfo;
 import in.shick.diode.things.ThingListing;
-import in.shick.diode.threads.ShowThumbnailsTask;
-import in.shick.diode.threads.ShowThumbnailsTask.ThumbnailLoadAction;
 
 /**
  * Task takes in a subreddit name string and thread id, downloads its data, parses
@@ -58,9 +56,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
 
     private static AsyncTask<?, ?, ?> mCurrentDownloadCommentsTask = null;
     private static final Object mCurrentDownloadCommentsTaskLock = new Object();
-
-    private ShowThumbnailsTask mCurrentShowThumbnailsTask = null;
-    private final Object mCurrentShowThumbnailsTaskLock = new Object();
 
     private ProcessCommentsTask mProcessCommentsTask;
 
@@ -523,14 +518,6 @@ public class DownloadCommentsTask extends AsyncTask<Integer, Long, Boolean>
     }
 
     private void showOPThumbnail() {
-        if (mOpThingInfo != null) {
-            synchronized (mCurrentShowThumbnailsTaskLock) {
-                if (mCurrentShowThumbnailsTask != null)
-                    mCurrentShowThumbnailsTask.cancel(true);
-                mCurrentShowThumbnailsTask = new ShowThumbnailsTask(mActivity, mClient, null);
-            }
-            mCurrentShowThumbnailsTask.execute(new ThumbnailLoadAction(mOpThingInfo, null, 0));
-        }
     }
 
     @Override

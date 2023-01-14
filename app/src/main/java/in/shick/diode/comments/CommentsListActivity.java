@@ -495,11 +495,6 @@ public class CommentsListActivity extends ListActivity
                     //ThreadsListActivity.fillThreadsListItemView(
                     //    position, view, item, CommentsListActivity.this, mClient, mSettings, mThumbnailOnClickListenerFactory
                     //);
-                    if (item.isIs_self()) {
-                        View thumbnailContainer = view.findViewById(R.id.thumbnail_view);
-                        if (thumbnailContainer != null)
-                            thumbnailContainer.setVisibility(View.GONE);
-                    }
 
                     // In addition to stuff from ThreadsListActivity,
                     // we want to show selftext in CommentsListActivity.

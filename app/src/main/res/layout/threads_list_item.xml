@@ -139,48 +139,7 @@
 		        android:textAppearance="?android:attr/textAppearanceSmall"
 		    />
 		</LinearLayout>
-		
-		<LinearLayout android:id="@+id/thumbnail_view"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:orientation="horizontal">
-            
-            <View android:id="@+id/divider"
-                android:layout_width="1px"
-                android:layout_height="fill_parent"
-                android:layout_marginTop="5dip"
-                android:layout_marginBottom="5dip"
-                android:background="@drawable/divider_vertical_dark"
-            />
-            
-            <in.shick.diode.threads.DontPressWithParentFrameLayout
-                android:id="@+id/thumbnail_frame"
-                android:layout_width="?android:attr/listPreferredItemHeight"
-                android:layout_height="fill_parent"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                >
-                <ImageView android:id="@+id/thumbnail"
-                    android:layout_width="?android:attr/listPreferredItemHeight"
-                    android:layout_height="?android:attr/listPreferredItemHeight"
-                    android:paddingRight="5dp"
-                    android:src="@drawable/go_arrow"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="@string/thumbnail_content_description"
-                    android:visibility="gone"
-                />
-                
-                <ProgressBar android:id="@+id/indeterminate_progress"
-                    android:layout_width="?android:attr/listPreferredItemHeight"
-                    android:layout_height="?android:attr/listPreferredItemHeight"
-                    android:paddingRight="5dp"
-                    android:indeterminate="true"
-                    android:visibility="visible"
-                    />
-            </in.shick.diode.threads.DontPressWithParentFrameLayout>
-            
-        </LinearLayout>
-		
+
 	</LinearLayout>
 	
     <TextView android:id="@+id/selftext"

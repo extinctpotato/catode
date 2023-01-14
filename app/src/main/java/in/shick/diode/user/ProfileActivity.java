@@ -94,8 +94,6 @@ import in.shick.diode.things.Listing;
 import in.shick.diode.things.ListingData;
 import in.shick.diode.things.ThingInfo;
 import in.shick.diode.things.ThingListing;
-import in.shick.diode.threads.ShowThumbnailsTask;
-import in.shick.diode.threads.ShowThumbnailsTask.ThumbnailLoadAction;
 import in.shick.diode.threads.ThreadClickDialog;
 import in.shick.diode.threads.ThreadClickDialogOnClickListenerFactory;
 import in.shick.diode.threads.ThreadsListActivity;
@@ -833,12 +831,6 @@ public final class ProfileActivity extends ListActivity
     }
 
     private void showThumbnails(List<ThingInfo> thingInfos) {
-        int size = thingInfos.size();
-        ThumbnailLoadAction[] thumbnailLoadActions = new ThumbnailLoadAction[size];
-        for (int i = 0; i < thumbnailLoadActions.length; i++) {
-            thumbnailLoadActions[i] = new ThumbnailLoadAction(thingInfos.get(i), null, i);
-        }
-        new ShowThumbnailsTask(this, mClient, R.drawable.go_arrow).execute(thumbnailLoadActions);
     }
 
 

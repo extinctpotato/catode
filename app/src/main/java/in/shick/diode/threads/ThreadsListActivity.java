@@ -28,9 +28,7 @@ import in.shick.diode.common.Common;
 import in.shick.diode.common.Constants;
 import in.shick.diode.common.RedditIsFunHttpClientFactory;
 import in.shick.diode.common.tasks.HideTask;
-import in.shick.diode.common.tasks.SaveTask;
 import in.shick.diode.common.tasks.VoteTask;
-import in.shick.diode.common.util.StringUtils;
 import in.shick.diode.common.util.Util;
 import in.shick.diode.login.LoginDialog;
 import in.shick.diode.login.LoginTask;
@@ -46,7 +44,6 @@ import in.shick.diode.settings.RedditSettings;
 import in.shick.diode.submit.SubmitLinkActivity;
 import in.shick.diode.things.HnItem;
 import in.shick.diode.things.ThingInfo;
-import in.shick.diode.threads.ShowThumbnailsTask.ThumbnailLoadAction;
 import in.shick.diode.user.ProfileActivity;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -92,7 +89,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -442,10 +438,6 @@ public final class ThreadsListActivity extends ListActivity {
         TextView nsfwView;
         ImageView voteUpView;
         ImageView voteDownView;
-        View thumbnailContainer;
-        FrameLayout thumbnailFrame;
-        ImageView thumbnailImageView;
-        ProgressBar indeterminateProgressBar;
     }
 
     public static void fillThreadsListItemView(
@@ -468,18 +460,11 @@ public final class ThreadsListActivity extends ListActivity {
             vh.nsfwView = (TextView) view.findViewById(R.id.nsfw);
             vh.voteUpView = (ImageView) view.findViewById(R.id.vote_up_image);
             vh.voteDownView = (ImageView) view.findViewById(R.id.vote_down_image);
-            vh.thumbnailContainer = view.findViewById(R.id.thumbnail_view);
-            vh.thumbnailFrame = (FrameLayout) view.findViewById(R.id.thumbnail_frame);
-            vh.thumbnailImageView = (ImageView) view.findViewById(R.id.thumbnail);
-            vh.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
             view.setTag(vh);
         } else {
             vh = (ViewHolder)view.getTag();
         }
 
-        // Need to store the Thing's id in the thumbnail image so that the thumbnail loader task
-        // knows that the row is still displaying the requested thumbnail.
-        vh.thumbnailImageView.setTag(item.getId());
         // Set the title and domain using a SpannableStringBuilder
         SpannableStringBuilder builder = new SpannableStringBuilder();
         String title = item.getTitle();
@@ -557,50 +542,6 @@ public final class ThreadsListActivity extends ListActivity {
             vh.voteUpView.setImageResource(R.drawable.vote_up_gray);
             vh.voteDownView.setImageResource(R.drawable.vote_down_gray);
             vh.votesView.setTextColor(res.getColor(R.color.gray_75));
-        }
-
-        // Thumbnails open links
-        if (vh.thumbnailContainer != null) {
-            vh.thumbnailContainer.setVisibility(View.GONE);
-            //if (Common.shouldLoadThumbnails(activity, settings)) {
-            //    vh.thumbnailContainer.setVisibility(View.VISIBLE);
-
-            //    if (item.getUrl() != null) {
-            //        OnClickListener thumbnailOnClickListener = thumbnailOnClickListenerFactory.getThumbnailOnClickListener(item, activity);
-            //        if (thumbnailOnClickListener != null) {
-            //            vh.thumbnailFrame.setOnClickListener(thumbnailOnClickListener);
-            //        }
-            //    }
-
-            //    // Show thumbnail based on ThingInfo
-            //    if (Constants.NSFW_STRING.equalsIgnoreCase(item.getThumbnail()) || Constants.DEFAULT_STRING.equals(item.getThumbnail()) || Constants.SUBMIT_KIND_SELF.equals(item.getThumbnail()) || StringUtils.isEmpty(item.getThumbnail())) {
-            //        vh.indeterminateProgressBar.setVisibility(View.GONE);
-            //        vh.thumbnailImageView.setVisibility(View.VISIBLE);
-            //        vh.thumbnailImageView.setImageResource(R.drawable.go_arrow);
-            //    }
-            //    else {
-            //        if (item.getThumbnailBitmap() != null) {
-            //            vh.indeterminateProgressBar.setVisibility(View.GONE);
-            //            vh.thumbnailImageView.setVisibility(View.VISIBLE);
-            //            vh.thumbnailImageView.setImageBitmap(item.getThumbnailBitmap());
-            //        }
-            //        else {
-            //            vh.indeterminateProgressBar.setVisibility(View.VISIBLE);
-            //            vh.thumbnailImageView.setVisibility(View.GONE);
-            //            vh.thumbnailImageView.setImageBitmap(null);
-            //            new ShowThumbnailsTask(activity, client, R.drawable.go_arrow).execute(new ThumbnailLoadAction(item, vh.thumbnailImageView, position, vh.indeterminateProgressBar));
-            //        }
-            //    }
-
-            //    // Set thumbnail background based on current theme
-            //    if (Util.isLightTheme(settings.getTheme()))
-            //        vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_light);
-            //    else
-            //        vh.thumbnailFrame.setBackgroundResource(R.drawable.thumbnail_background_dark);
-            //} else {
-            //    // if thumbnails disabled, hide thumbnail icon
-            //    vh.thumbnailContainer.setVisibility(View.GONE);
-            //}
         }
     }
 
