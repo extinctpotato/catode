@@ -532,7 +532,7 @@ public final class ThreadsListActivity extends ListActivity {
         // Lock icon emoji
         String preText = item.isDead() ? "\uD83D\uDD12 " : "";
         vh.numCommentsSubredditView.setText(
-                preText + Util.showNumComments(item.getDescendants()) + "  " + item.getBy()
+                preText + Util.showNumComments(item.getDescendants()) + " | posted by " + item.getBy()
         );
 
         // There's no notion of NSFW posts on HN :)
