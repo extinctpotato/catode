@@ -494,7 +494,7 @@ public final class ThreadsListActivity extends ListActivity {
         String domain = item.getUrl();
         if (domain == null)
             domain = "";
-        String flair = null;
+        String flair = item.getType();
         if(flair == null) {
             flair = "";
         } else {
