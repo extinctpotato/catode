@@ -180,7 +180,7 @@ public class Util {
         return getTimeAgo((long)utcTimeSeconds, resources);
     }
 
-    public static String showNumComments(int comments) {
+    public static String showNumComments(Long comments) {
         if (comments == 1) {
             return "1 comment";
         } else {

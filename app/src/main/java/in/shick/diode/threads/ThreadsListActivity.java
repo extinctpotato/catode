@@ -531,7 +531,9 @@ public final class ThreadsListActivity extends ListActivity {
         vh.votesView.setText(String.format(Locale.US, "%d", item.getScore()));
         // Lock icon emoji
         String preText = item.isDead() ? "\uD83D\uDD12 " : "";
-        //vh.numCommentsSubredditView.setText(preText + Util.showNumComments(item.getNum_comments()) + "  " + item.getSubreddit());
+        vh.numCommentsSubredditView.setText(
+                preText + Util.showNumComments(item.getDescendants()) + "  " + item.getBy()
+        );
 
         //vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
 
