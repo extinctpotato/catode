@@ -112,7 +112,6 @@ public final class ThreadsListActivity extends ListActivity {
     // Mostly followed advise from http://stackoverflow.com/a/3821998/360844
     private static class ObjectStates {
         public MyDownloadThreadsTask mCurrentDownloadThreadsTask = null;
-        public ArrayList<ThingInfo> mThreadsList = null;
         public ArrayList<HnItem> mHnItemList = null;
     }
 
@@ -201,7 +200,7 @@ public final class ThreadsListActivity extends ListActivity {
 
             if (mObjectStates == null) {
                 mObjectStates = new ObjectStates();
-                if (mObjectStates.mThreadsList == null) {
+                if (mObjectStates.mHnItemList == null) {
                     // Load previous view of threads
                     if (mLastAfter != null) {
                         mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSubreddit, mLastAfter, null, mLastCount);
@@ -720,7 +719,6 @@ public final class ThreadsListActivity extends ListActivity {
         synchronized (THREAD_ADAPTER_LOCK) {
             if (threadsAdapter == null) {
                 // Reset the list to be empty.
-                mObjectStates.mThreadsList = new ArrayList<ThingInfo>();
                 mObjectStates.mHnItemList = new ArrayList<HnItem>();
                 mThreadsAdapter = new ThreadsListAdapter(this, mObjectStates.mHnItemList);
             } else {
@@ -872,7 +870,6 @@ public final class ThreadsListActivity extends ListActivity {
 
             if (success) {
                 synchronized (THREAD_ADAPTER_LOCK) {
-                    mObjectStates.mThreadsList.addAll(mThingInfos);
                     mObjectStates.mHnItemList.addAll(mHnItemsList);
                     threadListActivity.mThreadsAdapter.notifyDataSetChanged();
                 }
