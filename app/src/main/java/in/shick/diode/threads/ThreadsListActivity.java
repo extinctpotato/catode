@@ -222,21 +222,6 @@ public final class ThreadsListActivity extends ListActivity {
                 }
             }
         }
-        // Handle subreddit Uri passed via Intent
-        else if (getIntent().getData() != null) {
-            mObjectStates = new ObjectStates();
-            Matcher redditContextMatcher = REDDIT_PATH_PATTERN.matcher(getIntent().getData().getPath());
-            if (redditContextMatcher.matches()) {
-                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(redditContextMatcher.group(1));
-            } else if (getIntent().getData().toString().toLowerCase().endsWith("/saved.json")) {
-                mSavedUri = getIntent().getData();
-                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(getIntent().getData());
-            } else {
-                mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSettings.getHomepage());
-            }
-            mObjectStates.mCurrentDownloadThreadsTask.execute();
-        }
-        // No subreddit specified by Intent, so load the user's home reddit
         else {
             mObjectStates = new ObjectStates();
             mObjectStates.mCurrentDownloadThreadsTask = new MyDownloadThreadsTask(mSettings.getHomepage());
