@@ -535,7 +535,8 @@ public final class ThreadsListActivity extends ListActivity {
                 preText + Util.showNumComments(item.getDescendants()) + "  " + item.getBy()
         );
 
-        //vh.nsfwView.setVisibility(item.isOver_18() ? View.VISIBLE : View.GONE);
+        // There's no notion of NSFW posts on HN :)
+        vh.nsfwView.setVisibility(View.GONE);
 
         // Set the up and down arrow colors based on whether user likes
         if (settings.isLoggedIn()) {
